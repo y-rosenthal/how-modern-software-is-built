@@ -1,156 +1,171 @@
 <section class="session" id="session-4">
   <div class="eyebrow">Session 4 · 75 minutes</div>
-  <h2>Identity, Security, and Software Beyond the Browser</h2>
-  <p class="goal">Every architecture so far has quietly assumed the server knows who is asking. This session explains how it finds out: passwords, cookies and sessions, Basic Auth, and OAuth, the mechanism behind every "Sign in with Google" button. We then widen the lens from websites to phone apps, installed programs, and embedded devices, and finish with where AI services fit in the picture.</p>
+  <h2>Hosting, Scaling, and the Cloud</h2>
+  <p class="goal">So far everything has run on one laptop. This session moves the bakery onto the internet and then grows it, one step at a time, from a single rented server to the distributed architecture used by companies serving millions of people. Each step is motivated by a specific problem the previous step could not solve, and each step has a price tag.</p>
 
   <div class="objectives">
     <h4>By the end of this session students can</h4>
     <ul>
-      <li>Distinguish authentication from authorization with examples.</li>
-      <li>Explain why passwords are hashed and what multi-factor authentication adds.</li>
-      <li>Describe how a cookie keeps a user logged in across stateless requests.</li>
-      <li>Explain HTTP Basic Authentication and why it is only acceptable over HTTPS.</li>
-      <li>Walk through the OAuth authorization-code flow and explain what it protects.</li>
-      <li>Compare web, native mobile, cross-platform, desktop, and embedded software and describe how all of them use the same back end.</li>
-      <li>Explain where an AI model such as Claude sits in a product's architecture.</li>
+      <li>Explain what deployment means and name the standard environments code moves through.</li>
+      <li>Describe the single-server setup and its main weakness.</li>
+      <li>Explain why the database is moved to its own machine.</li>
+      <li>Describe horizontal scaling, load balancing, and why servers must be stateless.</li>
+      <li>Say what a cache, a CDN, and object storage each do.</li>
+      <li>Distinguish IaaS, PaaS, SaaS, and serverless, and know when each is a sensible choice.</li>
     </ul>
   </div>
 
   <table class="agenda">
     <thead><tr><th>Section</th><th>Minutes</th></tr></thead>
     <tbody>
-      <tr><td><a href="#s4-1">4.1 Authentication versus authorization</a></td><td>8</td></tr>
-      <tr><td><a href="#s4-2">4.2 Passwords done right</a></td><td>8</td></tr>
-      <tr><td><a href="#s4-3">4.3 Staying logged in: cookies, sessions, and tokens</a></td><td>10</td></tr>
-      <tr><td><a href="#s4-4">4.4 HTTP Basic Authentication and API keys</a></td><td>7</td></tr>
-      <tr><td><a href="#s4-5">4.5 OAuth: how "Sign in with Google" works</a></td><td>15</td></tr>
-      <tr><td><a href="#s4-6">4.6 Security basics every product owner should know</a></td><td>7</td></tr>
-      <tr><td><a href="#s4-7">4.7 Beyond the browser: mobile, desktop, embedded</a></td><td>10</td></tr>
-      <tr><td><a href="#s4-8">4.8 Where AI fits</a></td><td>5</td></tr>
+      <tr><td><a href="#s4-1">4.1 From localhost to production</a></td><td>10</td></tr>
+      <tr><td><a href="#s4-2">4.2 Step 1: everything on one server</a></td><td>10</td></tr>
+      <tr><td><a href="#s4-3">4.3 Step 2: give the database its own machine</a></td><td>10</td></tr>
+      <tr><td><a href="#s4-4">4.4 Step 3: many web servers behind a load balancer</a></td><td>15</td></tr>
+      <tr><td><a href="#s4-5">4.5 Step 4: caches, CDNs, and storage</a></td><td>10</td></tr>
+      <tr><td><a href="#s4-6">4.6 The cloud menu: IaaS, PaaS, SaaS, serverless</a></td><td>10</td></tr>
+      <tr><td><a href="#s4-7">4.7 Shipping code safely</a></td><td>5</td></tr>
     </tbody>
     <tfoot><tr><td>Review questions and buffer</td><td>5</td></tr></tfoot>
   </table>
 </section>
 
 <section id="s4-1-wrap">
-<h3 id="s4-1">4.1 Authentication versus authorization <span class="time">8 min</span></h3>
-<p>Two words that sound alike and are constantly confused, even by professionals. Keep them apart with two questions.</p>
-<ul>
-  <li><dfn class="kw" id="kw-authentication" data-def="Verifying that someone is who they claim to be, typically by checking a password, a code from their phone, a fingerprint, or a token issued by a trusted identity provider. Answers 'Who are you?' Often shortened to 'authn'.">Authentication</dfn> answers <em>"Who are you?"</em> It is the act of proving identity: a password, a code from your phone, a fingerprint, or a login through Google. Shortened to "authn" or just "auth".</li>
-  <li><dfn class="kw" id="kw-authorization" data-def="Deciding what an already-identified user is allowed to do: view this order, edit that page, approve a refund. Answers 'What may you do?' Often shortened to 'authz'.">Authorization</dfn> answers <em>"What are you allowed to do?"</em> Once the system knows you are Dana, may Dana see order 90? May Dana see <em>Sam's</em> order 88? May Dana issue a refund? Shortened to "authz".</li>
-</ul>
-<div class="analogy"><span class="label">Analogy</span><p>An office building. Showing your badge at the front desk is authentication: they confirm you are an employee. Which doors your badge opens is authorization: the server room is not among them unless you are in IT. A guest badge authenticates you as a visitor and authorizes almost nothing.</p></div>
-<p>Authorization is usually organised through <dfn class="kw" id="kw-role" data-def="A named bundle of permissions assigned to users, such as customer, staff, or administrator, so that access rules are written once per role instead of once per person. Role-based access control (RBAC) is the common name for this approach.">roles</dfn>: customer, staff, manager, administrator. Rules are written per role ("staff may mark orders ready; only managers may refund") and users are assigned roles. Deciding the roles and rules of a product is a business question, not a technical one, and it is one you should expect to answer when you build something.</p>
-<p>A rule of thumb that catches most authorization bugs in the wild: <strong>every request that touches a specific record must check that <em>this</em> user may touch <em>this</em> record.</strong> Systems that check "is the user logged in?" but forget "is this their order?" allow anyone to read anyone's data by changing the number in the URL. This exact flaw has produced many of the largest data leaks of the last decade.</p>
+<h3 id="s4-1">4.1 From localhost to production <span class="time">10 min</span></h3>
+<p>The bakery's back end works beautifully at <code>http://localhost:5000</code>. Moving it to a place where customers can reach it is called <dfn class="kw" id="kw-deployment" data-def="The act of putting a version of your software onto servers where real users can reach it. 'We deployed on Tuesday' means Tuesday's version went live.">deployment</dfn>. "Deploy" is one of the most frequently used verbs in a software team, and it means exactly this: take the code that works here and make it run there.</p>
+<p>Serious teams do not deploy straight from a laptop to customers. Code passes through <dfn class="kw" id="kw-environment" data-def="A complete, separate copy of the application and its supporting services used for one purpose. Development (the programmer's own machine), staging (a private replica of production for testing), and production (the live system real users use) are the standard three.">environments</dfn>, each a full copy of the application with its own database:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Environment</th><th>Who uses it</th><th>Purpose</th><th>Data</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Development</strong> ("dev", "local")</td><td>Each programmer, on their own computer</td><td>Write and try code freely; break things</td><td>Fake or sample data</td></tr>
+    <tr><td><strong>Staging</strong> ("test", "QA")</td><td>The team, testers, sometimes the client</td><td>A private replica of production to check a release before customers see it</td><td>Realistic but not real (or anonymised)</td></tr>
+    <tr><td><strong>Production</strong> ("prod", "live")</td><td>Real customers</td><td>The actual business</td><td>Real; protected and backed up</td></tr>
+  </tbody>
+</table>
+</div>
+<p>"It works on my machine" is the oldest joke in software precisely because development and production differ: different operating system, different database size, different traffic, different secrets. Staging exists to catch those differences before a customer does. When a founder asks "can we just push it live?" the honest engineering answer is "only if you would be comfortable finding the bugs at the same moment your customers do."</p>
+<p>Two measures describe how well a production system is doing. <dfn class="kw" id="kw-uptime" data-def="The fraction of time a service is working and reachable, usually quoted as a percentage. 99.9% uptime ('three nines') allows about 9 hours of downtime a year; 99.99% allows about 53 minutes.">Uptime</dfn> is the percentage of time it is reachable; each extra "nine" is dramatically more expensive to achieve. <dfn class="kw" id="kw-latency" data-def="The delay between a request being sent and the response arriving, usually measured in milliseconds. Users notice anything over about 100 ms; a page taking more than 3 seconds loses a large fraction of visitors.">Latency</dfn> is how long each request takes to answer. Much of the architecture in this session exists to push uptime up and latency down.</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Uptime</th><th>Downtime allowed per year</th><th>Typical of</th></tr></thead>
+  <tbody>
+    <tr><td>99%</td><td>About 3.7 days</td><td>A hobby site on one cheap server</td></tr>
+    <tr><td>99.9% ("three nines")</td><td>About 8.8 hours</td><td>A small business product with sensible hosting</td></tr>
+    <tr><td>99.99% ("four nines")</td><td>About 53 minutes</td><td>Payment, banking, large SaaS. Requires redundancy at every layer</td></tr>
+    <tr><td>99.999% ("five nines")</td><td>About 5 minutes</td><td>Telecom, critical infrastructure. Very expensive</td></tr>
+  </tbody>
+</table>
+</div>
 </section>
 
 <section id="s4-2-wrap">
-<h3 id="s4-2">4.2 Passwords done right <span class="time">8 min</span></h3>
-<p>The oldest authentication method is a shared secret: the user and the server both know the password. The obvious design, storing each user's password in the database next to their email, is also the most dangerous thing a product can do. If the database is ever stolen (and databases are stolen constantly), every password is exposed, and since people reuse passwords, so are their bank and email accounts.</p>
-<p>The correct design stores a <dfn class="kw" id="kw-hash" data-def="A fixed-length scramble of some input produced by a one-way mathematical function: the same input always gives the same hash, but the hash cannot be reversed to recover the input. Passwords are stored as hashes so that a stolen database does not reveal them.">hash</dfn> of the password instead. A hash function turns any input into a fixed-length scramble in a way that cannot be reversed. <code>correct-horse-battery</code> might hash to <code>$2b$12$K9xT…</code>. To check a login, the server hashes what the user typed and compares the two scrambles. The server never needs the original password, and a thief who steals the database gets scrambles they cannot turn back into passwords. (Details you may hear: passwords are "salted," meaning a random value is mixed in so identical passwords do not produce identical hashes, and slow algorithms such as bcrypt or argon2 are used so that guessing billions of passwords takes years.)</p>
-<p>The lesson for a product owner is simple and non-negotiable: <strong>if a system can email you your old password, it is storing passwords wrongly.</strong> A correctly built system can only reset a password, never reveal it.</p>
-<p>Passwords alone are weak because people choose bad ones and reuse them. <dfn class="kw" id="kw-mfa" data-def="Multi-Factor Authentication: requiring two or more independent proofs of identity, typically something you know (a password) plus something you have (a code from your phone, a hardware key) or something you are (a fingerprint). Blocks most account takeovers even when the password is stolen.">Multi-factor authentication</dfn> (MFA, or two-factor, 2FA) adds a second, independent proof: something you <em>have</em> (a code from an authenticator app or a hardware key) or something you <em>are</em> (a fingerprint or face) on top of something you <em>know</em> (the password). A stolen password alone then no longer opens the account. Every serious product should offer it, and every business should require it for staff accounts. Newer <em>passkeys</em> go further and replace passwords with a cryptographic key stored on your device, unlocked by fingerprint or face; they are becoming the default on major platforms.</p>
+<h3 id="s4-2">4.2 Step 1: everything on one server <span class="time">10 min</span></h3>
+<p>The simplest deployment is to rent one computer in a data center and install everything on it. Cloud companies rent these by the hour or month as <dfn class="kw" id="kw-vps" data-def="Virtual Private Server: a rented slice of a physical server in a data center that behaves like your own dedicated computer, with its own operating system, IP address, and disk. The cheapest way to run a back end on the internet; typically 5 to 50 dollars a month.">virtual private servers</dfn> (VPS) from providers such as DigitalOcean, Linode, Hetzner, or Amazon's EC2, for as little as 5 dollars a month. "Virtual" because one powerful physical machine is carved into several independent virtual ones, each of which feels to its renter like a whole computer.</p>
+<p>On that one machine you install:</p>
+<ul>
+  <li>An <dfn class="kw" id="kw-operating-system" data-def="The base software that manages a computer's hardware and runs programs: Linux on almost all servers, Windows and macOS on desktops, iOS and Android on phones.">operating system</dfn>, almost always Linux on servers. Linux is free, stable, and what nearly all server software is built for. Windows and macOS run desktops; iOS and Android run phones; Linux runs the internet.</li>
+  <li>The web server program (Nginx is the usual choice), which accepts connections on ports 80 and 443, handles HTTPS, serves the static files itself, and forwards dynamic requests to the back end.</li>
+  <li>Your back-end program (the Python/Flask app), listening on an internal port such as 5000.</li>
+  <li>The database (PostgreSQL), listening on its own internal port, 5432 by convention.</li>
+</ul>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 250" role="img" aria-label="Browsers on the internet connect through DNS to one rented server that runs the web server program, the back-end application, and the database together.">
+  <defs>
+    <marker id="arr8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- users -->
+  <rect x="20" y="60" width="110" height="36" rx="6" class="d-box"/><text x="75" y="83" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="106" width="110" height="36" rx="6" class="d-box"/><text x="75" y="129" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="152" width="110" height="36" rx="6" class="d-box"/><text x="75" y="175" class="d-t" text-anchor="middle">Phone app</text>
+  <text x="75" y="215" class="d-ts" text-anchor="middle">Customers, anywhere</text>
+  <!-- internet -->
+  <text x="205" y="118" class="d-ts" text-anchor="middle">the internet</text>
+  <line x1="135" y1="124" x2="275" y2="124" class="d-line-hi" marker-end="url(#arr8)"/>
+  <text x="205" y="142" class="d-ts" text-anchor="middle">HTTPS, port 443</text>
+  <!-- server -->
+  <rect x="280" y="20" width="420" height="210" rx="12" class="d-zone"/>
+  <text x="490" y="42" class="d-tl" text-anchor="middle">One rented server (VPS), Linux, IP 203.0.113.7</text>
+  <rect x="300" y="70" width="110" height="110" rx="6" class="d-hi"/>
+  <text x="355" y="115" class="d-th" text-anchor="middle">Web server</text>
+  <text x="355" y="132" class="d-ts" text-anchor="middle">Nginx</text>
+  <text x="355" y="148" class="d-ts" text-anchor="middle">HTTPS, static files</text>
+  <rect x="440" y="70" width="110" height="110" rx="6" class="d-box"/>
+  <text x="495" y="115" class="d-t" text-anchor="middle">Back end</text>
+  <text x="495" y="132" class="d-ts" text-anchor="middle">Python app</text>
+  <text x="495" y="148" class="d-ts" text-anchor="middle">port 5000</text>
+  <rect x="580" y="70" width="105" height="110" rx="6" class="d-box"/>
+  <text x="632" y="115" class="d-t" text-anchor="middle">Database</text>
+  <text x="632" y="132" class="d-ts" text-anchor="middle">PostgreSQL</text>
+  <text x="632" y="148" class="d-ts" text-anchor="middle">port 5432</text>
+  <line x1="415" y1="125" x2="435" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <line x1="555" y1="125" x2="575" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <text x="490" y="210" class="d-ts" text-anchor="middle">All three programs share one processor, one memory, one disk, one power supply</text>
+</svg>
+</div>
+<figcaption><b>Step 1: the single-server deployment.</b> Simple, cheap, and enough for thousands of daily visitors. Every component shares the same hardware, so every component shares the same fate.</figcaption>
+</figure>
+<p>Do not underestimate this setup. A modest 20-dollar server can comfortably handle tens of thousands of visits a day, which covers most small businesses and every early-stage prototype. Its weaknesses only appear with growth:</p>
+<ul>
+  <li><strong>Single point of failure.</strong> If the machine's disk dies, or the data center loses power, or you make a mistake while updating it, the website and the database disappear together. A <dfn class="kw" id="kw-spof" data-def="Any single component whose failure takes the whole system down. Removing single points of failure by adding duplicates is the main way to increase uptime.">single point of failure</dfn> is the enemy of uptime.</li>
+  <li><strong>Resource contention.</strong> The database and the back end compete for the same memory and processor. A heavy report query can make the website slow for every visitor.</li>
+  <li><strong>Hard ceiling.</strong> When traffic outgrows the machine, the only option is a bigger machine, and machines do not get infinitely big.</li>
+  <li><strong>Security blast radius.</strong> If an attacker breaks into the web server, they are already sitting on the same machine as all the customer data.</li>
+</ul>
+<p>Each of the following steps removes one of these weaknesses, and each adds cost and complexity. Good architecture means taking the next step when the problem is real, not before.</p>
 </section>
 
 <section id="s4-3-wrap">
-<h3 id="s4-3">4.3 Staying logged in: cookies, sessions, and tokens <span class="time">10 min</span></h3>
-<p>Session 3 established that HTTP is stateless: each request arrives with no memory of the last. Yet you log in once and stay logged in for weeks. How does the server recognise you on the second request?</p>
-<p>The mechanism is the <dfn class="kw" id="kw-cookie" data-def="A small piece of text a server asks the browser to store and to send back automatically with every future request to that site. The standard way a website recognises a returning browser, most importantly to keep you logged in.">cookie</dfn>. When you log in successfully, the server's response includes an instruction: "browser, please store this piece of text and send it back to me with every future request." The browser obeys automatically. The text is usually a <dfn class="kw" id="kw-session" data-def="The server's record that a particular user has logged in, identified by a long random session ID that is stored in the user's cookie. On each request the server looks up the ID to learn who is asking. Sessions expire after a period or on logout.">session ID</dfn>: a long random string that means nothing by itself but which the server has recorded in its session store (the Redis box in Session 3) alongside "this is Dana, logged in at 8:14, expires in 14 days." Each request carries the cookie; the server looks up the ID; now it knows who is asking. Log out, and the server deletes the record so the ID becomes worthless.</p>
+<h3 id="s4-3">4.3 Step 2: give the database its own machine <span class="time">10 min</span></h3>
+<p>The first thing to move off the shared server is the database. It goes onto a second machine, a dedicated <dfn class="kw" id="kw-database-server" data-def="A machine (or managed cloud service) whose only job is to run the database, separate from the servers that run the application. Allows the two to be sized, secured, and scaled independently.">database server</dfn>, and the back end connects to it over the network instead of talking to it on the same box.</p>
 <figure>
 <div class="scroll">
-<svg class="seq" viewBox="0 0 720 300" role="img" aria-label="Login sequence: the browser posts email and password; the server checks the hash, creates a session record, and replies with a Set-Cookie header; the browser stores the cookie and sends it with every later request; the server looks up the session ID to identify the user.">
+<svg viewBox="0 0 720 260" role="img" aria-label="Two servers: a public web server running Nginx and the Python back end, and a database server reachable only over a private network. Customers reach the web server; only the web server reaches the database.">
   <defs>
-    <marker id="arr14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+    <marker id="arr9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
   </defs>
-  <rect x="30" y="16" width="130" height="34" rx="6" class="d-box"/><text x="95" y="38" class="d-tl" text-anchor="middle">Browser</text>
-  <rect x="380" y="16" width="130" height="34" rx="6" class="d-hi"/><text x="445" y="38" class="d-th" text-anchor="middle">Back end</text>
-  <rect x="570" y="16" width="130" height="34" rx="6" class="d-box"/><text x="635" y="38" class="d-tl" text-anchor="middle">Session store</text>
-  <line x1="95" y1="50" x2="95" y2="290" class="d-line-dash"/>
-  <line x1="445" y1="50" x2="445" y2="290" class="d-line-dash"/>
-  <line x1="635" y1="50" x2="635" y2="290" class="d-line-dash"/>
-  <!-- 1 login -->
-  <line x1="100" y1="80" x2="440" y2="80" class="d-line" marker-end="url(#arr14)"/>
-  <circle cx="112" cy="70" r="8" class="d-num"/><text x="112" y="73.5" class="d-numt" text-anchor="middle">1</text>
-  <text x="270" y="74" class="d-ts" text-anchor="middle">POST /login  {email, password}   (over HTTPS)</text>
-  <!-- 2 check -->
-  <rect x="365" y="92" width="160" height="30" rx="4" class="d-box-plain"/>
-  <text x="445" y="106" class="d-ts" text-anchor="middle">2. hash(password) matches</text>
-  <text x="445" y="118" class="d-ts" text-anchor="middle">stored hash? yes</text>
-  <!-- 3 store session -->
-  <line x1="450" y1="140" x2="630" y2="140" class="d-line" marker-end="url(#arr14)"/>
-  <circle cx="462" cy="130" r="8" class="d-num"/><text x="462" y="133.5" class="d-numt" text-anchor="middle">3</text>
-  <text x="545" y="134" class="d-ts" text-anchor="middle">save: a8f3…c9 = Dana, 14 days</text>
-  <!-- 4 set cookie -->
-  <line x1="440" y1="170" x2="100" y2="170" class="d-line-hi" marker-end="url(#arr14)"/>
-  <circle cx="428" cy="160" r="8" class="d-num"/><text x="428" y="163.5" class="d-numt" text-anchor="middle">4</text>
-  <text x="270" y="164" class="d-ts" text-anchor="middle">200 OK   Set-Cookie: session=a8f3…c9</text>
-  <rect x="30" y="182" width="130" height="24" rx="4" class="d-box-plain"/>
-  <text x="95" y="198" class="d-ts" text-anchor="middle">browser stores cookie</text>
-  <!-- 5 later request -->
-  <line x1="100" y1="230" x2="440" y2="230" class="d-line-hi" marker-end="url(#arr14)"/>
-  <circle cx="112" cy="220" r="8" class="d-num"/><text x="112" y="223.5" class="d-numt" text-anchor="middle">5</text>
-  <text x="270" y="224" class="d-ts" text-anchor="middle">GET /api/orders   Cookie: session=a8f3…c9</text>
-  <!-- 6 lookup -->
-  <line x1="450" y1="255" x2="630" y2="255" class="d-line" marker-end="url(#arr14)"/>
-  <circle cx="462" cy="245" r="8" class="d-num"/><text x="462" y="248.5" class="d-numt" text-anchor="middle">6</text>
-  <text x="545" y="249" class="d-ts" text-anchor="middle">who is a8f3…c9?  → Dana</text>
-  <line x1="440" y1="282" x2="100" y2="282" class="d-line" marker-end="url(#arr14)"/>
-  <circle cx="428" cy="272" r="8" class="d-num"/><text x="428" y="275.5" class="d-numt" text-anchor="middle">7</text>
-  <text x="270" y="276" class="d-ts" text-anchor="middle">200 OK   Dana's orders only</text>
+  <rect x="20" y="95" width="110" height="36" rx="6" class="d-box"/><text x="75" y="118" class="d-t" text-anchor="middle">Customers</text>
+  <line x1="135" y1="113" x2="195" y2="113" class="d-line-hi" marker-end="url(#arr9)"/>
+  <text x="165" y="104" class="d-ts" text-anchor="middle">HTTPS</text>
+  <!-- web server -->
+  <rect x="200" y="30" width="220" height="170" rx="12" class="d-zone"/>
+  <text x="310" y="52" class="d-tl" text-anchor="middle">Web server (public IP)</text>
+  <rect x="220" y="75" width="80" height="100" rx="6" class="d-hi"/>
+  <text x="260" y="120" class="d-th" text-anchor="middle">Nginx</text>
+  <text x="260" y="138" class="d-ts" text-anchor="middle">HTTPS, static</text>
+  <rect x="320" y="75" width="80" height="100" rx="6" class="d-box"/>
+  <text x="360" y="120" class="d-t" text-anchor="middle">Back end</text>
+  <text x="360" y="138" class="d-ts" text-anchor="middle">Python</text>
+  <line x1="305" y1="125" x2="315" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <!-- db server -->
+  <rect x="500" y="30" width="200" height="170" rx="12" class="d-zone"/>
+  <text x="600" y="52" class="d-tl" text-anchor="middle">Database server (private IP)</text>
+  <rect x="540" y="75" width="120" height="100" rx="6" class="d-box"/>
+  <text x="600" y="115" class="d-t" text-anchor="middle">PostgreSQL</text>
+  <text x="600" y="133" class="d-ts" text-anchor="middle">more memory,</text>
+  <text x="600" y="147" class="d-ts" text-anchor="middle">fast disks, backups</text>
+  <line x1="405" y1="125" x2="535" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <text x="470" y="116" class="d-ts" text-anchor="middle">SQL over the</text>
+  <text x="470" y="145" class="d-ts" text-anchor="middle">private network</text>
+  <!-- blocked -->
+  <line x1="75" y1="150" x2="75" y2="230" class="d-line-dash"/>
+  <line x1="75" y1="230" x2="580" y2="230" class="d-line-dash"/>
+  <line x1="580" y1="230" x2="580" y2="212" class="d-line-dash"/>
+  <circle cx="330" cy="230" r="11" fill="var(--surface)" stroke="currentColor" stroke-width="1.4"/>
+  <line x1="324" y1="224" x2="336" y2="236" stroke="currentColor" stroke-width="2"/>
+  <line x1="336" y1="224" x2="324" y2="236" stroke="currentColor" stroke-width="2"/>
+  <text x="330" y="253" class="d-ts" text-anchor="middle">No path from the internet to the database. Only the web server may connect.</text>
 </svg>
 </div>
-<figcaption><b>How a login survives stateless HTTP.</b> The password is sent exactly once. Afterwards a random session ID in a cookie stands in for it, and any web server can look the ID up in the shared session store.</figcaption>
+<figcaption><b>Step 2: the database moves to its own machine on a private network.</b> The public internet can reach the web server but not the database. Each machine can now be sized for its own job.</figcaption>
 </figure>
-<p>Three consequences worth drawing out:</p>
+<p>Why this is worth the second bill:</p>
 <ul>
-  <li><strong>The cookie is as good as the password while it lasts.</strong> Anyone who copies the session cookie can act as Dana until it expires. This is why cookies are marked to be sent only over HTTPS and never be readable by JavaScript, and why sensitive actions (changing the password, paying) often ask for the password again.</li>
-  <li><strong>This is how any web server in a load-balanced pool can serve Dana.</strong> The identity travels with the request; the facts live in the shared store. Stateless servers, from Session 3, depend on exactly this.</li>
-  <li><strong>Cookies are also how advertising tracks people.</strong> The same mechanism that remembers your login lets a third-party advertising server recognise your browser across every site that shows its ads. Cookie-consent banners and privacy laws exist because of that second use, not the first.</li>
+  <li><strong>Right-sized hardware.</strong> Databases want lots of memory and fast disks; web servers want processor cores and network bandwidth. Separated, each can be bought for what it actually needs.</li>
+  <li><strong>Security.</strong> The database server gets a <dfn class="kw" id="kw-private-network" data-def="A network inside a data center or cloud account that is not reachable from the public internet. Databases and internal services are placed on it so that only your own servers can connect to them.">private network</dfn> address only. There is no route from the internet to it. A <dfn class="kw" id="kw-firewall" data-def="A rule set on a network or server that decides which connections are allowed in or out, for example 'accept web traffic on port 443 from anywhere; accept database connections on port 5432 only from the web server'.">firewall</dfn> allows connections on port 5432 only from the web server. An attacker who compromises the web server still has another wall to get through, and no one can stumble across the customer records from outside.</li>
+  <li><strong>Independent failure and maintenance.</strong> The web server can be rebuilt, upgraded, or replaced without touching a byte of data. Backups of the database run without slowing the website.</li>
+  <li><strong>It unlocks the next step.</strong> With the data in one shared place, you can now run more than one copy of the web server, which is what Step 3 does.</li>
 </ul>
-<p>Mobile apps and APIs often use a variant: instead of a random ID that the server looks up, the server issues a <dfn class="kw" id="kw-token" data-def="A string handed to a client after it authenticates, which the client then attaches to each request as proof of identity, instead of sending a password every time. Session IDs, API keys, JSON Web Tokens (JWTs), and OAuth access tokens are all kinds of tokens.">token</dfn>: a signed piece of text that itself says "Dana, valid until Friday" and cannot be forged because it carries a signature only the server could produce. The most common format is the JSON Web Token (JWT, said "jot"). The client sends the token in an <code>Authorization</code> header rather than a cookie. The concept is identical: prove who you are once, receive a credential, present the credential thereafter.</p>
-</section>
-
-<section id="s4-4-wrap">
-<h3 id="s4-4">4.4 HTTP Basic Authentication and API keys <span class="time">7 min</span></h3>
-<p>Before cookies and tokens there was the simplest possible scheme, built into HTTP itself and still in use: <dfn class="kw" id="kw-basic-auth" data-def="The simplest authentication method built into HTTP: the client sends the username and password, encoded (not encrypted) in Base64, in an Authorization header on every request. Acceptable only over HTTPS, and used mainly for internal tools, quick protection of staging sites, and some APIs.">HTTP Basic Authentication</dfn>. When a server requires it, the browser pops up its own plain grey username/password box (you have probably seen one on a router or a staging site). The browser then attaches the credentials to <em>every</em> request:</p>
-<pre><code>GET /admin/reports HTTP/1.1
-Host: www.rosenthalsbakery.com
-Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
-<p>That jumble after <code>Basic</code> is not encryption. It is <dfn class="kw" id="kw-base64" data-def="A way of writing any data using only letters, digits, and a few symbols so it can travel safely in text. It is encoding, not encryption: anyone can decode it instantly. Basic Auth uses it to pack 'username:password' into one header.">Base64</dfn> encoding of the text <code>dana:correct-horse</code>, and anyone can decode it in a second. Basic Auth therefore has two rules and two uses:</p>
-<div class="two-col">
-<div>
-<h4>Rules</h4>
-<ul>
-  <li>Only ever over HTTPS. Over plain HTTP the password crosses the network in the clear on every request.</li>
-  <li>Only for things where a shared, static password is acceptable. There is no logout, no expiry, no second factor.</li>
-</ul>
-</div>
-<div>
-<h4>Where you still meet it</h4>
-<ul>
-  <li>Putting a quick password in front of a staging site so the public cannot see it.</li>
-  <li>Internal tools and admin pages for a handful of staff.</li>
-  <li>Some APIs, where the "username" is an account ID and the "password" is a key. Stripe's API, for instance, accepts your secret key this way.</li>
-</ul>
-</div>
-</div>
-<figure>
-<div class="scroll">
-<svg viewBox="0 0 720 150" role="img" aria-label="A browser sends a request with a Basic Authorization header containing Base64 of username colon password on every request; the server decodes it and checks the password. An HTTPS wrapper around the whole exchange is the only thing keeping it private.">
-  <defs>
-    <marker id="arr15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-  </defs>
-  <rect x="20" y="20" width="680" height="110" rx="12" class="d-hi" opacity="0.5"/>
-  <text x="360" y="40" class="d-th" text-anchor="middle">HTTPS tunnel: encrypted between browser and server. Without it, the header below is readable by anyone on the network.</text>
-  <rect x="50" y="62" width="110" height="44" rx="6" class="d-box"/><text x="105" y="89" class="d-t" text-anchor="middle">Browser</text>
-  <rect x="560" y="62" width="110" height="44" rx="6" class="d-box"/><text x="615" y="89" class="d-t" text-anchor="middle">Server</text>
-  <line x1="165" y1="84" x2="555" y2="84" class="d-line" marker-end="url(#arr15)"/>
-  <text x="360" y="76" class="d-mono" text-anchor="middle">Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</text>
-  <text x="360" y="102" class="d-ts" text-anchor="middle">= Base64("dana:correct-horse"), sent with every single request</text>
-  <text x="360" y="120" class="d-ts" text-anchor="middle">Encoding is reversible by anyone. It is not a secret; HTTPS is what makes it one.</text>
-</svg>
-</div>
-<figcaption><b>Basic Authentication.</b> The credentials ride along on every request in a trivially reversible encoding. The protection comes entirely from HTTPS.</figcaption>
-</figure>
-<p>A close cousin is the <dfn class="kw" id="kw-api-key" data-def="A long random secret string issued by a service to identify and bill the account calling its API. Sent with each request, kept on the server side of your product, never in front-end code or public repositories. Leaked keys are the most common cause of surprise cloud bills.">API key</dfn>, which we met in Session 2. It is a long random secret issued by a service provider that your back end presents with each call so the provider knows whose account to bill and what it may do. Keys are passwords for programs, and they must be treated as such: stored in server configuration (a file called <code>.env</code> is the convention), never typed into front-end code, and never committed into a Git repository. Automated bots scan GitHub around the clock for accidentally published keys and can spend thousands of dollars of someone's cloud budget within minutes. When you use Claude Code with the Claude API or any other service, this is the single most important habit to build.</p>
+<p>In practice, almost nobody installs PostgreSQL on a rented machine themselves any more. Cloud providers offer a <dfn class="kw" id="kw-managed-database" data-def="A database run for you by a cloud provider (Amazon RDS, Google Cloud SQL, Supabase, Neon, PlanetScale): they handle installation, backups, security patches, and failover; you get a connection address and a monthly bill.">managed database</dfn>, such as Amazon RDS, Google Cloud SQL, Supabase, or Neon: you click "create PostgreSQL," and they run the machine, take nightly backups, install security patches, and can switch to a standby copy automatically if the primary fails. You get a connection address and a bill, starting around 15 to 50 dollars a month. For nearly every business this is the correct choice; running your own database is expertise you do not want to have to hire.</p>
 </section>

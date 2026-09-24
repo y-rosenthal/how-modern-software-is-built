@@ -1,287 +1,416 @@
 <section class="session" id="session-2">
   <div class="eyebrow">Session 2 · 75 minutes</div>
-  <h2>Dynamic Websites, APIs, and Databases</h2>
-  <p class="goal">Session 1 ended with a program running on the server. This session opens that box. We see what a back end actually looks like, how the front end talks to it through an API, why almost every product needs a database, and what SQL is, illustrated with a bakery that finally takes orders.</p>
+  <h2>From a File on Your Laptop to a Page on the Internet</h2>
+  <p class="goal">We start with the simplest possible website, a single text file opened in a browser, and follow it all the way to being served to strangers over the internet. Along the way we meet the browser, the three languages of a web page, addresses, servers, and the request-and-response conversation that every website depends on.</p>
 
   <div class="objectives">
     <h4>By the end of this session students can</h4>
     <ul>
-      <li>Read a ten-line Python web server and say what each route does.</li>
-      <li>Explain what an API is, what JSON looks like, and what GET and POST mean.</li>
-      <li>Describe the relational model: tables, rows, columns, primary and foreign keys.</li>
-      <li>Read simple SQL statements and say in plain English what they do.</li>
-      <li>Draw the three-tier architecture and trace an order through it.</li>
+      <li>Explain the client–server model and identify the client and server in everyday examples.</li>
+      <li>Describe what HTML, CSS, and JavaScript each contribute to a web page.</li>
+      <li>Trace what happens between typing a web address and seeing a page, including DNS and HTTP.</li>
+      <li>Distinguish a static website from a dynamic one and explain the limits of static sites.</li>
+      <li>Say where Python runs in a web application and why it does not run in the browser.</li>
     </ul>
   </div>
 
   <table class="agenda">
     <thead><tr><th>Section</th><th>Minutes</th></tr></thead>
     <tbody>
-      <tr><td><a href="#s2-1">2.1 Inside the back end: a Python web server</a></td><td>12</td></tr>
-      <tr><td><a href="#s2-2">2.2 APIs and JSON: how programs talk to programs</a></td><td>15</td></tr>
-      <tr><td><a href="#s2-3">2.3 Why every product needs a database</a></td><td>10</td></tr>
-      <tr><td><a href="#s2-4">2.4 SQL by example</a></td><td>15</td></tr>
-      <tr><td><a href="#s2-5">2.5 Beyond tables: NoSQL and ORMs</a></td><td>8</td></tr>
-      <tr><td><a href="#s2-6">2.6 Putting it together: the three-tier architecture</a></td><td>10</td></tr>
+      <tr><td><a href="#s2-1">2.1 Why architecture is a business topic</a></td><td>5</td></tr>
+      <tr><td><a href="#s2-2">2.2 Clients, servers, and programs</a></td><td>10</td></tr>
+      <tr><td><a href="#s2-3">2.3 A web page is three languages</a></td><td>15</td></tr>
+      <tr><td><a href="#s2-4">2.4 The static website on your own computer</a></td><td>5</td></tr>
+      <tr><td><a href="#s2-5">2.5 How the internet delivers a page</a></td><td>20</td></tr>
+      <tr><td><a href="#s2-6">2.6 Front end, back end, and the limits of static sites</a></td><td>10</td></tr>
+      <tr><td><a href="#s2-7">2.7 Where Python fits</a></td><td>5</td></tr>
     </tbody>
     <tfoot><tr><td>Review questions and buffer</td><td>5</td></tr></tfoot>
   </table>
 </section>
 
 <section id="s2-1-wrap">
-<h3 id="s2-1">2.1 Inside the back end: a Python web server <span class="time">12 min</span></h3>
-<p>Here is a complete dynamic web server written in Python, using a popular library called Flask. It is short enough to read in full.</p>
-<pre><code>from flask import Flask
-from datetime import datetime
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "&lt;h1&gt;Rosenthal's Bakery&lt;/h1&gt;&lt;p&gt;Fresh bread every morning.&lt;/p&gt;"
-
-@app.route("/hours")
-def hours():
-    now = datetime.now()
-    if 7 &lt;= now.hour &lt; 18:
-        return "&lt;p&gt;We are &lt;b&gt;open&lt;/b&gt; right now!&lt;/p&gt;"
-    return "&lt;p&gt;We are closed. Back at 7 a.m.&lt;/p&gt;"
-
-app.run(port=5000)</code></pre>
-<p>Walk through it slowly with the class:</p>
+<h3 id="s2-1">2.1 Why architecture is a business topic <span class="time">5 min</span></h3>
+<p>When an architect designs a building, they decide where the load-bearing walls go, how people move between floors, and where the plumbing runs. Change those decisions after the concrete is poured and the cost is enormous. Software has the same property. <strong>Architecture</strong> is the set of big structural decisions about a piece of software: what its major parts are, what each part is responsible for, and how the parts talk to each other.</p>
+<p>Three reasons a business student should care:</p>
 <ul>
-  <li><code>app = Flask(__name__)</code> creates the web server program. Flask is a <dfn class="kw" id="kw-framework" data-def="A pre-built collection of code that handles the routine parts of a kind of program (for a web framework: receiving requests, matching paths to functions, sending responses) so that developers write only the parts specific to their product. Flask, Django, FastAPI, Express, Rails, and Next.js are web frameworks.">framework</dfn>: a bundle of pre-written code that handles the routine parts of being a web server, so the developer only writes the parts unique to the bakery. Flask, Django, and FastAPI are Python frameworks; Express and Next.js are JavaScript ones; Rails is Ruby; Spring is Java. When Claude Code builds you a web app, it will pick one of these.</li>
-  <li>Each <code>@app.route("...")</code> line is a <dfn class="kw" id="kw-route" data-def="A rule in a back-end program that says which function should run when a request arrives for a particular path, such as /hours or /orders/42. Routing is the act of matching incoming paths to code.">route</dfn>: it connects a path (the part of the URL after the domain) to a Python function. When a request for <code>/hours</code> arrives, the <code>hours()</code> function runs and whatever it returns is sent back as the response.</li>
-  <li>The <code>hours()</code> function is where "dynamic" happens. It checks the current time and returns different HTML depending on the answer. Two visitors a minute apart at 5:59 p.m. and 6:00 p.m. see different pages. No static file could do that.</li>
-  <li><code>app.run(port=5000)</code> starts listening. A <dfn class="kw" id="kw-port" data-def="A numbered 'door' on a computer that a server program listens on, so that one machine can run several services. Web traffic uses port 80 (HTTP) and 443 (HTTPS); developers often run test servers on ports like 3000, 5000, or 8000.">port</dfn> is a numbered door on a computer. One machine can run many server programs, each behind a different door. Websites use port 443 (HTTPS) and 80 (HTTP) by convention, so you never type them; developers testing on their own machine use doors like 5000 or 3000, which is why you will see addresses like <code>http://localhost:5000</code>.</li>
+  <li><strong>Cost.</strong> Architecture decides whether you pay a few dollars a month or tens of thousands. It decides whether adding customers adds cost linearly or barely at all.</li>
+  <li><strong>Risk.</strong> Architecture decides what happens when a component fails, how a data breach could occur, and whether the product survives a viral moment or collapses under it.</li>
+  <li><strong>Speed.</strong> Architecture decides how fast a team (or you with an AI coding assistant) can add features without breaking what already works.</li>
 </ul>
-<p><dfn class="kw" id="kw-localhost" data-def="The name a computer uses for itself. Opening http://localhost:5000 in a browser connects to a server program running on your own machine, which is how developers test before deploying.">localhost</dfn> means "this computer." When you run the program above and open <code>http://localhost:5000/hours</code>, your browser is the client, your own laptop is the server, and the request never leaves the machine. Every developer works this way before putting anything on the internet. Session 3 covers the jump from localhost to the world.</p>
-<div class="demo"><span class="label">Live demo (4 minutes)</span>
-<ol>
-  <li>Ask Claude Code to create the Flask app above and run it.</li>
-  <li>Open <code>http://localhost:5000</code> and <code>http://localhost:5000/hours</code> in a browser.</li>
-  <li>Change the closing hour in the code, save, refresh. Point out that the HTML did not exist as a file anywhere; the program composed it on demand.</li>
-  <li>Try <code>http://localhost:5000/nothing</code> to get a live 404.</li>
-</ol>
-</div>
-<p>In practice, back ends do not build HTML by gluing strings together. They use <dfn class="kw" id="kw-template" data-def="An HTML file with placeholders (such as {{ customer_name }}) that the back end fills in with real data before sending the page. Templates keep page design separate from program logic.">templates</dfn>: HTML files with blanks in them, such as <code>Welcome back, {{ customer_name }}</code>, which the program fills in for each request. Designers can edit the template without touching the Python, and the Python can change without touching the design. The idea to carry away is the same either way: the server runs code, and the code produces the page.</p>
+<p>You will not be writing the load-bearing walls yourself in this course. But you will be talking to people and tools that do, and the person who cannot follow the conversation does not get a vote.</p>
+<div class="note"><span class="label">Instructor note</span><p>A good opener is to ask the class to name a website or app that "went down" recently and speculate why. Most outages trace back to a component in this module: a database, a server that ran out of capacity, a login system, a third-party service. Return to their examples as the relevant pieces appear.</p></div>
 </section>
 
 <section id="s2-2-wrap">
-<h3 id="s2-2">2.2 APIs and JSON: how programs talk to programs <span class="time">15 min</span></h3>
-<p>The Flask example returned HTML for a human to read. But increasingly the thing making the request is not a human's browser rendering a page. It is another program: JavaScript in the page asking for "just the data," a mobile app, a partner's system, or an AI assistant. For those callers, the server returns raw data instead of a designed page. The set of requests a server understands, and the shape of the answers it gives, is its <dfn class="kw" id="kw-api" data-def="Application Programming Interface. The defined set of requests a program accepts and the responses it gives, so that other programs can use it without knowing how it works inside. A web API is reached over HTTP and usually speaks JSON.">API</dfn> (Application Programming Interface).</p>
-<div class="analogy"><span class="label">Analogy</span><p>Back to the restaurant. The <em>menu</em> is the API. It lists exactly what you may order and what you will get. You do not need to see the kitchen, and the kitchen can be reorganised without changing the menu. A menu written in a standard format lets anyone order, including delivery apps that were never imagined when the restaurant opened.</p></div>
-<p>A web API is reached over HTTP just like a page, but its <dfn class="kw" id="kw-endpoint" data-def="One specific address in an API, such as GET /api/products or POST /api/orders, that performs one operation. An API is a collection of endpoints.">endpoints</dfn> (individual addresses) return data rather than HTML. Here is the bakery adding one:</p>
-<pre><code>@app.route("/api/products")
-def list_products():
-    return {
-        "products": [
-            {"id": 1, "name": "Sourdough loaf", "price": 7.50, "in_stock": True},
-            {"id": 2, "name": "Rye bread",      "price": 6.00, "in_stock": False},
-            {"id": 3, "name": "Challah",        "price": 8.00, "in_stock": True}
-        ]
-    }</code></pre>
-<p>A request to <code>/api/products</code> gets back this:</p>
-<pre><code>{
-  "products": [
-    {"id": 1, "name": "Sourdough loaf", "price": 7.5, "in_stock": true},
-    {"id": 2, "name": "Rye bread", "price": 6.0, "in_stock": false},
-    {"id": 3, "name": "Challah", "price": 8.0, "in_stock": true}
-  ]
-}</code></pre>
-<p>This format is <dfn class="kw" id="kw-json" data-def="JavaScript Object Notation. The standard text format for exchanging data between programs over the web: values in curly braces with 'name': value pairs and square brackets for lists. Human-readable and understood by every programming language.">JSON</dfn> (JavaScript Object Notation, pronounced "Jason"). Curly braces hold a set of named values; square brackets hold a list; text is in quotes; numbers and true/false stand alone. Python students will recognise it: a JSON object is almost exactly a Python dictionary, and a JSON array is a Python list. Every programming language can read and write JSON, which is why it became the common tongue of the web.</p>
+<h3 id="s2-2">2.2 Clients, servers, and programs <span class="time">10 min</span></h3>
+<p>Almost every piece of modern software follows one pattern: one computer asks, another computer answers. The computer that asks is the <dfn class="kw" id="kw-client" data-def="The computer or program that asks for something, such as your laptop's browser requesting a web page.">client</dfn>. The computer that answers is the <dfn class="kw" id="kw-server" data-def="A computer, or a program on a computer, that waits for requests from clients and answers them. Servers are ordinary computers, usually in a data center, running around the clock.">server</dfn>. Together this is the <dfn class="kw" id="kw-client-server" data-def="The dominant pattern for networked software: many clients send requests to a server, and the server sends back responses.">client–server model</dfn>.</p>
+<p>Two things students often get wrong about servers:</p>
+<ul>
+  <li><strong>A server is an ordinary computer.</strong> It has a processor, memory, and a disk exactly like a laptop. It usually has no screen or keyboard because nobody sits at it. It lives in a building full of other servers (a <dfn class="kw" id="kw-data-center" data-def="A building full of servers with reliable power, cooling, and fast internet connections. Cloud providers run enormous data centers and rent out slices of them.">data center</dfn>) with reliable power, cooling, and a fast internet connection. It runs 24 hours a day, waiting.</li>
+  <li><strong>"Server" also names a program.</strong> A <dfn class="kw" id="kw-web-server" data-def="A program that listens for web requests and sends back web pages and files. Popular examples are Nginx and Apache. The word also refers to the computer running that program.">web server</dfn> is a program whose only job is to listen for requests and hand back web pages. The same physical computer can run several server programs at once. In conversation, "the server" means whichever of the two is obvious from context.</li>
+</ul>
+<div class="analogy"><span class="label">Analogy</span><p>A restaurant. You (the client) sit at a table and ask the waiter for a menu. The kitchen (the server) prepares what you ask for and sends it out. You never enter the kitchen and you don't need to know how it is organized to place an order. The menu is the agreed-upon list of what you may ask for. We will reuse this restaurant repeatedly; the menu becomes the API in Session 3.</p></div>
 
-<h4 id="s2-2-methods">Verbs: GET, POST, and friends</h4>
-<p>HTTP requests carry a <dfn class="kw" id="kw-http-method" data-def="The verb at the start of an HTTP request that says what kind of action is wanted. GET reads, POST creates or submits, PUT/PATCH updates, DELETE removes.">method</dfn>, a verb stating the kind of action. Static sites only ever needed GET ("give me this"). APIs use the full set:</p>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 660 210" role="img" aria-label="A client laptop sends a request to a server; the server sends back a response.">
+  <defs>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- client -->
+  <rect x="30" y="50" width="180" height="110" rx="10" class="d-box"/>
+  <rect x="55" y="70" width="130" height="60" rx="4" class="d-box-plain"/>
+  <text x="120" y="102" class="d-t" text-anchor="middle">Browser</text>
+  <text x="120" y="150" class="d-tl" text-anchor="middle">Client (your laptop)</text>
+  <!-- server -->
+  <rect x="450" y="40" width="180" height="130" rx="10" class="d-box"/>
+  <rect x="475" y="58" width="130" height="28" rx="4" class="d-hi"/>
+  <text x="540" y="77" class="d-th" text-anchor="middle">Web server program</text>
+  <rect x="475" y="96" width="130" height="28" rx="4" class="d-box-plain"/>
+  <text x="540" y="115" class="d-t" text-anchor="middle">Files: pages, images</text>
+  <text x="540" y="158" class="d-tl" text-anchor="middle">Server (in a data center)</text>
+  <!-- arrows -->
+  <line x1="215" y1="80" x2="445" y2="80" class="d-line-hi" marker-end="url(#arr1)"/>
+  <text x="330" y="70" class="d-t" text-anchor="middle">1. Request: "send me the home page"</text>
+  <line x1="445" y1="130" x2="215" y2="130" class="d-line" marker-end="url(#arr1)"/>
+  <text x="330" y="150" class="d-t" text-anchor="middle">2. Response: the page's contents</text>
+  <text x="330" y="196" class="d-ts" text-anchor="middle">Millions of clients can talk to the same server. The server never starts the conversation.</text>
+</svg>
+</div>
+<figcaption><b>The client–server model.</b> The client always speaks first. The server waits, answers, and forgets about the client until the next request arrives.</figcaption>
+</figure>
+
+<p>Everyday examples students already use, with the client and server identified:</p>
 <div class="tbl-wrap">
 <table class="tbl">
-  <thead><tr><th>Method</th><th>Meaning</th><th>Bakery example</th><th>Business action</th></tr></thead>
+  <thead><tr><th>Activity</th><th>Client</th><th>Server</th></tr></thead>
   <tbody>
-    <tr><td><code>GET</code></td><td>Read; fetch something</td><td><code>GET /api/products</code></td><td>Show the catalogue</td></tr>
-    <tr><td><code>POST</code></td><td>Create; submit new data</td><td><code>POST /api/orders</code> with the order in the body</td><td>Place an order</td></tr>
-    <tr><td><code>PUT</code> / <code>PATCH</code></td><td>Update something existing</td><td><code>PATCH /api/orders/88</code> with <code>{"status": "ready"}</code></td><td>Mark an order ready</td></tr>
-    <tr><td><code>DELETE</code></td><td>Remove</td><td><code>DELETE /api/orders/88</code></td><td>Cancel an order</td></tr>
+    <tr><td>Reading news on your phone</td><td>The browser or news app on the phone</td><td>The newspaper's computers that hold the articles</td></tr>
+    <tr><td>Sending a WhatsApp message</td><td>The WhatsApp app</td><td>Meta's messaging servers, which pass the message to your friend's phone (another client)</td></tr>
+    <tr><td>Checking your bank balance</td><td>The banking app</td><td>The bank's servers holding account records</td></tr>
+    <tr><td>Asking Claude a question</td><td>The Claude app or Claude Code on your computer</td><td>Anthropic's servers running the AI model</td></tr>
   </tbody>
 </table>
 </div>
-<p>An API organised this way, where every URL names a <em>thing</em> (a product, an order) and the method says what to do to it, is called <dfn class="kw" id="kw-rest" data-def="A widely used style for designing web APIs in which each URL names a resource (a product, an order) and the HTTP method (GET, POST, PUT, DELETE) says what to do with it. 'A REST API' is the most common kind of API a business will build or consume.">REST</dfn> (or "RESTful"). Almost every API you will encounter, from Stripe to Shopify to the Claude API, is roughly REST. The letters stand for something (Representational State Transfer) that nobody needs to remember; the idea is <em>nouns in the URL, verbs in the method</em>.</p>
-<p>The four verbs map to the four things any system does with data, remembered by the acronym <dfn class="kw" id="kw-crud" data-def="Create, Read, Update, Delete: the four basic operations any application performs on stored data. Most business software is, at heart, CRUD screens over a database.">CRUD</dfn>: Create, Read, Update, Delete. A surprising fraction of all business software is CRUD screens over a database: customers, invoices, tickets, inventory. Recognising a product as "mostly CRUD" is a useful signal that it is well understood and inexpensive to build.</p>
-
-<h4 id="s2-2-who">Who calls APIs?</h4>
-<figure>
-<div class="scroll">
-<svg viewBox="0 0 720 260" role="img" aria-label="A back-end API in the middle is called by JavaScript in a web page, by a mobile app, and by a partner company's system; the back end in turn calls third-party APIs such as Stripe and the Claude API.">
-  <defs>
-    <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-  </defs>
-  <!-- callers -->
-  <rect x="20" y="30" width="150" height="46" rx="6" class="d-box"/>
-  <text x="95" y="50" class="d-t" text-anchor="middle">Web page</text>
-  <text x="95" y="66" class="d-ts" text-anchor="middle">JavaScript in the browser</text>
-  <rect x="20" y="107" width="150" height="46" rx="6" class="d-box"/>
-  <text x="95" y="127" class="d-t" text-anchor="middle">Mobile app</text>
-  <text x="95" y="143" class="d-ts" text-anchor="middle">iPhone or Android</text>
-  <rect x="20" y="184" width="150" height="46" rx="6" class="d-box"/>
-  <text x="95" y="204" class="d-t" text-anchor="middle">Partner system</text>
-  <text x="95" y="220" class="d-ts" text-anchor="middle">e.g. a delivery marketplace</text>
-  <!-- api -->
-  <rect x="280" y="60" width="170" height="140" rx="10" class="d-hi"/>
-  <text x="365" y="90" class="d-th" text-anchor="middle">Your back end</text>
-  <text x="365" y="110" class="d-ts" text-anchor="middle">GET  /api/products</text>
-  <text x="365" y="126" class="d-ts" text-anchor="middle">POST /api/orders</text>
-  <text x="365" y="142" class="d-ts" text-anchor="middle">GET  /api/orders/88</text>
-  <text x="365" y="172" class="d-ts" text-anchor="middle">Answers in JSON</text>
-  <!-- arrows in -->
-  <line x1="175" y1="53" x2="275" y2="95" class="d-line" marker-end="url(#arr5)"/>
-  <line x1="175" y1="130" x2="275" y2="130" class="d-line" marker-end="url(#arr5)"/>
-  <line x1="175" y1="207" x2="275" y2="165" class="d-line" marker-end="url(#arr5)"/>
-  <!-- third parties -->
-  <rect x="560" y="45" width="140" height="42" rx="6" class="d-box-plain"/>
-  <text x="630" y="63" class="d-t" text-anchor="middle">Stripe API</text>
-  <text x="630" y="78" class="d-ts" text-anchor="middle">charge a card</text>
-  <rect x="560" y="109" width="140" height="42" rx="6" class="d-box-plain"/>
-  <text x="630" y="127" class="d-t" text-anchor="middle">Claude API</text>
-  <text x="630" y="142" class="d-ts" text-anchor="middle">generate, summarise</text>
-  <rect x="560" y="173" width="140" height="42" rx="6" class="d-box-plain"/>
-  <text x="630" y="191" class="d-t" text-anchor="middle">Email API</text>
-  <text x="630" y="206" class="d-ts" text-anchor="middle">send confirmation</text>
-  <line x1="455" y1="100" x2="555" y2="66" class="d-line" marker-end="url(#arr5)"/>
-  <line x1="455" y1="130" x2="555" y2="130" class="d-line" marker-end="url(#arr5)"/>
-  <line x1="455" y1="160" x2="555" y2="194" class="d-line" marker-end="url(#arr5)"/>
-  <text x="95" y="252" class="d-ts" text-anchor="middle">Your clients call you…</text>
-  <text x="630" y="240" class="d-ts" text-anchor="middle">…and you call other companies' APIs</text>
-</svg>
-</div>
-<figcaption><b>APIs in both directions.</b> Your back end offers an API to your own front ends and to partners, and it consumes other companies' APIs for payments, AI, email, maps, and more. Being on both sides is normal.</figcaption>
-</figure>
-<p>The right-hand side of this picture is where much of modern product-building happens. A <dfn class="kw" id="kw-third-party-api" data-def="An API offered by another company that your product calls to get a capability without building it: payments (Stripe), maps (Google), text messages (Twilio), AI (Claude API). Usually paid per use.">third-party API</dfn> lets you rent a capability instead of building it: charge a card with Stripe, send a text message with Twilio, look up an address with Google Maps, or generate text with the Claude API. Each is usually billed per use, which turns what used to be an engineering project into a line item. Much of "using AI to build products" is, architecturally, calling the right third-party APIs from your back end.</p>
-<div class="note"><span class="label">Instructor note</span><p>Students will meet the phrase "API key" constantly. It is a long secret string a third party gives you that identifies your account when your back end calls their API, so they know whom to bill. It lives on your server, never in front-end code. We return to this in Session 4, but planting it here pays off.</p></div>
+<p>The client for a website is nearly always a <dfn class="kw" id="kw-browser" data-def="A program such as Chrome, Safari, Firefox, or Edge that requests web pages from servers and turns the HTML, CSS, and JavaScript it receives into what you see on screen.">web browser</dfn>: Chrome, Safari, Firefox, Edge. The browser is itself just a program installed on your computer. Its job is to request pages and turn what comes back into pictures and text on the screen.</p>
 </section>
 
 <section id="s2-3-wrap">
-<h3 id="s2-3">2.3 Why every product needs a database <span class="time">10 min</span></h3>
-<p>The <code>/api/products</code> example had its data typed directly into the program. That breaks the moment a real business touches it: the baker cannot edit Python to change a price, and an order placed by a customer has nowhere to be saved. The server needs somewhere to <em>store</em> data that survives restarts, can be changed by the program, and can be searched. That somewhere is a <dfn class="kw" id="kw-database" data-def="A program dedicated to storing, organising, and retrieving data reliably, so that many users and programs can read and write it at the same time without losing or corrupting anything. Almost every dynamic application has one.">database</dfn>.</p>
-<p>Why not just save to a file, the way you might save a spreadsheet? Because a database solves problems a file cannot:</p>
-<ul>
-  <li><strong>Many writers at once.</strong> Two customers buying the last challah at the same instant must not both succeed. A database handles this; a file being edited by two programs simultaneously gets corrupted.</li>
-  <li><strong>Speed at scale.</strong> Finding one order among ten million by scanning a file takes minutes. A database with an <em>index</em> (like the index in a textbook) does it in milliseconds.</li>
-  <li><strong>Reliability.</strong> If the power fails halfway through saving an order, a database guarantees the order is either fully saved or not saved at all, never half. This property is called a <dfn class="kw" id="kw-transaction" data-def="A group of database changes that either all succeed or all fail together, so the data is never left half-updated. Moving money between two accounts is the classic example.">transaction</dfn>. Moving money between two bank accounts is the classic case: the debit and the credit must both happen or neither.</li>
-  <li><strong>Questions.</strong> "Which customers ordered rye more than three times last quarter?" is one line in a database language and a small programming project against a pile of files.</li>
-</ul>
-<p>The database is a separate program, a <dfn class="kw" id="kw-dbms" data-def="Database Management System: the actual software product that implements a database, such as PostgreSQL, MySQL, SQLite, SQL Server, Oracle, or MongoDB.">database management system</dfn> (DBMS). Your Python back end does not store data itself; it sends instructions to the DBMS and gets results back, much as the browser sends requests to the web server. In Session 3 we will see that the DBMS often runs on its own machine.</p>
+<h3 id="s2-3">2.3 A web page is three languages <span class="time">15 min</span></h3>
+<p>Here is a surprising fact: a web page is a plain text file. You can open it in Notepad. If you save a text file with the name <code>index.html</code>, type a few lines into it, and double-click it, your browser will display it as a web page. No internet connection, no server, no company involved.</p>
+<p>The text inside that file is written in up to three languages, each with a separate job.</p>
 
-<h4 id="s2-3-relational">The relational model: tables</h4>
-<p>The dominant way to organise business data for the last fifty years is the <dfn class="kw" id="kw-relational" data-def="The way of organising data into tables of rows and columns, where each table describes one kind of thing (customers, orders) and tables are linked to each other by shared identifying values (keys). Managed by relational databases and queried with SQL.">relational model</dfn>. Data lives in <dfn class="kw" id="kw-table" data-def="In a relational database, a grid holding all records of one kind of thing. Each row is one record (one customer) and each column is one attribute (name, email).">tables</dfn>: each table holds one kind of thing, each <strong>row</strong> is one instance of that thing, and each <strong>column</strong> is one fact about it. The bakery needs at least these:</p>
+<h4 id="s2-3-html">HTML: the content and its structure</h4>
+<p><dfn class="kw" id="kw-html" data-def="HyperText Markup Language. The language that describes the content and structure of a web page: headings, paragraphs, images, links, forms. Every web page is HTML at its core.">HTML</dfn> (HyperText Markup Language) says <em>what is on the page</em>: this is a heading, this is a paragraph, this is an image, this is a link to another page. It does this with <dfn class="kw" id="kw-tag" data-def="A label in angle brackets, such as &lt;h1&gt; or &lt;p&gt;, that HTML uses to mark what a piece of content is. Most tags come in pairs: an opening tag and a closing tag with a slash.">tags</dfn>, labels in angle brackets that wrap the content.</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Rosenthal's Bakery&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Rosenthal's Bakery&lt;/h1&gt;
+    &lt;p&gt;Fresh bread every morning since 1998.&lt;/p&gt;
+    &lt;img src="storefront.jpg" alt="Our shop"&gt;
+    &lt;a href="menu.html"&gt;See the menu&lt;/a&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>Read it aloud and it almost explains itself: <code>&lt;h1&gt;</code> is a top-level heading, <code>&lt;p&gt;</code> is a paragraph, <code>&lt;img&gt;</code> places an image stored in a file called <code>storefront.jpg</code>, and <code>&lt;a href=...&gt;</code> is a link (an "anchor") to another page called <code>menu.html</code>. HTML alone gives you a working but ugly page: black text on white, default fonts, no layout.</p>
 
-<div class="two-col">
-<div>
-<table class="datatable">
-<caption>customers</caption>
-<thead><tr><th>customer_id</th><th>name</th><th>email</th><th>city</th></tr></thead>
-<tbody>
-<tr><td>1</td><td>Dana Levi</td><td>dana@example.com</td><td>Boston</td></tr>
-<tr><td>2</td><td>Sam Ortiz</td><td>sam@example.com</td><td>Cambridge</td></tr>
-<tr><td>3</td><td>Priya Nair</td><td>priya@example.com</td><td>Boston</td></tr>
-</tbody>
-</table>
-</div>
-<div>
-<table class="datatable">
-<caption>products</caption>
-<thead><tr><th>product_id</th><th>name</th><th>price</th></tr></thead>
-<tbody>
-<tr><td>1</td><td>Sourdough loaf</td><td>7.50</td></tr>
-<tr><td>2</td><td>Rye bread</td><td>6.00</td></tr>
-<tr><td>3</td><td>Challah</td><td>8.00</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<table class="datatable">
-<caption>orders</caption>
-<thead><tr><th>order_id</th><th>customer_id</th><th>product_id</th><th>quantity</th><th>ordered_at</th><th>status</th></tr></thead>
-<tbody>
-<tr><td>87</td><td>1</td><td>3</td><td>2</td><td>2026-09-21 08:14</td><td>ready</td></tr>
-<tr><td>88</td><td>2</td><td>1</td><td>1</td><td>2026-09-21 08:20</td><td>baking</td></tr>
-<tr><td>89</td><td>1</td><td>2</td><td>1</td><td>2026-09-22 07:55</td><td>placed</td></tr>
-</tbody>
-</table>
-<p>Two ideas make this work:</p>
-<ul>
-  <li>Every row has a <dfn class="kw" id="kw-primary-key" data-def="A column whose value uniquely identifies each row in a table, such as customer_id. No two rows share one, and it never changes, so it can be used to refer to that row from anywhere.">primary key</dfn>, a column whose value is unique for that row and never changes: <code>customer_id</code>, <code>product_id</code>, <code>order_id</code>. Names are not good keys because two customers can share one and people change theirs.</li>
-  <li>Instead of copying Dana's name and email into every order she places, the order stores only her <code>customer_id</code>. A column that holds the primary key of a row in <em>another</em> table is a <dfn class="kw" id="kw-foreign-key" data-def="A column in one table that holds the primary key of a row in another table, linking the two. The customer_id in an orders table is a foreign key pointing to the customers table.">foreign key</dfn>. The orders table has two: <code>customer_id</code> and <code>product_id</code>. This is what "relational" refers to: tables related through keys.</li>
-</ul>
+<h4 id="s2-3-css">CSS: how it looks</h4>
+<p><dfn class="kw" id="kw-css" data-def="Cascading Style Sheets. The language that controls the visual appearance of HTML: colors, fonts, spacing, layout, and how the page adapts to different screen sizes.">CSS</dfn> (Cascading Style Sheets) says <em>what the page looks like</em>: colors, fonts, spacing, how things are arranged, what happens on a phone screen versus a desktop monitor. A CSS rule names the thing it applies to and lists the properties to change.</p>
+<pre><code>h1 {
+  color: #7a3e12;
+  font-family: Georgia, serif;
+}
+p {
+  font-size: 18px;
+  line-height: 1.6;
+}</code></pre>
+<p>This says: every top-level heading is a warm brown in the Georgia font; every paragraph uses 18-pixel text with comfortable line spacing. The same HTML file with a different CSS file can look like a completely different website. That separation is deliberate: content people write the HTML, design people write the CSS, and neither steps on the other.</p>
+
+<h4 id="s2-3-js">JavaScript: what it does</h4>
+<p><dfn class="kw" id="kw-javascript" data-def="The programming language that runs inside the browser and makes web pages interactive: reacting to clicks, validating forms, fetching new data without reloading the page. Not related to Java despite the name.">JavaScript</dfn> is a real programming language, the only one that browsers can run, and it makes the page <em>do things</em>: react when a button is clicked, check that an email address looks valid before a form is sent, show a dropdown menu, load more posts as you scroll. Without JavaScript a page is a document. With it, a page becomes an application.</p>
+<pre><code>const button = document.querySelector("#order-button");
+button.addEventListener("click", function () {
+  alert("Thanks! Your order is on its way.");
+});</code></pre>
+<p>In words: find the element on the page whose id is <code>order-button</code>; when it is clicked, show a message. Students in a Python course will notice that this looks like a programming language because it is one. The syntax differs from Python (curly braces, semicolons) but the ideas are the same: variables, functions, conditions, loops.</p>
+<div class="note"><span class="label">Common confusion</span><p>JavaScript and Java are unrelated languages that share half a name for 1990s marketing reasons. Java runs on servers and in Android apps. JavaScript runs in browsers (and, since 2009, on servers too, through a program called Node.js). When people say "JS" they mean JavaScript.</p></div>
+
 <figure>
 <div class="scroll">
-<svg viewBox="0 0 720 200" role="img" aria-label="Three tables: customers, orders, and products. The orders table's customer_id column points to the customers table's primary key, and its product_id column points to the products table's primary key.">
+<svg viewBox="0 0 680 230" role="img" aria-label="Three text files, HTML, CSS, and JavaScript, are read by the browser, which renders the finished page on screen.">
   <defs>
-    <marker id="arr6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--diagram-hi)"/></marker>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
   </defs>
-  <!-- customers -->
-  <rect x="20" y="30" width="180" height="130" rx="6" class="d-box-plain"/>
-  <rect x="20" y="30" width="180" height="26" rx="6" class="d-box"/>
-  <text x="110" y="48" class="d-tl" text-anchor="middle">customers</text>
-  <text x="34" y="78" class="d-mono" style="font-weight:700">customer_id  (PK)</text>
-  <text x="34" y="98" class="d-mono">name</text>
-  <text x="34" y="118" class="d-mono">email</text>
-  <text x="34" y="138" class="d-mono">city</text>
-  <!-- orders -->
-  <rect x="270" y="20" width="180" height="170" rx="6" class="d-box-plain"/>
-  <rect x="270" y="20" width="180" height="26" rx="6" class="d-hi"/>
-  <text x="360" y="38" class="d-th" text-anchor="middle">orders</text>
-  <text x="284" y="68" class="d-mono" style="font-weight:700">order_id  (PK)</text>
-  <text x="284" y="88" class="d-mono" style="font-weight:700">customer_id  (FK)</text>
-  <text x="284" y="108" class="d-mono" style="font-weight:700">product_id  (FK)</text>
-  <text x="284" y="128" class="d-mono">quantity</text>
-  <text x="284" y="148" class="d-mono">ordered_at</text>
-  <text x="284" y="168" class="d-mono">status</text>
-  <!-- products -->
-  <rect x="520" y="30" width="180" height="110" rx="6" class="d-box-plain"/>
-  <rect x="520" y="30" width="180" height="26" rx="6" class="d-box"/>
-  <text x="610" y="48" class="d-tl" text-anchor="middle">products</text>
-  <text x="534" y="78" class="d-mono" style="font-weight:700">product_id  (PK)</text>
-  <text x="534" y="98" class="d-mono">name</text>
-  <text x="534" y="118" class="d-mono">price</text>
+  <!-- files -->
+  <rect x="20" y="20" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="42" class="d-tl">index.html</text>
+  <text x="34" y="60" class="d-ts">Content and structure</text>
+  <rect x="20" y="90" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="112" class="d-tl">style.css</text>
+  <text x="34" y="130" class="d-ts">Colors, fonts, layout</text>
+  <rect x="20" y="160" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="182" class="d-tl">app.js</text>
+  <text x="34" y="200" class="d-ts">Behaviour and interaction</text>
+  <!-- browser -->
+  <rect x="290" y="40" width="150" height="150" rx="10" class="d-hi"/>
+  <text x="365" y="108" class="d-th" text-anchor="middle">Browser</text>
+  <text x="365" y="126" class="d-ts" text-anchor="middle">reads all three,</text>
+  <text x="365" y="140" class="d-ts" text-anchor="middle">builds the page</text>
+  <!-- screen -->
+  <rect x="520" y="35" width="140" height="160" rx="8" class="d-box"/>
+  <rect x="532" y="47" width="116" height="14" rx="2" fill="currentColor" opacity="0.8"/>
+  <rect x="532" y="68" width="90" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="80" width="110" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="92" width="70" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="108" width="116" height="50" rx="3" fill="var(--diagram-hi)" opacity="0.55"/>
+  <rect x="532" y="166" width="60" height="16" rx="8" fill="var(--diagram-hi)"/>
+  <text x="590" y="212" class="d-ts" text-anchor="middle">What the user sees</text>
   <!-- arrows -->
-  <line x1="270" y1="84" x2="205" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
-  <text x="238" y="66" class="d-ts" text-anchor="middle">refers to</text>
-  <line x1="450" y1="104" x2="515" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
-  <text x="484" y="66" class="d-ts" text-anchor="middle">refers to</text>
-  <text x="360" y="196" class="d-ts" text-anchor="middle">PK = primary key   FK = foreign key.  One customer can have many orders; each order has exactly one customer.</text>
+  <line x1="195" y1="46" x2="285" y2="90" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="195" y1="116" x2="285" y2="116" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="195" y1="186" x2="285" y2="142" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="445" y1="116" x2="515" y2="116" class="d-line-hi" marker-end="url(#arr2)"/>
+  <text x="480" y="106" class="d-ts" text-anchor="middle">renders</text>
 </svg>
 </div>
-<figcaption><b>A schema for the bakery.</b> Orders do not copy customer or product details; they point at them by key. Change Dana's email once and every order she ever placed reflects it.</figcaption>
+<figcaption><b>Three files, one page.</b> The browser combines structure (HTML), appearance (CSS), and behaviour (JavaScript) into the page a person sees. All three are plain text files.</figcaption>
 </figure>
-<p>The overall design of the tables, their columns, and the keys that link them is the <dfn class="kw" id="kw-schema" data-def="The blueprint of a database: which tables exist, what columns each has, what type of data each column holds, and how tables link to one another through keys.">schema</dfn>. Designing a schema is really designing the business: what things exist, what we record about them, and how they relate. Business students are often better at this than engineers, because it is a question about the domain rather than about code.</p>
+<p>The browser's act of turning those text files into pixels is called <dfn class="kw" id="kw-rendering" data-def="The process by which a browser turns HTML, CSS, and JavaScript into the visible page on screen.">rendering</dfn>. Every browser does it slightly differently, which is why the same site can look marginally different in Safari and Chrome.</p>
 </section>
 
 <section id="s2-4-wrap">
-<h3 id="s2-4">2.4 SQL by example <span class="time">15 min</span></h3>
-<p>Relational databases are all controlled with one language, <dfn class="kw" id="kw-sql" data-def="Structured Query Language, the standard language for asking questions of and making changes to a relational database. Statements read almost like English: SELECT, FROM, WHERE, INSERT, UPDATE, DELETE, JOIN.">SQL</dfn> (Structured Query Language, said "sequel" or "S-Q-L"). It was designed in the 1970s to be readable by business analysts, and it largely is. You are not expected to write SQL in this course; you are expected to recognise it, read simple statements, and know what it can do. Claude Code will write the SQL, but you will be reviewing what it writes and asking for the right things.</p>
-<p>A request to a database is a <dfn class="kw" id="kw-query" data-def="A question or instruction sent to a database, written in SQL. 'Running a query' means asking the database for data or telling it to change data.">query</dfn>. Six examples cover most of what a business ever needs.</p>
+<h3 id="s2-4">2.4 The static website on your own computer <span class="time">5 min</span></h3>
+<p>A website made only of files like the ones above, files that are written once and sent to every visitor exactly as they are, is a <dfn class="kw" id="kw-static-site" data-def="A website made of fixed files (HTML, CSS, JavaScript, images) that are delivered to every visitor exactly as stored. Nothing is computed per visitor and no data is saved on the server.">static website</dfn>. The word "static" means the content does not change depending on who is looking or when. A brochure site for a bakery, a personal portfolio, a documentation site, and a landing page are all naturally static.</p>
+<p>The essential point for this session: a static website needs no server at all to work on your own computer. The browser reads the files straight off your disk. This is the zero-cost, zero-infrastructure starting point from which everything else in this module is built up.</p>
+<div class="demo"><span class="label">Live demo (3 minutes)</span>
+<ol>
+  <li>Create a folder on the desktop called <code>bakery</code>.</li>
+  <li>Ask Claude Code: "Create a one-page static website for a bakery in this folder with an index.html, a style.css, and a small script that shows a greeting when a button is clicked."</li>
+  <li>Double-click <code>index.html</code>. Point out the address bar: it starts with <code>file:///</code>, meaning "a file on this machine," not <code>https://</code>.</li>
+  <li>Change one word in the HTML in a text editor, save, and refresh the browser to show the connection between the file and the page.</li>
+</ol>
+</div>
+<p>Notice the limitation, though. Only you can see this page. Your friend across town cannot type anything into their browser that reaches a file on your desktop. To share it with the world, the files have to be placed on a server that is always on and reachable by address. That is the subject of the next section.</p>
+</section>
 
-<h4>Reading: SELECT</h4>
-<pre><code>SELECT name, email FROM customers WHERE city = 'Boston';</code></pre>
-<p>"Give me the name and email of every customer whose city is Boston." <code>SELECT</code> picks the columns, <code>FROM</code> picks the table, <code>WHERE</code> filters the rows. Result: Dana Levi and Priya Nair. Replace the column list with <code>*</code> to get every column.</p>
+<section id="s2-5-wrap">
+<h3 id="s2-5">2.5 How the internet delivers a page <span class="time">20 min</span></h3>
+<p>Suppose the bakery's files are now sitting on a server somewhere. A customer types <code>https://www.rosenthalsbakery.com/menu.html</code> into their browser. In the roughly half a second before the page appears, a lot happens. We take it piece by piece.</p>
 
-<h4>Counting and summing: aggregate functions</h4>
-<pre><code>SELECT status, COUNT(*) AS how_many
-FROM orders
-GROUP BY status;</code></pre>
-<p>"For each order status, how many orders are there?" Result: one row per status (placed 1, baking 1, ready 1). <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, and <code>MAX</code> work the same way. Every management dashboard in the world is a stack of queries like this.</p>
+<h4 id="s2-5-url">The address: anatomy of a URL</h4>
+<p>The thing you type is a <dfn class="kw" id="kw-url" data-def="Uniform Resource Locator, the full address of something on the web. It names the protocol (https), the domain (which server), and the path (which page or file on that server).">URL</dfn> (Uniform Resource Locator). It has parts, and each part answers a different question.</p>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 190" role="img" aria-label="The URL https://www.rosenthalsbakery.com/menu.html?lang=en broken into protocol, domain, path, and query string.">
+  <text x="360" y="60" class="d-mono" text-anchor="middle" style="font-size:19px;font-weight:600">https://www.rosenthalsbakery.com/menu.html?lang=en</text>
+  <!-- protocol -->
+  <line x1="54" y1="72" x2="122" y2="72" class="d-line-hi"/>
+  <line x1="88" y1="72" x2="88" y2="100" class="d-line-hi"/>
+  <text x="88" y="118" class="d-th" text-anchor="middle">Protocol</text>
+  <text x="88" y="134" class="d-ts" text-anchor="middle">how to talk:</text>
+  <text x="88" y="148" class="d-ts" text-anchor="middle">secure HTTP</text>
+  <!-- domain -->
+  <line x1="126" y1="72" x2="410" y2="72" class="d-line-hi"/>
+  <line x1="268" y1="72" x2="268" y2="100" class="d-line-hi"/>
+  <text x="268" y="118" class="d-th" text-anchor="middle">Domain name</text>
+  <text x="268" y="134" class="d-ts" text-anchor="middle">which server to ask</text>
+  <text x="268" y="148" class="d-ts" text-anchor="middle">(rosenthalsbakery.com is the registered name; www is a subdomain)</text>
+  <!-- path -->
+  <line x1="414" y1="72" x2="540" y2="72" class="d-line-hi"/>
+  <line x1="477" y1="72" x2="477" y2="100" class="d-line-hi"/>
+  <text x="477" y="118" class="d-th" text-anchor="middle">Path</text>
+  <text x="477" y="134" class="d-ts" text-anchor="middle">which page or file</text>
+  <text x="477" y="148" class="d-ts" text-anchor="middle">on that server</text>
+  <!-- query -->
+  <line x1="544" y1="72" x2="666" y2="72" class="d-line-hi"/>
+  <line x1="605" y1="72" x2="605" y2="100" class="d-line-hi"/>
+  <text x="605" y="118" class="d-th" text-anchor="middle">Query string</text>
+  <text x="605" y="134" class="d-ts" text-anchor="middle">extra details, as</text>
+  <text x="605" y="148" class="d-ts" text-anchor="middle">name=value pairs</text>
+</svg>
+</div>
+<figcaption><b>Anatomy of a URL.</b> Protocol, domain, path, and optional query string. The domain picks the server; the path picks the file or page on it.</figcaption>
+</figure>
+<ul>
+  <li>The <dfn class="kw" id="kw-domain" data-def="The human-readable name of a website, such as rosenthalsbakery.com. Domains are rented from a registrar, usually by the year, and are translated into IP addresses by DNS.">domain name</dfn> is the human-friendly name a business rents (typically 10 to 20 dollars a year from a <em>registrar</em> such as GoDaddy, Namecheap, or Cloudflare). Owning the domain is owning the brand's address on the internet.</li>
+  <li>The <dfn class="kw" id="kw-path" data-def="The part of a URL after the domain, such as /menu.html or /products/42, that identifies which page, file, or resource on the server is being requested.">path</dfn> identifies a specific page or file on that server. For a static site the path is literally a file name. For dynamic sites (Session 3) the path is more like an instruction: <code>/orders/1234</code> means "show me order number 1234".</li>
+  <li>The <dfn class="kw" id="kw-query-string" data-def="The optional part of a URL after a question mark, made of name=value pairs such as ?lang=en&amp;page=2, used to pass extra details to the server.">query string</dfn> passes extra details, like a language or a search term. When you search Google, the words you typed appear in the query string of the results URL.</li>
+</ul>
 
-<h4>Combining tables: JOIN</h4>
-<pre><code>SELECT customers.name, products.name, orders.quantity
-FROM orders
-JOIN customers ON orders.customer_id = customers.customer_id
-JOIN products  ON orders.product_id  = products.product_id
-WHERE orders.status = 'placed';</code></pre>
-<p>This is the query that makes the relational model pay off. The orders table has only ID numbers; a <dfn class="kw" id="kw-join" data-def="The SQL operation that combines rows from two tables by matching a foreign key in one to the primary key in the other, for example attaching each order to the customer who placed it.">JOIN</dfn> stitches each order to the matching customer row and product row using the keys, so the result reads like a human wants it to: "Dana Levi, Rye bread, 1." Whenever you see a report that combines information from several places, there is a JOIN behind it.</p>
+<h4 id="s2-5-dns">Finding the server: IP addresses and DNS</h4>
+<p>Computers on the internet do not find each other by name. Every connected machine has an <dfn class="kw" id="kw-ip-address" data-def="Internet Protocol address, the numeric address of a computer on a network, such as 142.250.72.14. Every server reachable on the internet has one. DNS translates domain names into IP addresses.">IP address</dfn>, a number such as <code>142.250.72.14</code>, and traffic is routed by number. Nobody wants to memorize numbers, so the internet has a distributed phone book called <dfn class="kw" id="kw-dns" data-def="Domain Name System. The internet's directory service that translates a domain name (rosenthalsbakery.com) into the IP address of the server that hosts it. The first step in loading any website.">DNS</dfn> (Domain Name System). When you type a domain, your browser first asks DNS "what is the IP address of www.rosenthalsbakery.com?" and gets back a number. Only then does it know where to send the request.</p>
+<p>When a business buys a domain and then signs up with a hosting company, "pointing the domain at the host" means editing a DNS record so that the name resolves to the host's IP address. It is one of the few technical tasks a founder often does personally, and it is where the phrase "DNS changes can take up to 48 hours to propagate" comes from: the phone book is copied to thousands of servers worldwide and they refresh on a schedule.</p>
 
-<h4>Writing: INSERT, UPDATE, DELETE</h4>
-<pre><code>INSERT INTO orders (customer_id, product_id, quantity, status)
-VALUES (3, 1, 2, 'placed');
+<h4 id="s2-5-http">The conversation: HTTP requests and responses</h4>
+<p>Now the browser knows the number. It opens a connection to that server and speaks a language called <dfn class="kw" id="kw-http" data-def="HyperText Transfer Protocol. The set of rules browsers and servers use to talk: the client sends a request naming a method (such as GET) and a path, and the server sends back a response with a status code and, usually, content.">HTTP</dfn> (HyperText Transfer Protocol). A <dfn class="kw" id="kw-protocol" data-def="An agreed set of rules for how two computers exchange messages, so that programs written by different people can still understand each other. HTTP, HTTPS, and DNS are all protocols.">protocol</dfn> is simply an agreed set of rules for how two computers exchange messages, the way a business letter has a conventional layout. HTTP is refreshingly readable. The browser's <dfn class="kw" id="kw-request" data-def="The message a client sends to a server asking for something. An HTTP request names a method (GET, POST, and so on), a path, and headers with extra details, and may carry a body of data.">request</dfn> looks like this:</p>
+<pre><code>GET /menu.html HTTP/1.1
+Host: www.rosenthalsbakery.com
+User-Agent: Mozilla/5.0 (Macintosh) Chrome/128.0
+Accept-Language: en-US</code></pre>
+<p>Read it as: "GET me the thing at /menu.html. I'm looking for the site called www.rosenthalsbakery.com. I'm Chrome on a Mac, and I prefer English." The server's <dfn class="kw" id="kw-response" data-def="The message a server sends back to a client after a request. An HTTP response carries a status code (200 OK, 404 Not Found), headers, and usually a body such as an HTML page or JSON data.">response</dfn> is equally readable:</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 5120
 
-UPDATE orders SET status = 'ready' WHERE order_id = 88;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt; ... the actual page ...</code></pre>
+<p>The first line carries a <dfn class="kw" id="kw-status-code" data-def="The three-digit number in an HTTP response that says how the request went. 200 means success, 301 means moved, 404 means not found, 500 means the server hit an error.">status code</dfn>, a three-digit summary of how things went. A handful are worth knowing because they show up in everyday life:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Code</th><th>Meaning</th><th>When you see it</th></tr></thead>
+  <tbody>
+    <tr><td><code>200 OK</code></td><td>Success, here is what you asked for</td><td>Every normal page load</td></tr>
+    <tr><td><code>301 Moved Permanently</code></td><td>That moved; go here instead</td><td>Old links that still work after a redesign</td></tr>
+    <tr><td><code>401 Unauthorized</code> / <code>403 Forbidden</code></td><td>You need to log in / you're not allowed</td><td>Trying to open someone else's account page</td></tr>
+    <tr><td><code>404 Not Found</code></td><td>No such page</td><td>A typo in the address, a deleted page</td></tr>
+    <tr><td><code>500 Internal Server Error</code></td><td>The server's own code crashed</td><td>A bug in the site; the visitor did nothing wrong</td></tr>
+    <tr><td><code>503 Service Unavailable</code></td><td>The server is overloaded or down for maintenance</td><td>Ticket sales opening, launch-day traffic</td></tr>
+  </tbody>
+</table>
+</div>
+<p>One page usually triggers many requests. The HTML arrives first; as the browser reads it, it discovers it also needs <code>style.css</code>, <code>app.js</code>, and <code>storefront.jpg</code>, and sends a separate request for each. A typical commercial home page today makes 50 to 150 requests. This is why "the number of requests" is a real performance metric and why the CDN in Session 4 matters.</p>
 
-DELETE FROM orders WHERE order_id = 89;</code></pre>
+<figure>
+<div class="scroll">
+<svg class="seq" viewBox="0 0 720 300" role="img" aria-label="Sequence of a page load: browser asks DNS for the IP address, receives it, sends an HTTP GET to the web server, receives HTML, then requests the CSS, JavaScript, and image files and renders the page.">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- actors -->
+  <rect x="30" y="16" width="130" height="34" rx="6" class="d-box"/><text x="95" y="38" class="d-tl" text-anchor="middle">Browser</text>
+  <rect x="295" y="16" width="130" height="34" rx="6" class="d-box"/><text x="360" y="38" class="d-tl" text-anchor="middle">DNS server</text>
+  <rect x="560" y="16" width="130" height="34" rx="6" class="d-hi"/><text x="625" y="38" class="d-th" text-anchor="middle">Web server</text>
+  <line x1="95" y1="50" x2="95" y2="290" class="d-line-dash"/>
+  <line x1="360" y1="50" x2="360" y2="130" class="d-line-dash"/>
+  <line x1="625" y1="50" x2="625" y2="290" class="d-line-dash"/>
+  <!-- 1 dns -->
+  <line x1="100" y1="80" x2="355" y2="80" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="70" r="8" class="d-num"/><text x="112" y="73.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="235" y="74" class="d-ts" text-anchor="middle">IP address of www.rosenthalsbakery.com?</text>
+  <line x1="355" y1="110" x2="100" y2="110" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="343" cy="100" r="8" class="d-num"/><text x="343" y="103.5" class="d-numt" text-anchor="middle">2</text>
+  <text x="228" y="104" class="d-ts" text-anchor="middle">It is 203.0.113.7</text>
+  <!-- 3 http -->
+  <line x1="100" y1="150" x2="620" y2="150" class="d-line-hi" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="140" r="8" class="d-num"/><text x="112" y="143.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="360" y="144" class="d-ts" text-anchor="middle">GET /menu.html  (sent to 203.0.113.7)</text>
+  <line x1="620" y1="180" x2="100" y2="180" class="d-line-hi" marker-end="url(#arr3)"/>
+  <circle cx="608" cy="170" r="8" class="d-num"/><text x="608" y="173.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="360" y="174" class="d-ts" text-anchor="middle">200 OK + the HTML of menu.html</text>
+  <!-- 5 assets -->
+  <line x1="100" y1="215" x2="620" y2="215" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="205" r="8" class="d-num"/><text x="112" y="208.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="360" y="209" class="d-ts" text-anchor="middle">GET /style.css, GET /app.js, GET /storefront.jpg …</text>
+  <line x1="620" y1="245" x2="100" y2="245" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="608" cy="235" r="8" class="d-num"/><text x="608" y="238.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="360" y="239" class="d-ts" text-anchor="middle">200 OK for each file</text>
+  <rect x="30" y="262" width="130" height="26" rx="6" class="d-hi"/>
+  <text x="95" y="279" class="d-th" text-anchor="middle">7. Render the page</text>
+</svg>
+</div>
+<figcaption><b>What happens after you press Enter.</b> A name lookup (DNS) comes first, then one HTTP request for the page, then more requests for everything the page references. Time flows downward.</figcaption>
+</figure>
+
+<h4 id="s2-5-https">HTTPS: the padlock</h4>
+<p>Plain HTTP sends everything as readable text, so anyone on the same coffee-shop Wi-Fi could read the pages you request and anything you type into them. <dfn class="kw" id="kw-https" data-def="HTTP Secure: HTTP carried over an encrypted connection (TLS), so that nobody between the browser and the server can read or alter the traffic. Shown as a padlock in the browser. Standard for all websites today.">HTTPS</dfn> wraps the same conversation in <dfn class="kw" id="kw-encryption" data-def="Scrambling data with a mathematical key so that only someone holding the matching key can read it. Used in transit (HTTPS) and at rest (encrypted disks and databases).">encryption</dfn>, so that only the browser and the server can read it. The padlock in the address bar means HTTPS is on. The server proves its identity with a <em>certificate</em> issued by a trusted authority; since 2015 these are free (from a non-profit called Let's Encrypt) and every serious hosting service turns them on automatically. There is no longer a business reason to run a site without HTTPS, and browsers actively warn visitors away from sites that do.</p>
+
+<h4 id="s2-5-hosting">Getting the files onto a server: hosting</h4>
+<p><dfn class="kw" id="kw-hosting" data-def="Paying a company to keep your website's files and programs on servers that are always on and connected to the internet, so that anyone can reach them.">Hosting</dfn> means renting space on someone else's always-on server and putting your files there. For a static website this is astonishingly cheap or free. Services such as GitHub Pages, Netlify, Vercel, and Cloudflare Pages will take a folder of HTML, CSS, and JavaScript and serve it to the whole world, including HTTPS and a domain of your choosing, for nothing or a few dollars a month. The workflow is: put the files in the service, point your domain's DNS at it, done.</p>
+<p>Why is it so cheap? Because serving static files is the easiest job a computer can do. The server reads a file from disk and sends it. No thinking, no computation per visitor, nothing to remember. That simplicity is the reason static sites are fast, hard to hack, and almost impossible to overload. It is also the reason they are limited, which brings us to the next section.</p>
+<div class="note"><span class="label">Instructor note</span><p>If time allows, open the browser's developer tools (F12 or right-click, Inspect) on any real site and show the Network tab. Students can watch the list of requests grow, see the status codes, and see the HTML arrive first. This makes the diagram above concrete in about 90 seconds.</p></div>
+</section>
+
+<section id="s2-6-wrap">
+<h3 id="s2-6">2.6 Front end, back end, and the limits of static sites <span class="time">10 min</span></h3>
+<p>Two words you will hear in every conversation about software: <dfn class="kw" id="kw-frontend" data-def="The part of an application that runs on the user's device and that the user sees and interacts with: the HTML, CSS, and JavaScript in the browser, or the screens of a mobile app.">front end</dfn> and <dfn class="kw" id="kw-backend" data-def="The part of an application that runs on servers, out of the user's sight: the code that applies business rules, talks to the database, processes payments, and answers the front end's requests.">back end</dfn>. The front end is everything that runs on the user's device and that they can see and touch: the HTML, CSS, and JavaScript we have been discussing. The back end is everything that runs on the server, out of sight: the code that decides what to send, checks who you are, records your order, charges your card.</p>
+<p>A static website is front end only. That is precisely why it is cheap, and precisely why it cannot do certain things:</p>
+<ul>
+  <li><strong>It cannot remember anything.</strong> If a visitor fills in a form, there is nowhere for the data to go. The server just hands out files; it does not accept and store information.</li>
+  <li><strong>It cannot personalise.</strong> Every visitor gets the same <code>menu.html</code>. There is no "Welcome back, Dana" and no shopping cart that survives a page reload, because nothing on the server knows who Dana is.</li>
+  <li><strong>It cannot keep secrets.</strong> Everything in a static site is sent to the visitor's browser, so anything in it can be read by anyone. A password, a payment key, or a private price list cannot live in front-end code. This is one of the most important security rules in this module and it will return in Session 5.</li>
+  <li><strong>It cannot do work on your behalf.</strong> Sending a confirmation email, charging a credit card, or generating a PDF invoice all require a program running somewhere that is not the visitor's browser.</li>
+</ul>
+<p>Every one of those needs is met by adding a back end: a program on the server that receives requests, runs logic, reads and writes stored data, and produces a response tailored to the visitor. A website with a back end is a <dfn class="kw" id="kw-dynamic-site" data-def="A website whose pages are produced by a program on the server at the moment of each request, so that content can depend on who is asking, what they asked for, and what is stored in a database.">dynamic website</dfn>: its pages are generated at the moment they are requested, so they can be different for every person and every moment.</p>
+
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 250" role="img" aria-label="Side by side: a static site's server returns a stored file unchanged; a dynamic site's server runs a program that consults a database and builds a page for this request.">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- static -->
+  <text x="170" y="24" class="d-tl" text-anchor="middle">Static website</text>
+  <rect x="20" y="40" width="300" height="190" rx="10" class="d-zone"/>
+  <rect x="35" y="110" width="80" height="44" rx="6" class="d-box"/>
+  <text x="75" y="136" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="180" y="70" width="125" height="120" rx="8" class="d-box"/>
+  <text x="242" y="90" class="d-t" text-anchor="middle">Server</text>
+  <rect x="195" y="105" width="95" height="66" rx="4" class="d-box-plain"/>
+  <text x="242" y="130" class="d-ts" text-anchor="middle">menu.html</text>
+  <text x="242" y="146" class="d-ts" text-anchor="middle">style.css</text>
+  <text x="242" y="162" class="d-ts" text-anchor="middle">logo.png</text>
+  <line x1="120" y1="122" x2="175" y2="122" class="d-line" marker-end="url(#arr4)"/>
+  <line x1="175" y1="142" x2="120" y2="142" class="d-line" marker-end="url(#arr4)"/>
+  <text x="170" y="215" class="d-ts" text-anchor="middle">Same file for everyone, every time</text>
+  <!-- dynamic -->
+  <text x="545" y="24" class="d-tl" text-anchor="middle">Dynamic website</text>
+  <rect x="380" y="40" width="330" height="190" rx="10" class="d-zone"/>
+  <rect x="395" y="110" width="80" height="44" rx="6" class="d-box"/>
+  <text x="435" y="136" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="520" y="70" width="175" height="120" rx="8" class="d-box"/>
+  <text x="607" y="90" class="d-t" text-anchor="middle">Server</text>
+  <rect x="533" y="104" width="70" height="66" rx="4" class="d-hi"/>
+  <text x="568" y="130" class="d-th" text-anchor="middle">Program</text>
+  <text x="568" y="146" class="d-ts" text-anchor="middle">(back end,</text>
+  <text x="568" y="160" class="d-ts" text-anchor="middle">e.g. Python)</text>
+  <rect x="615" y="104" width="68" height="66" rx="4" class="d-box-plain"/>
+  <text x="649" y="140" class="d-ts" text-anchor="middle">Database</text>
+  <line x1="605" y1="137" x2="612" y2="137" class="d-line"/>
+  <line x1="480" y1="122" x2="515" y2="122" class="d-line" marker-end="url(#arr4)"/>
+  <line x1="515" y1="142" x2="480" y2="142" class="d-line" marker-end="url(#arr4)"/>
+  <text x="545" y="215" class="d-ts" text-anchor="middle">Page built for this visitor, right now</text>
+</svg>
+</div>
+<figcaption><b>Static versus dynamic.</b> On the left, the server only hands out stored files. On the right, a program runs for each request, consults stored data, and composes a page. Everything in Sessions 3 and 4 lives inside that right-hand box.</figcaption>
+</figure>
+
+<p>Most real products mix the two. The marketing pages of a company are static; the product behind the login button is dynamic. Knowing which parts of your product genuinely need a back end, and which can be static, is one of the first cost-saving architecture decisions a founder can make.</p>
+</section>
+
+<section id="s2-7-wrap">
+<h3 id="s2-7">2.7 Where Python fits <span class="time">5 min</span></h3>
+<p>You are learning Python in parallel with this course, so it is worth saying exactly where it fits into the picture. The browser can run only JavaScript. Python does not run in the browser. Python runs on <em>your</em> computer when you run a script, and it runs on <em>servers</em> as back-end code. When a Python program on a server answers web requests, it is the "Program" box in the diagram above.</p>
+<p>Python is one of the most popular back-end languages in the world, used at Instagram, Spotify, Netflix, Dropbox, and nearly every AI company. In Session 3 you will see a complete, working Python web server in about ten lines. The Python skills from your other course are directly the skills of writing back ends.</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Language</th><th>Where it runs</th><th>Job</th></tr></thead>
+  <tbody>
+    <tr><td>HTML, CSS</td><td>Browser</td><td>Content and appearance of pages</td></tr>
+    <tr><td>JavaScript</td><td>Browser (also servers via Node.js)</td><td>Interactivity in the page; also a common back-end language</td></tr>
+    <tr><td>Python</td><td>Servers and your own computer</td><td>Back-end logic, data processing, AI, scripts and automation</td></tr>
+    <tr><td>SQL</td><td>Database server</td><td>Asking questions of stored data (Session 3)</td></tr>
+    <tr><td>Swift, Kotlin</td><td>Phones</td><td>Native iPhone and Android apps (Session 5)</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Session 1 covered how a back-end language is chosen; the table above shows the result of that choice for this module. A final piece of vocabulary. A developer who works on the front end is a front-end developer; one who works on the back end is a back-end developer; one who does both is a <dfn class="kw" id="kw-full-stack" data-def="Describes a developer or a project that covers both the front end (what the user sees) and the back end (servers and databases). 'The stack' is the set of technologies a product is built from.">full-stack</dfn> developer. "The stack" is the list of technologies a product uses, top to bottom: the front-end framework, the back-end language, the database, the hosting. When someone asks "what's your stack?", they are asking about your architecture.</p>
+</section>
+
+<div class="review" id="review-2">
+  <span class="label">Review questions</span>
+  <h4>Session 2: From a file to a page on the internet</h4>
+  <ol>
+    <li>In the client–server model, which side starts every conversation, and why does that matter for how servers are designed?<span class="answer">The client always starts. The server only waits and answers. This means a server must be always on and reachable, and it never needs to "find" its users; it just has to handle whatever arrives. It also means a server cannot push you information you did not ask for without tricks such as the browser repeatedly asking.</span></li>
+    <li>A web page is written in up to three languages. Name each one and state in one phrase what it is responsible for.<span class="answer">HTML describes the content and structure (headings, paragraphs, images, links). CSS controls appearance (colors, fonts, spacing, layout). JavaScript controls behaviour and interactivity (reacting to clicks, changing the page, fetching data).</span></li>
+    <li>Why can you open a static website from a folder on your desktop with no internet connection, but your friend across town cannot see it?<span class="answer">A static site is just files, and a browser can read files straight off the local disk (the address begins with <code>file:///</code>). Your friend's browser cannot reach files on your computer because your machine is not a publicly addressable, always-on server. To share it, the files must be placed on a hosted server with a domain name pointing to it.</span></li>
+    <li>Break the URL <code>https://shop.example.com/products/42?color=blue</code> into its parts and say what each part tells the browser.<span class="answer"><code>https</code> is the protocol (talk securely using HTTP). <code>shop.example.com</code> is the domain name, identifying which server to contact (<code>shop</code> is a subdomain of <code>example.com</code>). <code>/products/42</code> is the path, identifying which resource on that server (product number 42). <code>?color=blue</code> is the query string, an extra detail passed as a name=value pair.</span></li>
+    <li>What does DNS do, and what everyday object is it usually compared to?<span class="answer">DNS translates a human-readable domain name into the numeric IP address of the server hosting it. It is compared to a phone book or contacts list: you look up a name and get a number you can actually dial.</span></li>
+    <li>A customer reports seeing "500 Internal Server Error" while another reports "404 Not Found." Which one suggests a bug in your own code, and which suggests a bad link or typo?<span class="answer">500 means the server's own program failed while handling the request, so it points to a bug or outage on your side. 404 means the server is fine but no such page exists at that path, which usually indicates a broken link, a deleted page, or a typo in the address.</span></li>
+    <li>Give two things a purely static website cannot do, and explain in one sentence what has to be added to do them.<span class="answer">Any two of: remember information a visitor submits, personalise pages per visitor, keep a secret such as a payment key, or perform work such as sending emails or charging cards. To do them you add a back end: a program on the server that runs per request, applies logic, and reads and writes stored data.</span></li>
+    <li>Your Python course teaches you to write programs. In a web application, where would that Python code run, and why not in the visitor's browser?<span class="answer">Python runs on the server as back-end code (or on your own computer as a script). It does not run in the browser because browsers only execute JavaScript; that is the one language every browser was built to understand.</span></li>
+  </ol>
+  <p class="answers-link">Answers are in <a href="#answers-2">Appendix B, Session 2</a>.</p>
+</div>

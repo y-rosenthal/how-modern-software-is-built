@@ -1,251 +1,145 @@
-<section id="s3-4-wrap">
-<h3 id="s3-4">3.4 Step 3: many web servers behind a load balancer <span class="time">15 min</span></h3>
-<p>The bakery is featured on a national morning show. Ten thousand people open the site in the same minute. The single web server, already the busiest machine, runs out of capacity and starts answering with 503 errors. There are two ways to add capacity, and their names are worth knowing because they come up in every scaling conversation.</p>
+<p>"Add an order: customer 3, product 1, quantity 2, status placed." "Change order 88's status to ready." "Remove order 89." The database assigns the new order its <code>order_id</code> automatically. Notice how much rides on the <code>WHERE</code> clause: <code>DELETE FROM orders;</code> with no <code>WHERE</code> deletes every order in the company. This is not a hypothetical. It is a well-known category of career-defining mistakes, and the reason production databases have backups and restricted permissions (Session 4).</p>
+
+<h4>Creating the structure: CREATE TABLE</h4>
+<pre><code>CREATE TABLE orders (
+    order_id     INTEGER PRIMARY KEY,
+    customer_id  INTEGER REFERENCES customers(customer_id),
+    product_id   INTEGER REFERENCES products(product_id),
+    quantity     INTEGER NOT NULL,
+    ordered_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status       TEXT DEFAULT 'placed'
+);</code></pre>
+<p>This defines the table itself: each column, its data type (whole number, timestamp, text), which column is the primary key, which columns are foreign keys (<code>REFERENCES</code>), and which are required (<code>NOT NULL</code>). The database will now refuse to save an order with no quantity, or one pointing at a customer who does not exist. Those constraints are business rules enforced by the storage layer, which is far more reliable than hoping every program remembers to check.</p>
+
+<div class="note"><span class="label">What students should take away</span>
 <ul>
-  <li><dfn class="kw" id="kw-vertical-scaling" data-def="Adding capacity by making one machine bigger: more processor cores, more memory, faster disks. Simple, but has a hard ceiling and the machine remains a single point of failure.">Vertical scaling</dfn> ("scaling up"): replace the machine with a bigger one. Simple, no code changes. But the biggest machine money can buy is still finite, price grows faster than capacity, and there is still exactly one of it.</li>
-  <li><dfn class="kw" id="kw-horizontal-scaling" data-def="Adding capacity by running more copies of a server side by side and spreading requests across them. No ceiling in principle, and losing one copy does not take the service down. Requires a load balancer and stateless servers.">Horizontal scaling</dfn> ("scaling out"): keep the machines modest but run several identical copies of the web server. Twice the traffic, twice the servers. In principle there is no ceiling; this is how every large internet company works.</li>
+  <li>SQL is a language of questions and instructions about tables. It reads roughly like English.</li>
+  <li>Reading is <code>SELECT</code>; writing is <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>; structure is <code>CREATE TABLE</code>.</li>
+  <li><code>JOIN</code> is how information split across tables is put back together.</li>
+  <li>They should be able to look at a query Claude Code writes and say "this deletes every row" or "this only fetches Boston customers."</li>
 </ul>
-<figure>
-<div class="scroll">
-<svg viewBox="0 0 720 200" role="img" aria-label="Vertical scaling replaces a small server with one large server. Horizontal scaling keeps servers small and adds more of them.">
-  <defs>
-    <marker id="arr10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-  </defs>
-  <text x="180" y="26" class="d-tl" text-anchor="middle">Vertical: one bigger machine</text>
-  <rect x="60" y="110" width="60" height="60" rx="6" class="d-box"/>
-  <text x="90" y="145" class="d-ts" text-anchor="middle">4 GB</text>
-  <line x1="130" y1="140" x2="185" y2="140" class="d-line" marker-end="url(#arr10)"/>
-  <rect x="195" y="50" width="120" height="120" rx="6" class="d-hi"/>
-  <text x="255" y="105" class="d-th" text-anchor="middle">64 GB</text>
-  <text x="255" y="125" class="d-ts" text-anchor="middle">still only one</text>
-  <text x="180" y="192" class="d-ts" text-anchor="middle">Ceiling: the largest machine that exists</text>
-  <line x1="365" y1="20" x2="365" y2="190" class="d-line-dash"/>
-  <text x="545" y="26" class="d-tl" text-anchor="middle">Horizontal: more identical machines</text>
-  <rect x="410" y="110" width="60" height="60" rx="6" class="d-box"/>
-  <text x="440" y="145" class="d-ts" text-anchor="middle">4 GB</text>
-  <line x1="480" y1="140" x2="520" y2="140" class="d-line" marker-end="url(#arr10)"/>
-  <rect x="530" y="110" width="44" height="60" rx="6" class="d-hi"/>
-  <rect x="584" y="110" width="44" height="60" rx="6" class="d-hi"/>
-  <rect x="638" y="110" width="44" height="60" rx="6" class="d-hi"/>
-  <text x="552" y="145" class="d-ts" text-anchor="middle">4 GB</text>
-  <text x="606" y="145" class="d-ts" text-anchor="middle">4 GB</text>
-  <text x="660" y="145" class="d-ts" text-anchor="middle">4 GB</text>
-  <text x="606" y="96" class="d-ts" text-anchor="middle">… and as many more as needed</text>
-  <text x="545" y="192" class="d-ts" text-anchor="middle">Ceiling: none in principle. Losing one copy is survivable.</text>
-</svg>
 </div>
-<figcaption><b>Two ways to add capacity.</b> Vertical scaling is a bigger box; horizontal scaling is more boxes. Modern architecture is built around the second.</figcaption>
-</figure>
 
-<h4 id="s3-4-lb">The load balancer</h4>
-<p>Several web servers create an immediate question: the domain name resolves to <em>one</em> IP address, so which server does a customer's request go to? The answer is a new component that sits in front of all of them, the <dfn class="kw" id="kw-load-balancer" data-def="A component that receives all incoming requests and distributes them across a pool of identical servers, so that no one server is overloaded and a failed server is skipped automatically. The public address of a scaled website points at its load balancer.">load balancer</dfn>. The public address belongs to the load balancer. It accepts every request and forwards each to one of the servers behind it, spreading the work evenly (round-robin, or to whichever is least busy). It also performs <dfn class="kw" id="kw-health-check" data-def="A small request a load balancer sends to each server every few seconds to confirm it is alive and responding correctly. A server that fails its health check is removed from rotation until it recovers.">health checks</dfn>: every few seconds it pings each server, and if one stops answering it simply stops sending it traffic. Customers never notice.</p>
-<figure>
-<div class="scroll">
-<svg viewBox="0 0 720 300" role="img" aria-label="Customers connect to a load balancer, which distributes requests across three identical web servers, one of which is marked failed and skipped. All web servers connect to one database server and one shared session store.">
-  <defs>
-    <marker id="arr11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-  </defs>
-  <rect x="20" y="115" width="100" height="40" rx="6" class="d-box"/><text x="70" y="140" class="d-t" text-anchor="middle">Customers</text>
-  <line x1="125" y1="135" x2="175" y2="135" class="d-line-hi" marker-end="url(#arr11)"/>
-  <text x="150" y="126" class="d-ts" text-anchor="middle">HTTPS</text>
-  <!-- LB -->
-  <rect x="180" y="95" width="110" height="80" rx="8" class="d-hi"/>
-  <text x="235" y="128" class="d-th" text-anchor="middle">Load balancer</text>
-  <text x="235" y="146" class="d-ts" text-anchor="middle">public IP</text>
-  <text x="235" y="160" class="d-ts" text-anchor="middle">health checks</text>
-  <!-- servers -->
-  <rect x="350" y="30" width="120" height="56" rx="6" class="d-box"/>
-  <text x="410" y="54" class="d-t" text-anchor="middle">Web server 1</text>
-  <text x="410" y="72" class="d-ts" text-anchor="middle">Nginx + Python</text>
-  <rect x="350" y="106" width="120" height="56" rx="6" class="d-box"/>
-  <text x="410" y="130" class="d-t" text-anchor="middle">Web server 2</text>
-  <text x="410" y="148" class="d-ts" text-anchor="middle">Nginx + Python</text>
-  <rect x="350" y="182" width="120" height="56" rx="6" class="d-box" opacity="0.45"/>
-  <text x="410" y="206" class="d-t" text-anchor="middle" opacity="0.6">Web server 3</text>
-  <text x="410" y="224" class="d-ts" text-anchor="middle">failed: skipped</text>
-  <line x1="295" y1="120" x2="345" y2="60" class="d-line" marker-end="url(#arr11)"/>
-  <line x1="295" y1="135" x2="345" y2="134" class="d-line" marker-end="url(#arr11)"/>
-  <line x1="295" y1="150" x2="345" y2="208" class="d-line-dash" opacity="0.6"/>
-  <line x1="333" y1="196" x2="343" y2="206" stroke="currentColor" stroke-width="2"/>
-  <line x1="343" y1="196" x2="333" y2="206" stroke="currentColor" stroke-width="2"/>
-  <text x="410" y="264" class="d-ts" text-anchor="middle">Identical copies of the same code.</text>
-  <text x="410" y="278" class="d-ts" text-anchor="middle">Add a fourth in minutes.</text>
-  <!-- db + session -->
-  <rect x="560" y="55" width="140" height="70" rx="6" class="d-box"/>
-  <text x="630" y="85" class="d-t" text-anchor="middle">Database server</text>
-  <text x="630" y="103" class="d-ts" text-anchor="middle">PostgreSQL (one copy)</text>
-  <rect x="560" y="150" width="140" height="70" rx="6" class="d-box-plain"/>
-  <text x="630" y="180" class="d-t" text-anchor="middle">Session store</text>
-  <text x="630" y="198" class="d-ts" text-anchor="middle">Redis: who is logged in</text>
-  <line x1="475" y1="58" x2="555" y2="82" class="d-line" marker-end="url(#arr11)"/>
-  <line x1="475" y1="134" x2="555" y2="98" class="d-line" marker-end="url(#arr11)"/>
-  <line x1="475" y1="70" x2="555" y2="176" class="d-line-dash"/>
-  <line x1="475" y1="146" x2="555" y2="188" class="d-line-dash"/>
-  <text x="630" y="246" class="d-ts" text-anchor="middle">Shared state lives here,</text>
-  <text x="630" y="260" class="d-ts" text-anchor="middle">not on any web server</text>
-</svg>
-</div>
-<figcaption><b>Step 3: horizontal scaling.</b> The load balancer is the only public address. Web servers are interchangeable and disposable; anything that must be remembered between requests lives in the shared database or session store.</figcaption>
-</figure>
-
-<h4 id="s3-4-stateless">The catch: servers must be stateless</h4>
-<p>Horizontal scaling has one requirement that shapes how back ends are written. Consider a customer who logs in. Their first request goes to web server 1, which notes "this person is Dana, logged in." Their next click is routed by the load balancer to web server 2, which has never heard of them and asks them to log in again. The site appears broken.</p>
-<p>The solution is that web servers must be <dfn class="kw" id="kw-stateless" data-def="A server that keeps no memory of previous requests between one request and the next. Any copy can handle any request because everything that must be remembered (who is logged in, what is in the cart) is stored in a shared database or cache, not on the server itself.">stateless</dfn>: they remember nothing between requests. Everything that needs remembering (who is logged in, what is in the shopping cart) is stored somewhere all the servers can reach: the database, or a fast shared store such as Redis. Any server can then handle any request, because the information travels with the request (in a cookie, as Session 4 explains) and the facts live in the shared store. Statelessness is what makes servers interchangeable, and interchangeable servers are what make it possible to add ten more during the morning show and remove them after lunch.</p>
-<p>This step is also the one that turns "the server is down" from a disaster into a non-event. With two or more servers behind a load balancer, one can fail, be updated, or be replaced while the others carry on. Redundancy at every layer, including the database, is what the industry calls <dfn class="kw" id="kw-high-availability" data-def="A design in which every component has at least one duplicate ready to take over, so that the failure of any single machine does not interrupt the service. The way three- and four-nines uptime is achieved.">high availability</dfn>, and it is how three and four nines of uptime are bought.</p>
-<div class="note"><span class="label">Business translation</span><p>Horizontal scaling is what makes cloud costs <em>elastic</em>: pay for eight servers during Black Friday and two in February. It is also why a founder should ask, before launch, "Can we run two copies of this?" If the answer is no, because the code keeps things in memory on one machine, the first traffic spike will expose it.</p></div>
-</section>
-
-<section id="s3-5-wrap">
-<h3 id="s3-5">3.5 Step 4: caches, CDNs, and storage <span class="time">10 min</span></h3>
-<p>With the servers scaled, the next bottlenecks are usually the database and the distance between servers and customers. Three components address them.</p>
-<h4>Cache</h4>
-<p>A <dfn class="kw" id="kw-cache" data-def="A fast temporary copy of data that is expensive to compute or fetch, kept close to where it is needed so the next request for it is answered instantly. Caches exist in the browser, on servers (Redis), and in CDNs. The hard part is knowing when the copy is out of date.">cache</dfn> is a fast, temporary copy of something that was expensive to produce. The bakery's product list is requested thousands of times a minute and changes twice a day. Running the same SQL query thousands of times is wasteful; the back end runs it once, keeps the result in memory (typically in Redis, the same in-memory store used for sessions), and hands out the copy for the next 60 seconds. Database load drops by a thousand-fold. Caches appear everywhere: your browser caches images so it does not re-download them, servers cache query results, and the CDN below is a cache too. Their one hard problem is <em>staleness</em>: the copy can be out of date, so someone must decide how long a copy may live and when to throw it away.</p>
-<h4>Content delivery network</h4>
-<p>A customer in Singapore requesting an image from a server in Virginia waits for the bytes to cross the Pacific twice, about 200 milliseconds, before anything appears. A <dfn class="kw" id="kw-cdn" data-def="Content Delivery Network: a worldwide network of servers that keep copies of a site's static files (images, CSS, JavaScript, video) close to users, so pages load fast everywhere and the origin servers handle far less traffic. Cloudflare, Akamai, and Amazon CloudFront are examples.">CDN</dfn> (Content Delivery Network) is a company with servers in hundreds of cities that keeps copies of your static files (images, CSS, JavaScript, video) near your users. The Singaporean customer gets the image from Singapore in 10 milliseconds, and your own servers never see the request at all. Cloudflare, Akamai, Fastly, and Amazon CloudFront are the household names. Most of the bytes of most websites are served by a CDN, not by the site's own servers, and CDNs also absorb the flood of junk traffic in a denial-of-service attack.</p>
-<h4>Object storage</h4>
-<p>Customers upload photos; the bakery publishes menus as PDFs; the app records videos. Files like these should not live on a web server's disk, because with three web servers a file uploaded to server 1 is invisible to servers 2 and 3. They go into <dfn class="kw" id="kw-object-storage" data-def="A cloud service for storing files of any size (images, documents, video, backups) at very low cost and reachable from anywhere by URL. Amazon S3 is the original; every cloud has an equivalent. The standard home for user uploads.">object storage</dfn>, a cloud service designed to hold unlimited files at fractions of a cent per gigabyte and hand them out by URL. Amazon S3 is the original and the name people use generically; Google Cloud Storage, Azure Blob Storage, and Cloudflare R2 are equivalents. The database stores the <em>address</em> of the photo; the photo itself is in object storage, usually behind the CDN.</p>
-<h4>Read replicas</h4>
-<p>Finally, the database itself can be partially scaled. Most applications read far more than they write. A <dfn class="kw" id="kw-replica" data-def="A live copy of the database that is continuously kept up to date from the primary. Read replicas answer read-only queries to take load off the primary; a standby replica takes over if the primary fails.">read replica</dfn> is a continuously updated copy of the primary database that answers read-only queries (product lists, order history, reports) while all writes still go to the one primary. A replica also serves as a hot spare: if the primary fails, the replica is promoted and the site carries on. Splitting writes across several databases (called sharding) is the hard, expensive step that only very large companies take; it is beyond this course, but you should know the word.</p>
-
-<figure>
-<div class="scroll">
-<svg viewBox="0 0 760 360" role="img" aria-label="Full architecture: customers reach a CDN and a load balancer; the load balancer feeds several stateless web servers; the servers use a Redis cache, a primary database with a read replica, object storage for files, and call third-party APIs.">
-  <defs>
-    <marker id="arr12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-  </defs>
-  <!-- users -->
-  <rect x="20" y="150" width="90" height="44" rx="6" class="d-box"/>
-  <text x="65" y="170" class="d-t" text-anchor="middle">Customers</text>
-  <text x="65" y="186" class="d-ts" text-anchor="middle">web + mobile</text>
-  <!-- CDN -->
-  <rect x="160" y="40" width="120" height="60" rx="8" class="d-box-plain"/>
-  <text x="220" y="66" class="d-t" text-anchor="middle">CDN</text>
-  <text x="220" y="84" class="d-ts" text-anchor="middle">images, CSS, JS</text>
-  <line x1="115" y1="160" x2="155" y2="80" class="d-line" marker-end="url(#arr12)"/>
-  <text x="112" y="112" class="d-ts" text-anchor="end">static files</text>
-  <!-- LB -->
-  <rect x="160" y="140" width="120" height="60" rx="8" class="d-hi"/>
-  <text x="220" y="166" class="d-th" text-anchor="middle">Load balancer</text>
-  <text x="220" y="184" class="d-ts" text-anchor="middle">HTTPS ends here</text>
-  <line x1="115" y1="172" x2="155" y2="172" class="d-line-hi" marker-end="url(#arr12)"/>
-  <!-- private zone -->
-  <rect x="320" y="20" width="420" height="320" rx="12" class="d-zone"/>
-  <text x="530" y="38" class="d-ts" text-anchor="middle">Private network: not reachable from the internet</text>
-  <!-- web servers -->
-  <rect x="340" y="120" width="110" height="34" rx="5" class="d-box"/><text x="395" y="142" class="d-t" text-anchor="middle">Web server</text>
-  <rect x="340" y="160" width="110" height="34" rx="5" class="d-box"/><text x="395" y="182" class="d-t" text-anchor="middle">Web server</text>
-  <rect x="340" y="200" width="110" height="34" rx="5" class="d-box"/><text x="395" y="222" class="d-t" text-anchor="middle">Web server</text>
-  <text x="395" y="254" class="d-ts" text-anchor="middle">stateless, N copies</text>
-  <line x1="285" y1="160" x2="335" y2="137" class="d-line" marker-end="url(#arr12)"/>
-  <line x1="285" y1="172" x2="335" y2="177" class="d-line" marker-end="url(#arr12)"/>
-  <line x1="285" y1="184" x2="335" y2="217" class="d-line" marker-end="url(#arr12)"/>
-  <!-- cache -->
-  <rect x="510" y="60" width="110" height="46" rx="5" class="d-box-plain"/>
-  <text x="565" y="79" class="d-t" text-anchor="middle">Redis</text>
-  <text x="565" y="95" class="d-ts" text-anchor="middle">cache + sessions</text>
-  <line x1="455" y1="128" x2="505" y2="90" class="d-line" marker-end="url(#arr12)"/>
-  <!-- db -->
-  <rect x="510" y="130" width="110" height="52" rx="5" class="d-box"/>
-  <text x="565" y="151" class="d-t" text-anchor="middle">Database</text>
-  <text x="565" y="168" class="d-ts" text-anchor="middle">primary (writes)</text>
-  <rect x="640" y="130" width="90" height="52" rx="5" class="d-box-plain"/>
-  <text x="685" y="151" class="d-t" text-anchor="middle">Replica</text>
-  <text x="685" y="168" class="d-ts" text-anchor="middle">reads, standby</text>
-  <line x1="625" y1="156" x2="635" y2="156" class="d-line" marker-end="url(#arr12)"/>
-  <line x1="455" y1="172" x2="505" y2="158" class="d-line" marker-end="url(#arr12)"/>
-  <!-- object storage -->
-  <rect x="510" y="210" width="110" height="46" rx="5" class="d-box-plain"/>
-  <text x="565" y="229" class="d-t" text-anchor="middle">Object storage</text>
-  <text x="565" y="245" class="d-ts" text-anchor="middle">uploads, PDFs</text>
-  <line x1="455" y1="212" x2="505" y2="230" class="d-line" marker-end="url(#arr12)"/>
-  <line x1="510" y1="215" x2="280" y2="100" class="d-line-dash"/>
-  <text x="400" y="88" class="d-ts" text-anchor="middle">CDN pulls files from storage</text>
-  <!-- third party -->
-  <rect x="510" y="280" width="110" height="46" rx="5" class="d-box-plain"/>
-  <text x="565" y="299" class="d-t" text-anchor="middle">Third-party APIs</text>
-  <text x="565" y="315" class="d-ts" text-anchor="middle">Stripe, Claude, email</text>
-  <line x1="455" y1="228" x2="505" y2="296" class="d-line" marker-end="url(#arr12)"/>
-</svg>
-</div>
-<figcaption><b>Step 4: the standard architecture of a serious web product.</b> Every box here can be rented as a managed service. Compare with the single server in Step 1: same three tiers, each one now duplicated, cached, or moved closer to the user.</figcaption>
-</figure>
-<p>This picture, or something very like it, is what runs behind most products you use. Naming its parts and explaining why each exists is the core competence this module aims for. Notice that nothing conceptually new was added after Session 2: it is still presentation, application, and data. Everything in this session was about copies, placement, and failure.</p>
-</section>
-
-<section id="s3-6-wrap">
-<h3 id="s3-6">3.6 The cloud menu: IaaS, PaaS, SaaS, serverless <span class="time">10 min</span></h3>
-<p>Everything above can be rented rather than owned, and <dfn class="kw" id="kw-cloud" data-def="Renting computing (servers, databases, storage, networking) from a provider's data centers over the internet, paid by usage, instead of buying and running your own hardware. The big three providers are Amazon Web Services, Microsoft Azure, and Google Cloud.">cloud computing</dfn> is simply the name for that arrangement: someone else owns the data centers and you pay for what you use. Amazon Web Services (AWS), Microsoft Azure, and Google Cloud are the giants; there are many smaller, simpler providers. The real decision is not which brand but <em>how much of the work you want to do yourself</em>, and the industry describes that choice in layers.</p>
+<h4 id="s3-4-products">Which database? The names you will hear</h4>
 <div class="tbl-wrap">
 <table class="tbl">
-  <thead><tr><th>Layer</th><th>You get</th><th>You manage</th><th>Examples</th><th>Good for</th></tr></thead>
+  <thead><tr><th>Product</th><th>Type</th><th>Typical use</th><th>Cost model</th></tr></thead>
   <tbody>
-    <tr><td><dfn class="kw" id="kw-iaas" data-def="Infrastructure as a Service: renting raw computing (virtual machines, disks, networks). You install and run everything on them yourself. Maximum control, maximum work. Amazon EC2, DigitalOcean.">IaaS</dfn><br>Infrastructure as a Service</td><td>Virtual machines, disks, networks</td><td>Operating system, web server, database, security patches, scaling, backups</td><td>Amazon EC2, Google Compute Engine, DigitalOcean, Hetzner</td><td>Teams with operations expertise; unusual requirements</td></tr>
-    <tr><td><dfn class="kw" id="kw-paas" data-def="Platform as a Service: you hand the provider your code and they run it, handling servers, operating systems, scaling, HTTPS, and often the database. Less control, far less work. Heroku, Render, Railway, Vercel, Fly.io.">PaaS</dfn><br>Platform as a Service</td><td>"Here is my code; run it"</td><td>Just your code and your data</td><td>Heroku, Render, Railway, Fly.io, Vercel, Netlify, Google App Engine</td><td>Startups, small teams, anything built with Claude Code</td></tr>
-    <tr><td><dfn class="kw" id="kw-saas" data-def="Software as a Service: finished software you use through a browser or app and pay for by subscription, with nothing to install or run. Gmail, Salesforce, Shopify, Slack, Notion.">SaaS</dfn><br>Software as a Service</td><td>A finished product</td><td>Your account settings</td><td>Gmail, Salesforce, Shopify, Slack, Notion, QuickBooks</td><td>Everything you do not need to build yourself</td></tr>
-    <tr><td><dfn class="kw" id="kw-serverless" data-def="A cloud model in which you upload individual functions and the provider runs each one only when a request arrives, charging per execution. No servers to manage or pay for while idle; scales from zero to millions automatically. AWS Lambda, Cloudflare Workers, Vercel Functions.">Serverless</dfn><br>(Functions as a Service)</td><td>Run this function when something happens</td><td>Just the function's code</td><td>AWS Lambda, Cloudflare Workers, Vercel Functions, Google Cloud Functions</td><td>Spiky or infrequent workloads; glue between services</td></tr>
+    <tr><td>SQLite</td><td>Relational, single file</td><td>Prototypes, phone apps, small tools. Built into Python. Claude Code will often start you here.</td><td>Free, no server to run</td></tr>
+    <tr><td>PostgreSQL ("Postgres")</td><td>Relational server</td><td>The default choice for new web products of any size</td><td>Free software; hosted versions charged by size and usage</td></tr>
+    <tr><td>MySQL / MariaDB</td><td>Relational server</td><td>Very common in older web products, WordPress, many hosting packages</td><td>Free software; hosted versions charged</td></tr>
+    <tr><td>Microsoft SQL Server, Oracle</td><td>Relational server</td><td>Large enterprises, finance, legacy systems</td><td>Commercial licences, often expensive</td></tr>
+    <tr><td>MongoDB</td><td>Document (NoSQL)</td><td>Flexible or rapidly changing data shapes</td><td>Free software; hosted service (Atlas) charged</td></tr>
+    <tr><td>Redis</td><td>Key-value, in memory</td><td>Caching, sessions, counters (Session 4)</td><td>Free software; hosted charged</td></tr>
   </tbody>
 </table>
 </div>
-<div class="analogy"><span class="label">Analogy</span><p>Getting a pizza. IaaS is renting a kitchen: you bring ingredients and cook. PaaS is a meal kit: ingredients and instructions arrive, you assemble. SaaS is delivery: a finished pizza at the door. Serverless is a vending machine that bakes a slice when you press the button and charges you only for that slice. Each step to the right costs more per unit but less in effort and staff, and the right answer depends on how many pizzas you sell and whether pizza is your business.</p></div>
-<p>Two more terms fill out the vocabulary. A <dfn class="kw" id="kw-container" data-def="A standard, self-contained package holding a program together with everything it needs to run (language runtime, libraries, settings), so that it runs identically on a laptop, a test server, and production. Docker is the tool that creates them; Kubernetes runs many of them across many machines.">container</dfn> (made with a tool called Docker) packages a program with everything it needs so it runs identically on a developer's laptop and on any cloud, which largely cures "it works on my machine." Kubernetes is the system that runs and scales thousands of containers across many machines; it is powerful, complex, and almost never the right first choice for a small team. When people say "we containerised the app," they mean it is now portable across all the layers above.</p>
-<p>For students in this course, the practical guidance is direct. A prototype built with Claude Code is best deployed on a PaaS (Render, Railway, Vercel, Fly.io) with a managed database (Supabase, Neon, or the PaaS's own). That gives you Steps 1 through 3 of this session, including HTTPS, load balancing, and horizontal scaling, for somewhere between 0 and 50 dollars a month, without ever logging into a server. Move down to IaaS only when you have a specific reason and someone to operate it.</p>
+<p>All the relational ones speak SQL with minor dialect differences, so the concepts transfer. For a new product in 2026, "Postgres" is the safe default and the one you will hear most.</p>
 </section>
 
-<section id="s3-7-wrap">
-<h3 id="s3-7">3.7 Shipping code safely <span class="time">5 min</span></h3>
-<p>Three practices make it possible to change a live product without breaking it, and you will see all three in any team you work with.</p>
-<ul>
-  <li><dfn class="kw" id="kw-version-control" data-def="A system that records every change to a project's code, who made it, and why, so that changes can be reviewed, combined, and undone. Git is the universal tool; GitHub and GitLab host Git repositories online for teams.">Version control</dfn>. Every change to the code is recorded, with author and reason, and can be undone. The tool is Git; GitHub and GitLab host the shared copies. A <em>repository</em> ("repo") is one project's history. Claude Code works inside Git repositories and can commit changes for you; knowing that the history exists, and that anything can be rolled back, is what makes experimenting safe.</li>
-  <li><dfn class="kw" id="kw-ci-cd" data-def="Continuous Integration / Continuous Deployment: automation that, every time code is changed, runs the tests and, if they pass, deploys the new version, so releases are frequent, small, and low-risk. GitHub Actions is a common tool.">CI/CD</dfn> (Continuous Integration / Continuous Deployment). Automation that runs the tests every time code changes and, if they pass, deploys it. Instead of a risky quarterly release, teams ship small changes many times a day. On a PaaS this is often built in: connect your GitHub repo, and every change to the main branch goes live within minutes.</li>
-  <li><dfn class="kw" id="kw-monitoring" data-def="Continuously collecting measurements and log messages from a running system (errors, response times, traffic, server health) and alerting people when something goes wrong, so problems are found before customers report them.">Monitoring</dfn> and logging. Servers write a line to a log for every request and every error; monitoring tools (Datadog, Sentry, Grafana) collect them, chart them, and page someone at 2 a.m. if the error rate jumps. A product without monitoring finds out about outages from angry customers.</li>
-</ul>
+<section id="s3-5-wrap">
+<h3 id="s3-5">3.5 Beyond tables: NoSQL and ORMs <span class="time">8 min</span></h3>
+<h4>NoSQL databases</h4>
+<p>Not all data fits neatly into fixed columns. A product catalogue where every product has different attributes (shoes have sizes, laptops have memory) fights the relational model. <dfn class="kw" id="kw-nosql" data-def="A family of databases that do not use the table-and-SQL model. Document databases (MongoDB) store JSON-like records with flexible shapes; key-value stores (Redis) hold simple lookups very fast. Chosen for flexibility or speed at very large scale.">NoSQL</dfn> databases relax the rules. The most common kind, a <em>document database</em> such as MongoDB, stores each record as a JSON-like document with whatever fields it needs:</p>
+<pre><code>{
+  "product_id": 3,
+  "name": "Challah",
+  "price": 8.00,
+  "tags": ["bread", "shabbat", "egg"],
+  "sizes": {"small": 6.00, "large": 8.00}
+}</code></pre>
+<p>Flexibility has a price: the database no longer enforces that every product has a price, and combining data across collections is clumsier than a JOIN. The choice between relational and NoSQL is a genuine architecture decision, but a simple rule of thumb serves most businesses: <strong>start relational.</strong> Business data (customers, orders, invoices, inventory) is naturally tabular and you will want the guarantees. Reach for NoSQL when you have a specific reason: extremely high write volume, genuinely irregular data, or a cache.</p>
+
+<h4>ORMs: letting Python speak to the database</h4>
+<p>Developers rarely type SQL into their programs directly. Most use an <dfn class="kw" id="kw-orm" data-def="Object-Relational Mapper: a library that lets a program work with database rows as ordinary objects in its own language (Python, JavaScript) and writes the SQL behind the scenes. SQLAlchemy, Django ORM, and Prisma are examples.">ORM</dfn> (Object-Relational Mapper), a library that lets the program treat rows as ordinary Python objects and generates the SQL behind the scenes:</p>
+<pre><code># Python with an ORM (SQLAlchemy):
+boston = Customer.query.filter_by(city="Boston").all()
+
+# ...which the ORM turns into SQL for you:
+# SELECT * FROM customers WHERE city = 'Boston';</code></pre>
+<p>When Claude Code builds a back end for you, it will almost certainly use an ORM, and files called "models" describe the tables. The point for a business reader: the concepts (tables, keys, queries) are unchanged; the ORM is a convenience layer on top of them.</p>
+</section>
+
+<section id="s3-6-wrap">
+<h3 id="s3-6">3.6 Putting it together: the three-tier architecture <span class="time">10 min</span></h3>
+<p>We now have three distinct kinds of component, and the standard name for arranging them is the <dfn class="kw" id="kw-three-tier" data-def="The classic structure of a web application in three layers: the presentation tier (front end in the browser or app), the application or logic tier (back-end program), and the data tier (database). Each tier can be built, scaled, and replaced separately.">three-tier architecture</dfn>:</p>
+<ol>
+  <li><strong>Presentation tier</strong>: the front end. HTML, CSS, and JavaScript in the browser (or the screens of a phone app). Shows things to people and collects their input.</li>
+  <li><strong>Application tier</strong> (also called the logic tier or the back end): the server program. Receives requests, enforces business rules, decides what to do, talks to the database, and returns responses. This is where <dfn class="kw" id="kw-business-logic" data-def="The rules of the business as encoded in the back end: how prices are computed, who may see what, what makes an order valid, when to send a notification. Kept on the server so it cannot be bypassed or tampered with.">business logic</dfn> lives: prices, discounts, permissions, validation, workflows.</li>
+  <li><strong>Data tier</strong>: the database. Stores and retrieves the facts.</li>
+</ol>
+<p>Follow one order through all three tiers. Dana clicks "Order 2 challahs":</p>
 <figure>
 <div class="scroll">
-<svg viewBox="0 0 720 130" role="img" aria-label="Pipeline: a developer commits code to GitHub; automated tests run; the code deploys to staging for checks; then it deploys to production; monitoring watches production and feeds back to the developer.">
+<svg class="seq" viewBox="0 0 720 330" role="img" aria-label="An order placed in the browser travels to the back end as a POST request, the back end checks stock and price, writes to the database with SQL, the database confirms, the back end calls the payment and email APIs, and returns a JSON confirmation the browser displays.">
   <defs>
-    <marker id="arr13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+    <marker id="arr7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
   </defs>
-  <rect x="15" y="30" width="110" height="50" rx="6" class="d-box"/>
-  <text x="70" y="51" class="d-t" text-anchor="middle">Developer</text>
-  <text x="70" y="67" class="d-ts" text-anchor="middle">commits to Git</text>
-  <line x1="130" y1="55" x2="155" y2="55" class="d-line" marker-end="url(#arr13)"/>
-  <rect x="160" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
-  <text x="215" y="51" class="d-t" text-anchor="middle">Tests run</text>
-  <text x="215" y="67" class="d-ts" text-anchor="middle">automatically (CI)</text>
-  <line x1="275" y1="55" x2="300" y2="55" class="d-line" marker-end="url(#arr13)"/>
-  <rect x="305" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
-  <text x="360" y="51" class="d-t" text-anchor="middle">Staging</text>
-  <text x="360" y="67" class="d-ts" text-anchor="middle">team checks it</text>
-  <line x1="420" y1="55" x2="445" y2="55" class="d-line" marker-end="url(#arr13)"/>
-  <rect x="450" y="30" width="110" height="50" rx="6" class="d-hi"/>
-  <text x="505" y="51" class="d-th" text-anchor="middle">Production</text>
-  <text x="505" y="67" class="d-ts" text-anchor="middle">deployed (CD)</text>
-  <line x1="565" y1="55" x2="590" y2="55" class="d-line" marker-end="url(#arr13)"/>
-  <rect x="595" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
-  <text x="650" y="51" class="d-t" text-anchor="middle">Monitoring</text>
-  <text x="650" y="67" class="d-ts" text-anchor="middle">errors, latency</text>
-  <path d="M650,85 L650,108 L70,108 L70,90" class="d-line-dash" marker-end="url(#arr13)"/>
-  <text x="360" y="122" class="d-ts" text-anchor="middle">alerts and bug reports flow back to the developer</text>
+  <!-- tier headers -->
+  <rect x="20" y="14" width="200" height="40" rx="6" class="d-box"/>
+  <text x="120" y="31" class="d-tl" text-anchor="middle">Presentation tier</text>
+  <text x="120" y="46" class="d-ts" text-anchor="middle">Browser: HTML, CSS, JavaScript</text>
+  <rect x="260" y="14" width="200" height="40" rx="6" class="d-hi"/>
+  <text x="360" y="31" class="d-th" text-anchor="middle">Application tier</text>
+  <text x="360" y="46" class="d-ts" text-anchor="middle">Back end: Python + framework</text>
+  <rect x="500" y="14" width="200" height="40" rx="6" class="d-box"/>
+  <text x="600" y="31" class="d-tl" text-anchor="middle">Data tier</text>
+  <text x="600" y="46" class="d-ts" text-anchor="middle">Database: PostgreSQL</text>
+  <line x1="120" y1="54" x2="120" y2="320" class="d-line-dash"/>
+  <line x1="360" y1="54" x2="360" y2="320" class="d-line-dash"/>
+  <line x1="600" y1="54" x2="600" y2="320" class="d-line-dash"/>
+  <!-- 1 -->
+  <line x1="125" y1="86" x2="355" y2="86" class="d-line-hi" marker-end="url(#arr7)"/>
+  <circle cx="137" cy="76" r="8" class="d-num"/><text x="137" y="79.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="240" y="80" class="d-ts" text-anchor="middle">POST /api/orders  {product: 3, qty: 2}</text>
+  <!-- 2 logic -->
+  <rect x="285" y="100" width="150" height="34" rx="4" class="d-box-plain"/>
+  <text x="360" y="115" class="d-ts" text-anchor="middle">2. Business logic: is Dana</text>
+  <text x="360" y="128" class="d-ts" text-anchor="middle">logged in? in stock? price?</text>
+  <!-- 3 sql -->
+  <line x1="365" y1="158" x2="595" y2="158" class="d-line" marker-end="url(#arr7)"/>
+  <circle cx="377" cy="148" r="8" class="d-num"/><text x="377" y="151.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="482" y="152" class="d-ts" text-anchor="middle">INSERT INTO orders … ; UPDATE stock …</text>
+  <line x1="595" y1="186" x2="365" y2="186" class="d-line" marker-end="url(#arr7)"/>
+  <circle cx="583" cy="176" r="8" class="d-num"/><text x="583" y="179.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="482" y="180" class="d-ts" text-anchor="middle">Saved. New order_id = 90</text>
+  <!-- 5 third party -->
+  <rect x="285" y="204" width="150" height="46" rx="4" class="d-box-plain"/>
+  <text x="360" y="221" class="d-ts" text-anchor="middle">5. Call Stripe API to charge;</text>
+  <text x="360" y="234" class="d-ts" text-anchor="middle">call email API to confirm</text>
+  <text x="360" y="246" class="d-ts" text-anchor="middle" opacity="0.7">(third-party APIs, off to the side)</text>
+  <!-- 6 -->
+  <line x1="355" y1="276" x2="125" y2="276" class="d-line-hi" marker-end="url(#arr7)"/>
+  <circle cx="343" cy="266" r="8" class="d-num"/><text x="343" y="269.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="240" y="270" class="d-ts" text-anchor="middle">201 Created  {order_id: 90}</text>
+  <rect x="45" y="290" width="150" height="26" rx="4" class="d-hi"/>
+  <text x="120" y="307" class="d-th" text-anchor="middle">7. Show "Order #90 placed"</text>
 </svg>
 </div>
-<figcaption><b>How code reaches customers.</b> Each arrow is automated. A change that fails its tests never reaches staging; one that misbehaves in production is caught by monitoring and rolled back through version control.</figcaption>
+<figcaption><b>One order through three tiers.</b> The browser never touches the database and never sees the payment key. Everything that must be trusted happens in the application tier, on the server.</figcaption>
 </figure>
+<p>Three observations that will matter for the rest of the module:</p>
+<ul>
+  <li><strong>The browser never talks to the database directly.</strong> All access goes through the back end, which checks identity and applies rules. If a browser could send SQL, anyone could run <code>DELETE FROM orders</code>. This is why the front end can never be trusted with secrets or with enforcing rules; anything in the browser can be changed by the person using it.</li>
+  <li><strong>Each tier can be changed independently.</strong> Redesign the front end without touching the database. Swap SQLite for PostgreSQL without changing the HTML. Rewrite the back end from Python to something else while the other two tiers carry on. This independence is the whole point of tiers.</li>
+  <li><strong>Each tier can be placed on different hardware.</strong> Today all three might run on one laptop. Tomorrow the database can move to its own machine and the back end can be copied onto ten. That is Session 4.</li>
+</ul>
+<div class="note"><span class="label">Instructor note</span><p>Ask students to name the three tiers for an app they use daily. For Uber: the app on the phone (presentation), Uber's servers matching riders and drivers and computing fares (application), and the records of trips, drivers, and payments (data). Then ask where the surge-pricing rule lives. It is in the application tier, on the server, precisely so that no one can tamper with it from the app.</p></div>
 </section>
 
 <div class="review" id="review-3">
   <span class="label">Review questions</span>
-  <h4>Session 3: Hosting, scaling, and the cloud</h4>
+  <h4>Session 3: Dynamic websites, APIs, and databases</h4>
   <ol>
-    <li>What does "deploy" mean, and why do teams put a staging environment between development and production?<span class="answer">To deploy is to put a version of the software onto servers where real users can reach it. Staging is a private replica of production where the team checks a release with realistic data and settings before customers see it, catching the differences between "works on my machine" and the live system.</span></li>
-    <li>Describe the Step 1 single-server deployment and name its most serious weakness.<span class="answer">One rented machine (a VPS running Linux) hosts the web server program, the back-end application, and the database together. Its most serious weakness is that it is a single point of failure: a disk failure, power loss, or a botched update takes down the website and the data at the same time. It also suffers from resource contention and has a hard capacity ceiling.</span></li>
-    <li>Give two reasons for moving the database onto its own server, and explain what "private network" means in that design.<span class="answer">Reasons (any two): each machine can be sized for its own job (databases want memory and fast disks); security improves because the database is no longer on the machine exposed to the internet; the web server can be rebuilt without touching data; it enables running several web servers that share one database. A private network is one with no route from the public internet: only the company's own servers can connect to the database, enforced by firewall rules.</span></li>
-    <li>Explain the difference between vertical and horizontal scaling. Which one does modern web architecture rely on, and why?<span class="answer">Vertical scaling makes one machine bigger (more processor, memory). Horizontal scaling adds more identical machines and spreads work across them. Modern architecture relies on horizontal scaling because it has no hard ceiling, tolerates the failure of any single machine, and lets capacity grow and shrink with demand, whereas a single big machine remains a single point of failure and eventually cannot be made bigger.</span></li>
-    <li>What does a load balancer do, and what is a health check?<span class="answer">A load balancer holds the public address, receives every incoming request, and distributes requests across the pool of web servers so none is overloaded. A health check is a small request it sends to each server every few seconds; a server that fails to respond correctly is removed from rotation until it recovers, so customers never reach a broken server.</span></li>
-    <li>Why must web servers be stateless in a load-balanced setup? Where does the "state" go instead?<span class="answer">Because the load balancer may send a user's consecutive requests to different servers, any server that remembered something locally (such as "this person is logged in") would leave the others ignorant of it, and the site would appear broken. Servers therefore keep nothing between requests; who is logged in, cart contents, and all other shared facts live in a shared store every server can reach, such as the database or a Redis session store.</span></li>
-    <li>A customer in Tokyo complains that images load slowly from your site hosted in Virginia. Which component fixes this and how?<span class="answer">A content delivery network (CDN). It keeps copies of static files (images, CSS, JavaScript, video) on servers in cities around the world, so the Tokyo customer receives the image from a nearby server in a few milliseconds instead of waiting for it to cross the Pacific. It also removes that traffic from your own servers.</span></li>
-    <li>What is a cache, and what is the one hard problem every cache has?<span class="answer">A cache is a fast temporary copy of data that was expensive to compute or fetch, kept so the next request for it is answered instantly (for example a product list stored in memory instead of re-running the SQL query). The hard problem is staleness: the copy can be out of date, so someone must decide how long it may live and when it must be refreshed or discarded.</span></li>
-    <li>Place each of these on the IaaS / PaaS / SaaS / serverless menu: renting a virtual machine on AWS EC2; using Shopify to run a store; connecting a GitHub repo to Render so it runs your code; running a small function on AWS Lambda when a file is uploaded.<span class="answer">EC2 virtual machine = IaaS (you manage everything on it). Shopify = SaaS (finished software by subscription). Render running your code = PaaS (you provide code, they run the servers). Lambda function on upload = serverless (a single function run and billed per event).</span></li>
-    <li>You are deploying a prototype built with Claude Code for a business school project. Which layer of the cloud menu is the sensible choice and why?<span class="answer">PaaS (Render, Railway, Vercel, Fly.io) with a managed database (Supabase, Neon). It provides HTTPS, deployment from GitHub, load balancing, and horizontal scaling with no servers to administer, for little or no money, which matches a small team with no operations expertise. IaaS adds work without benefit at this scale.</span></li>
+    <li>In the Flask example, what does a route do, and what is the difference between the <code>/</code> route and the <code>/hours</code> route from the visitor's point of view?<span class="answer">A route connects a URL path to a function in the back end; when a request for that path arrives, the function runs and its return value becomes the response. The <code>/</code> route returns the same HTML every time, so it behaves like a static page. The <code>/hours</code> route checks the current time and returns different HTML depending on the answer, which is what makes it dynamic.</span></li>
+    <li>Explain what an API is using the restaurant analogy, then give a real example of a third-party API a small business might call and why.<span class="answer">An API is like a restaurant menu: a fixed list of what you may ask for and what you will receive, which lets outsiders use the kitchen without seeing inside it. Example: calling Stripe's API to charge a credit card, because building payment processing yourself is expensive, risky, and heavily regulated. Other valid answers: Twilio for text messages, Google Maps for addresses, the Claude API for text generation.</span></li>
+    <li>What is JSON, and why did it become the standard format for APIs?<span class="answer">JSON is a text format for data: curly braces hold named values, square brackets hold lists, text is quoted, numbers and true/false stand alone. It became the standard because it is human-readable, compact, maps directly onto the data structures of nearly every programming language (a Python dictionary, for instance), and is natively understood by JavaScript in the browser.</span></li>
+    <li>Match each HTTP method to a CRUD operation and give a bakery example for each.<span class="answer">POST = Create (place an order: <code>POST /api/orders</code>). GET = Read (list products: <code>GET /api/products</code>). PUT or PATCH = Update (mark an order ready: <code>PATCH /api/orders/88</code>). DELETE = Delete (cancel an order: <code>DELETE /api/orders/88</code>).</span></li>
+    <li>Give three reasons a business stores its data in a database rather than in ordinary files.<span class="answer">Any three of: many users and programs can write at the same time without corrupting the data; searches over millions of records are fast thanks to indexes; transactions guarantee changes are all-or-nothing so data is never left half-saved; complex questions (reports) can be asked in one line of SQL; constraints such as "every order must have a customer" are enforced automatically.</span></li>
+    <li>In the bakery schema, why does the orders table store a <code>customer_id</code> instead of the customer's name and email? Which term describes that column?<span class="answer">Storing the ID avoids copying the same customer details into every order. If Dana changes her email, it is updated once in the customers table and every order automatically reflects it; copies would drift out of sync. A column that holds another table's primary key is a foreign key.</span></li>
+    <li>In plain English, what does this query return?<br><code>SELECT customers.name, COUNT(*) FROM orders JOIN customers ON orders.customer_id = customers.customer_id GROUP BY customers.name;</code><span class="answer">For each customer who has placed at least one order, it returns the customer's name and the number of orders they have placed. The JOIN attaches the customer's name to each order via the customer_id key, and GROUP BY with COUNT tallies the orders per name.</span></li>
+    <li>What is dangerous about the statement <code>DELETE FROM orders;</code> and what single addition would make it safe?<span class="answer">It has no <code>WHERE</code> clause, so it deletes every row in the orders table, not just one. Adding a <code>WHERE</code> condition such as <code>WHERE order_id = 89</code> restricts it to the intended row. This is also why production databases are backed up and why write permissions are restricted.</span></li>
+    <li>Name the three tiers of the three-tier architecture and state which tier enforces the rule "customers get 10% off orders over $50" and why it must be there.<span class="answer">Presentation tier (front end in the browser or app), application tier (back-end program), and data tier (database). The discount rule belongs in the application tier, on the server. Anything in the browser can be altered by the user, so a rule enforced only in the front end could be bypassed to get a discount on any order.</span></li>
   </ol>
   <p class="answers-link">Answers are in <a href="#answers-3">Appendix B, Session 3</a>.</p>
 </div>

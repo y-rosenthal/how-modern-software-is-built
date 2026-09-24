@@ -1,0 +1,157 @@
+<section id="s1-4-wrap">
+<h3 id="s1-4">1.4 The ecosystem: packages and libraries <span class="time">10 min</span></h3>
+<p>No serious program is written from scratch. Sending an email, reading a spreadsheet, charging a credit card, resizing an image, talking to a database, drawing a chart: for any language worth using, someone has already written each of these and published it for free. A language's <dfn class="kw" id="kw-ecosystem" data-def="Everything that surrounds a language beyond the language itself: its libraries and frameworks, the package manager that distributes them, its tools, hosting support, documentation, and community. Often a bigger factor in language choice than the language's own features.">ecosystem</dfn> is that collection of ready-made parts plus the tools for finding and installing them, and it is frequently the deciding factor between two otherwise similar languages.</p>
+<p>The mechanics are worth knowing because they come up daily. Libraries are distributed through a <dfn class="kw" id="kw-package-manager" data-def="A tool that downloads, installs, and updates libraries for a language from a central registry, and records which ones a project depends on. pip and uv for Python, npm for JavaScript, Maven for Java, cargo for Rust.">package manager</dfn>, which fetches them from a central registry and keeps track of which versions your project uses. Python has <code>pip</code> (and a newer, faster tool called <code>uv</code>) drawing from a registry called PyPI with over half a million packages. JavaScript has <code>npm</code>, with more than two million. When a developer says "we added a dependency," they mean the project now relies on someone else's package.</p>
+<p>Almost all of these packages are <dfn class="kw" id="kw-open-source" data-def="Software whose source code is published for anyone to read, use, modify, and redistribute, usually free of charge under a licence. Most programming languages, libraries, and much infrastructure (Linux, PostgreSQL) are open source.">open source</dfn>: published freely for anyone to use, inspect, and improve. Open source is why a two-person startup can build on the same foundations as a bank. It is also a supply chain. A package you depend on may itself depend on fifty others, each maintained by volunteers who may stop, and occasionally one is abandoned or, rarely, deliberately sabotaged. Mature ecosystems have tooling that flags known-vulnerable packages, which is one more reason maturity matters.</p>
+<p>Ecosystem strength is uneven across domains, and this is where it steers language choice:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>If your product is mostly about…</th><th>The ecosystem pulls you toward</th><th>Because</th></tr></thead>
+  <tbody>
+    <tr><td>AI, machine learning, data analysis</td><td>Python</td><td>Every major AI library (PyTorch, scikit-learn, pandas, the Claude and OpenAI SDKs) is Python-first. Other languages get ports later, if at all.</td></tr>
+    <tr><td>A rich, interactive web front end</td><td>JavaScript / TypeScript</td><td>React, Vue, and the entire browser tooling world live here, and nothing else runs in the browser.</td></tr>
+    <tr><td>A conventional web back end with a database</td><td>Python, JavaScript, Ruby, Java, C#, Go, PHP</td><td>All have mature web frameworks; the choice is made by the other factors and by team familiarity.</td></tr>
+    <tr><td>Large enterprise integration (SAP, Oracle, mainframes)</td><td>Java, C#</td><td>Decades of connectors and vendor support.</td></tr>
+    <tr><td>Games</td><td>C# (Unity), C++ (Unreal)</td><td>The engines dictate the language.</td></tr>
+    <tr><td>A native iPhone or Android app</td><td>Swift / Kotlin</td><td>Apple and Google build their libraries and tools for these first.</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="ai"><span class="label">In the age of AI</span><p><strong>The ecosystem matters as much as ever, and there is a new failure mode to watch.</strong> An assistant is only as capable as the libraries it can call; it will not write a payment processor from scratch any more than a human would, so a language with the right packages is still the right language. Two things change. First, the assistant knows the ecosystem better than any individual, and will reach for the standard library for a job you did not know had one, which makes rich ecosystems even more valuable. Second, assistants sometimes <dfn class="kw" id="kw-hallucination" data-def="An AI model producing confident but false output, such as a function, package, or API that does not exist. In coding, the usual sign is an import or install command that fails. Always verify that a suggested package is real and maintained.">hallucinate</dfn>: they confidently name a package or function that does not exist, or that existed in an older version. The install fails or the code will not run, which makes it easy to catch, but it is why the person directing the assistant still needs to check that a suggested dependency is real, maintained, and reputable before it goes into a product.</p></div>
+</section>
+
+<section id="s1-5-wrap">
+<h3 id="s1-5">1.5 Speed and memory: when performance matters <span class="time">10 min</span></h3>
+<p>Languages differ enormously in how fast the programs written in them run and how much memory they use. Compiled languages such as C, C++, and Rust are typically ten to a hundred times faster than interpreted ones such as Python at raw computation, and use a fraction of the memory, because there is no interpreter in the way and the programmer controls exactly how data is laid out. Java, C#, and Go sit between the two.</p>
+<p>The instinct is to want the fastest, and it is usually wrong. What matters is <em>where the time actually goes</em>:</p>
+<ul>
+  <li><strong>Most business applications wait, they do not compute.</strong> A web request spends its time waiting for the database, the network, and the disk. Whether the surrounding logic runs in one millisecond or ten is invisible next to a fifty-millisecond database query. Instagram, Dropbox, Spotify, and Reddit serve enormous audiences from Python and the like, because the architecture in Sessions 4 and 5 (caching, more servers) buys far more speed than a faster language would.</li>
+  <li><strong>Developer time costs more than machine time.</strong> A language that lets a team ship in a week instead of a month is worth more than one that saves a few servers, at almost any scale short of the very largest. Servers cost dollars; developers cost thousands.</li>
+  <li><strong>The slow language often calls the fast one.</strong> Python's data and AI libraries are Python on the outside and C or C++ on the inside. The heavy arithmetic runs at compiled speed; the developer writes the convenient language. This is why "Python is slow" and "Python runs the world's AI" are both true.</li>
+</ul>
+<p>Performance genuinely decides the language in a minority of cases, and they are recognisable:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Situation</th><th>Why performance wins</th><th>Typical choice</th></tr></thead>
+  <tbody>
+    <tr><td>Embedded devices, wearables, sensors</td><td>Kilobytes of memory, a slow processor, a battery to preserve. Every byte and cycle counts.</td><td>C, C++, Rust</td></tr>
+    <tr><td>Games and graphics, video processing</td><td>Sixty frames a second leaves 16 milliseconds per frame for everything.</td><td>C++, C# (Unity), Rust</td></tr>
+    <tr><td>High-frequency trading, real-time control</td><td>Microseconds are money or safety.</td><td>C++, Rust</td></tr>
+    <tr><td>Very large scale services</td><td>At millions of requests per second, a 10× efficiency difference is thousands of servers.</td><td>Go, Rust, Java, C++ for the hot parts</td></tr>
+    <tr><td>Mobile apps</td><td>Battery life and a phone's memory limits; users notice a sluggish app instantly.</td><td>Swift, Kotlin (compiled for the device)</td></tr>
+  </tbody>
+</table>
+</div>
+<p><dfn class="kw" id="kw-memory-footprint" data-def="How much of a computer's working memory (RAM) a program uses while running. Matters on small devices, on phones, and on servers where memory is what you pay for; matters little for most business applications on modern hardware.">Memory footprint</dfn> follows the same logic: it decides everything on a device with 256 kilobytes and almost nothing on a server with 64 gigabytes. The sensible sequence for most products is to build in the productive language, measure, and rewrite only the specific slow part in a faster one if measurement proves it necessary. Teams that guess in advance which part will be slow are usually wrong.</p>
+<div class="ai"><span class="label">In the age of AI</span><p><strong>Performance constraints are physics and do not move; the cost of responding to them drops sharply.</strong> A thermostat's processor is no faster because an AI wrote the code, and a Python loop is no faster either. But the traditional reason to <em>start</em> in a fast, hard language, that rewriting later would be too expensive, has weakened. An assistant can take a slow Python function that measurement has identified and produce a Rust or C++ equivalent in minutes, a job that once justified hiring a specialist. The practical rule becomes even more strongly "build in the productive language, measure, then optimise the hot spots," because the last step is now cheap. Where performance rules from the start (embedded, games, trading), AI assistance makes the demanding languages more accessible to a small team but does not change which languages those are.</p></div>
+</section>
+
+<section id="s1-6-wrap">
+<h3 id="s1-6">1.6 Platforms and portability <span class="time">12 min</span></h3>
+<p>A <dfn class="kw" id="kw-platform" data-def="The combination of hardware and operating system a program runs on: Windows on an Intel laptop, macOS on Apple silicon, Linux on a server, iOS on an iPhone, Android on a Samsung phone, or a browser. Software must be built or packaged separately for each platform it targets unless something in between hides the difference.">platform</dfn> is the combination of processor and operating system a program runs on: Windows on an Intel laptop, macOS on an Apple chip, Linux on a cloud server, iOS on an iPhone, Android on a Samsung phone. Machine code for one is gibberish to another, for two independent reasons. The <dfn class="kw" id="kw-cpu-architecture" data-def="The family of a processor, which determines the machine code it understands. The two that matter today are x86 (Intel and AMD, most PCs and servers) and ARM (all phones, Apple silicon Macs, and a growing share of servers). Compiled programs must be built separately for each.">processor architecture</dfn> differs (Intel and AMD chips speak x86; phones, Apple silicon Macs, and a growing share of servers speak ARM), and the operating system differs in how programs ask for files, windows, and the network. Getting the same software onto several platforms is a real cost, and languages handle it in three different ways.</p>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 740 330" role="img" aria-label="Three strategies for reaching Windows, macOS, and Linux: C++ source is compiled separately into three different executables; Java source is compiled once into bytecode that a virtual machine on each platform runs; Python source is not compiled at all and is run by an interpreter installed on each platform.">
+  <defs>
+    <marker id="arr1p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- column headers -->
+  <text x="90" y="24" class="d-ts" text-anchor="middle" opacity="0.7">source code</text>
+  <text x="350" y="24" class="d-ts" text-anchor="middle" opacity="0.7">what ships</text>
+  <text x="630" y="24" class="d-ts" text-anchor="middle" opacity="0.7">each platform</text>
+  <!-- row 1: C++ -->
+  <text x="20" y="52" class="d-tl">1. Compile per platform (C, C++, Rust, Go, Swift)</text>
+  <rect x="30" y="62" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="82" class="d-mono" text-anchor="middle">app.cpp</text>
+  <rect x="270" y="58" width="160" height="14" rx="3" class="d-box"/><text x="350" y="68" class="d-ts" text-anchor="middle" style="font-size:9px">app.exe (Windows, x86)</text>
+  <rect x="270" y="76" width="160" height="14" rx="3" class="d-box"/><text x="350" y="86" class="d-ts" text-anchor="middle" style="font-size:9px">app (macOS, ARM)</text>
+  <rect x="270" y="94" width="160" height="14" rx="3" class="d-box"/><text x="350" y="104" class="d-ts" text-anchor="middle" style="font-size:9px">app (Linux, x86)</text>
+  <line x1="155" y1="70" x2="265" y2="65" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="155" y1="78" x2="265" y2="83" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="155" y1="86" x2="265" y2="101" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="205" y="60" class="d-ts" text-anchor="middle" style="font-size:9.5px">3 compiles</text>
+  <rect x="560" y="58" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="68" class="d-ts" text-anchor="middle" style="font-size:9px">Windows PC</text>
+  <rect x="560" y="76" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="86" class="d-ts" text-anchor="middle" style="font-size:9px">Mac</text>
+  <rect x="560" y="94" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="104" class="d-ts" text-anchor="middle" style="font-size:9px">Linux server</text>
+  <line x1="435" y1="65" x2="555" y2="65" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="83" x2="555" y2="83" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="101" x2="555" y2="101" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="380" y="126" class="d-ts" text-anchor="middle">Fastest programs; one build (and one round of testing) per platform</text>
+  <!-- row 2: Java -->
+  <text x="20" y="158" class="d-tl">2. Compile once to a virtual machine (Java, Kotlin, C#)</text>
+  <rect x="30" y="168" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="188" class="d-mono" text-anchor="middle">App.java</text>
+  <rect x="270" y="168" width="160" height="30" rx="5" class="d-hi"/><text x="350" y="188" class="d-th" text-anchor="middle">App.class (bytecode)</text>
+  <line x1="155" y1="183" x2="265" y2="183" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="210" y="176" class="d-ts" text-anchor="middle" style="font-size:9.5px">1 compile</text>
+  <rect x="560" y="164" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="174" class="d-ts" text-anchor="middle" style="font-size:9px">Windows + JVM</text>
+  <rect x="560" y="182" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="192" class="d-ts" text-anchor="middle" style="font-size:9px">Mac + JVM</text>
+  <rect x="560" y="200" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="210" class="d-ts" text-anchor="middle" style="font-size:9px">Linux + JVM</text>
+  <line x1="435" y1="178" x2="555" y2="171" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="184" x2="555" y2="189" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="190" x2="555" y2="207" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="380" y="232" class="d-ts" text-anchor="middle">"Write once, run anywhere": the same file runs wherever the virtual machine is installed</text>
+  <!-- row 3: Python -->
+  <text x="20" y="264" class="d-tl">3. Interpret the source directly (Python, JavaScript, Ruby)</text>
+  <rect x="30" y="274" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="294" class="d-mono" text-anchor="middle">app.py</text>
+  <rect x="270" y="274" width="160" height="30" rx="5" class="d-box"/><text x="350" y="294" class="d-t" text-anchor="middle">app.py, unchanged</text>
+  <line x1="155" y1="289" x2="265" y2="289" class="d-line-dash"/>
+  <text x="210" y="282" class="d-ts" text-anchor="middle" style="font-size:9.5px">no compile</text>
+  <rect x="560" y="270" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="280" class="d-ts" text-anchor="middle" style="font-size:9px">Windows + Python</text>
+  <rect x="560" y="288" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="298" class="d-ts" text-anchor="middle" style="font-size:9px">Mac + Python</text>
+  <rect x="560" y="306" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="316" class="d-ts" text-anchor="middle" style="font-size:9px">Linux + Python</text>
+  <line x1="435" y1="284" x2="555" y2="277" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="290" x2="555" y2="295" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="296" x2="555" y2="313" class="d-line" marker-end="url(#arr1p)"/>
+</svg>
+</div>
+<figcaption><b>Three ways to reach three platforms.</b> Compiled languages produce a separate program per platform. Java-style languages compile once to an intermediate form that a virtual machine runs anywhere. Interpreted languages ship the source itself. Each step down trades speed for portability.</figcaption>
+</figure>
+<ol>
+  <li><strong>Recompile for each platform.</strong> C and C++ programs are compiled straight to machine code, so a Windows build, a Mac build, and a Linux build are three separate products, each needing its own compilation and its own testing. When Apple moved Macs from Intel to its own ARM chips in 2020, every compiled Mac program had to be rebuilt, which is why some software ran slowly in an emulator for a year or two. Rust, Go, and Swift work the same way, though their tooling makes the rebuilds easier.</li>
+  <li><strong>Compile once, run on a virtual machine.</strong> Java was designed in the 1990s around the slogan "write once, run anywhere." Java source is compiled to <dfn class="kw" id="kw-bytecode" data-def="An intermediate, platform-neutral form of a compiled program (Java's .class files, .NET's assemblies) that is run by a virtual machine installed on each platform, rather than directly by the processor.">bytecode</dfn>, a machine code for an imaginary computer, and a <dfn class="kw" id="kw-virtual-machine" data-def="A program that behaves like a standardised imaginary computer and runs bytecode on top of whatever real platform it is installed on. The Java Virtual Machine (JVM) and the .NET runtime let one compiled program run unchanged on Windows, macOS, and Linux.">virtual machine</dfn> (the JVM) installed on each real platform runs that imaginary computer. The same <code>.class</code> file runs unchanged on Windows, Mac, Linux, and, historically, on phones and smart cards. Kotlin, Scala, and Clojure share the JVM; C# and the other .NET languages use the equivalent .NET runtime. The price is the virtual machine itself: it must be installed, it uses memory, and it takes a moment to start.</li>
+  <li><strong>Ship the source and interpret it.</strong> Python, JavaScript, and Ruby are never compiled by the developer at all. The same source file runs anywhere the interpreter is installed. JavaScript is the extreme case: the interpreter is built into every browser on earth, which makes the web the most portable platform that has ever existed. A web app needs no per-platform version, no app store, and no installer.</li>
+</ol>
+<p>Mobile phones are the important special case. Apple and Google each built their platform around a preferred language and toolset: Swift (and its predecessor Objective-C) for iOS, Kotlin (and older Java) for Android. Both are compiled for the phone's processor, and the platform's own libraries, design conventions, and store tooling are built for them first. A company that wants the best possible app on both platforms therefore writes it twice. <dfn class="kw" id="kw-cross-platform-framework" data-def="A toolkit (React Native, Flutter, .NET MAUI) that lets one codebase produce apps for both iOS and Android, and sometimes desktop, by translating to each platform's native components or drawing its own. Saves writing the app twice at some cost in performance and platform polish.">Cross-platform frameworks</dfn> such as React Native (JavaScript) and Flutter (Dart) exist to avoid that: one codebase produces both apps, at some cost in performance and in fidelity to each platform's conventions. Session 5 returns to this trade-off in detail. For desktop software, Electron plays the same role, wrapping a web app so that Slack, VS Code, and Discord ship one codebase to Windows, Mac, and Linux.</p>
+<p>The business reading of all this: every additional platform is an additional product to build, test, and support, and the language strategy determines how much of that work is duplicated. The web minimises it, virtual-machine languages nearly eliminate it for desktop and server software, compiled languages maximise it but run fastest, and native mobile doubles it on purpose in exchange for the best user experience.</p>
+<div class="ai"><span class="label">In the age of AI</span><p><strong>Portability matters somewhat less as a language-selection factor, and just as much as a testing burden.</strong> The reason to fear multiple platforms was the labour of writing and maintaining several versions. An assistant can port a function from Swift to Kotlin, adjust a build for ARM, or generate the platform-specific glue in a fraction of the time, so "we would have to write it twice" is a weaker objection than it was. What AI does not do is run the app on a real iPhone, a real Samsung, and a real Windows laptop and notice that the layout breaks or the battery drains. Each platform still has to be tested and supported by people. So choose the platform strategy on the basis of what your users need and what you can test, and let AI absorb more of the duplicated writing.</p></div>
+</section>
+
+<section id="s1-7-wrap">
+<h3 id="s1-7">1.7 Making the decision in the age of AI <span class="time">8 min</span></h3>
+<p><dfn class="kw" id="kw-ai-assisted-development" data-def="Building software with an AI model doing much of the writing, explaining, and debugging of code under a person's direction, using tools such as Claude Code. Shifts the human's work from typing code toward specifying, reviewing, testing, and deciding.">AI-assisted development</dfn> changes who types the code but not which language the code should be in. Pulling the session together, here is how each factor shifts:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Factor</th><th>The question to ask</th><th>Weight before AI</th><th>Weight with AI assistance</th></tr></thead>
+  <tbody>
+    <tr><td>Fit for purpose</td><td>Was this language built for this layer and this job?</td><td>Decisive</td><td><strong>Unchanged.</strong> Platforms dictate the browser, database, and mobile languages; AI cannot override that.</td></tr>
+    <tr><td>Popularity and maturity</td><td>How many people use it, how long has it been stable, will it exist in ten years?</td><td>High (hiring, answers, longevity)</td><td><strong>Higher.</strong> AI quality tracks how much public code exists. Mainstream, stable languages get the best help.</td></tr>
+    <tr><td>Ecosystem</td><td>Do the libraries I need already exist and are they maintained?</td><td>High</td><td><strong>Unchanged to higher.</strong> AI uses libraries rather than replacing them; verify that suggested packages are real.</td></tr>
+    <tr><td>Speed and memory</td><td>Does measurement say the language is the bottleneck, or is it the database and network?</td><td>Decisive in a minority of domains; overrated elsewhere</td><td><strong>Same domains decisive; elsewhere lower.</strong> Rewriting a hot spot in a fast language is now cheap, so start productive.</td></tr>
+    <tr><td>Platforms</td><td>Where must this run, and how many separate versions does that imply?</td><td>High (duplicated work)</td><td><strong>Lower for writing, unchanged for testing.</strong> AI ports code; people still verify every platform.</td></tr>
+    <tr><td>Your own familiarity</td><td>Can I (or my team) read and maintain it?</td><td>Often the deciding factor in practice</td><td><strong>Lower but not zero.</strong> AI lets you build in a language you do not know; you still have to review what it wrote and understand it when it breaks.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Three conclusions follow, and they are the ones to carry into the rest of the module:</p>
+<ol>
+  <li><strong>Choose mainstream.</strong> For anything built with an AI assistant, prefer the languages with the largest bodies of public code: Python, JavaScript/TypeScript, SQL, and Java or C# where the enterprise requires them, with Swift and Kotlin for native mobile. This is where the assistant is most reliable and where a human reviewer can most easily find help.</li>
+  <li><strong>Optimise for readability, not typing speed.</strong> When an AI writes most of the code, the human's job becomes reading it: reviewing, testing, and deciding. A language that is easy to read (Python was designed for exactly this) makes that job possible for a non-specialist. This is a real argument for Python as a first back-end language for people in this course.</li>
+  <li><strong>The language is rarely the risk.</strong> Products fail far more often from unclear requirements, wrong data models, and missing security than from choosing Python over Go. Spend the decision-making effort on the architecture in Sessions 2 to 5, pick a sensible mainstream language, and move on.</li>
+</ol>
+<div class="note"><span class="label">The stack used in this module</span><p>The rest of these sessions use HTML, CSS, and JavaScript in the browser, Python on the server, and SQL in the database. That is the combination most compatible with your Python course, the one with the deepest AI support, and one that real companies run at scale. Where a phone app appears, Swift and Kotlin are named as the native choices.</p></div>
+</section>
+
+<div class="review" id="review-1">
+  <span class="label">Review questions</span>
+  <h4>Session 1: Choosing a programming language</h4>
+  <ol>
+    <li>Explain the difference between a compiler and an interpreter, and name one language of each kind.<span class="answer">A compiler translates the whole program into machine code ahead of time, producing an executable tied to one processor and operating system (C, C++, Rust, Go, Swift). An interpreter reads the source code and carries out its instructions on the spot, so the same file runs wherever the interpreter is installed (Python, JavaScript, Ruby). Compiled code runs faster; interpreted code is more portable and quicker to develop.</span></li>
+    <li>Why would nobody build a website in SQL, even though SQL is an excellent language?<span class="answer">SQL is a domain-specific language designed only for asking questions of and making changes to relational databases. It has no way to express page layout, respond to a click, send an email, or run general logic. Websites need general-purpose languages (JavaScript in the browser, Python or similar on the server); SQL is used alongside them for the database part.</span></li>
+    <li>Give three reasons a language's popularity matters to a business, then explain the new reason it matters in the age of AI.<span class="answer">Any three of: easier and cheaper hiring; every problem has been solved and written up publicly; long-term support and longevity of the product; faster security fixes because many people inspect the code; better tools and hosting support. The new reason: AI assistants learn from public code, so they write mainstream languages far more reliably than niche or very new ones. Building with AI makes mainstream choices more valuable, not less.</span></li>
+    <li>What is a package manager, and what is a hallucinated package?<span class="answer">A package manager (pip or uv for Python, npm for JavaScript) downloads and installs libraries from a central registry and records which ones a project depends on. A hallucinated package is a library an AI assistant confidently names that does not actually exist (or no longer exists in that form); the install or import fails, which is why a person should verify that suggested dependencies are real and maintained.</span></li>
+    <li>A colleague insists your new online store must be written in C++ "because it is the fastest language." How do you respond?<span class="answer">Most web applications spend their time waiting for the database, network, and disk, not computing, so the language's raw speed is invisible next to those delays; companies such as Instagram and Spotify serve huge audiences from Python. Developer time is far more expensive than server time, and the architecture (caching, more servers) buys more speed than a faster language. The sensible approach is to build in a productive language, measure, and rewrite only a proven hot spot in a faster language, which AI assistance now makes cheap. C++ is the right choice for embedded devices, games, and trading systems, not for an online store.</span></li>
+    <li>Describe the three ways software reaches Windows, Mac, and Linux, and name a language for each.<span class="answer">(1) Compile separately for each platform, producing a different executable per processor and operating system (C, C++, Rust, Go, Swift). (2) Compile once to bytecode and run it on a virtual machine installed on each platform, Java's "write once, run anywhere" (Java, Kotlin, C# on .NET). (3) Ship the source code unchanged and run it with an interpreter installed on each platform (Python, JavaScript, Ruby); JavaScript's interpreter is built into every browser, making the web the most portable platform.</span></li>
+    <li>Why do companies often write their mobile app twice, and what alternative exists?<span class="answer">Apple and Google each built their platform around a preferred, compiled language with its own libraries and tools: Swift for iOS and Kotlin for Android. The best experience on each platform comes from using its native language, so a company wanting the best app on both writes two. The alternative is a cross-platform framework such as React Native or Flutter, which produces both apps from one codebase at some cost in performance and platform polish.</span></li>
+    <li>Which factor in language choice becomes <em>less</em> important with AI-assisted development, which becomes <em>more</em> important, and why?<span class="answer">Less important: the team's own familiarity with a language's syntax, and the labour of writing multiple platform versions, because the assistant can write in a language you do not know and port code between platforms. More important: popularity and maturity, because the assistant's reliability depends on how much public code exists in that language and version. Fit for purpose, ecosystem, and the physics of performance are unchanged, and testing on every platform still requires people.</span></li>
+  </ol>
+  <p class="answers-link">Answers are in <a href="#answers-1">Appendix B, Session 1</a>.</p>
+</div>

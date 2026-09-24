@@ -1,0 +1,156 @@
+<section class="session" id="session-5">
+  <div class="eyebrow">Session 5 · 75 minutes</div>
+  <h2>Identity, Security, and Software Beyond the Browser</h2>
+  <p class="goal">Every architecture so far has quietly assumed the server knows who is asking. This session explains how it finds out: passwords, cookies and sessions, Basic Auth, and OAuth, the mechanism behind every "Sign in with Google" button. We then widen the lens from websites to phone apps, installed programs, and embedded devices, and finish with where AI services fit in the picture.</p>
+
+  <div class="objectives">
+    <h4>By the end of this session students can</h4>
+    <ul>
+      <li>Distinguish authentication from authorization with examples.</li>
+      <li>Explain why passwords are hashed and what multi-factor authentication adds.</li>
+      <li>Describe how a cookie keeps a user logged in across stateless requests.</li>
+      <li>Explain HTTP Basic Authentication and why it is only acceptable over HTTPS.</li>
+      <li>Walk through the OAuth authorization-code flow and explain what it protects.</li>
+      <li>Compare web, native mobile, cross-platform, desktop, and embedded software and describe how all of them use the same back end.</li>
+      <li>Explain where an AI model such as Claude sits in a product's architecture.</li>
+    </ul>
+  </div>
+
+  <table class="agenda">
+    <thead><tr><th>Section</th><th>Minutes</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#s5-1">5.1 Authentication versus authorization</a></td><td>8</td></tr>
+      <tr><td><a href="#s5-2">5.2 Passwords done right</a></td><td>8</td></tr>
+      <tr><td><a href="#s5-3">5.3 Staying logged in: cookies, sessions, and tokens</a></td><td>10</td></tr>
+      <tr><td><a href="#s5-4">5.4 HTTP Basic Authentication and API keys</a></td><td>7</td></tr>
+      <tr><td><a href="#s5-5">5.5 OAuth: how "Sign in with Google" works</a></td><td>15</td></tr>
+      <tr><td><a href="#s5-6">5.6 Security basics every product owner should know</a></td><td>7</td></tr>
+      <tr><td><a href="#s5-7">5.7 Beyond the browser: mobile, desktop, embedded</a></td><td>10</td></tr>
+      <tr><td><a href="#s5-8">5.8 Where AI fits</a></td><td>5</td></tr>
+    </tbody>
+    <tfoot><tr><td>Review questions and buffer</td><td>5</td></tr></tfoot>
+  </table>
+</section>
+
+<section id="s5-1-wrap">
+<h3 id="s5-1">5.1 Authentication versus authorization <span class="time">8 min</span></h3>
+<p>Two words that sound alike and are constantly confused, even by professionals. Keep them apart with two questions.</p>
+<ul>
+  <li><dfn class="kw" id="kw-authentication" data-def="Verifying that someone is who they claim to be, typically by checking a password, a code from their phone, a fingerprint, or a token issued by a trusted identity provider. Answers 'Who are you?' Often shortened to 'authn'.">Authentication</dfn> answers <em>"Who are you?"</em> It is the act of proving identity: a password, a code from your phone, a fingerprint, or a login through Google. Shortened to "authn" or just "auth".</li>
+  <li><dfn class="kw" id="kw-authorization" data-def="Deciding what an already-identified user is allowed to do: view this order, edit that page, approve a refund. Answers 'What may you do?' Often shortened to 'authz'.">Authorization</dfn> answers <em>"What are you allowed to do?"</em> Once the system knows you are Dana, may Dana see order 90? May Dana see <em>Sam's</em> order 88? May Dana issue a refund? Shortened to "authz".</li>
+</ul>
+<div class="analogy"><span class="label">Analogy</span><p>An office building. Showing your badge at the front desk is authentication: they confirm you are an employee. Which doors your badge opens is authorization: the server room is not among them unless you are in IT. A guest badge authenticates you as a visitor and authorizes almost nothing.</p></div>
+<p>Authorization is usually organised through <dfn class="kw" id="kw-role" data-def="A named bundle of permissions assigned to users, such as customer, staff, or administrator, so that access rules are written once per role instead of once per person. Role-based access control (RBAC) is the common name for this approach.">roles</dfn>: customer, staff, manager, administrator. Rules are written per role ("staff may mark orders ready; only managers may refund") and users are assigned roles. Deciding the roles and rules of a product is a business question, not a technical one, and it is one you should expect to answer when you build something.</p>
+<p>A rule of thumb that catches most authorization bugs in the wild: <strong>every request that touches a specific record must check that <em>this</em> user may touch <em>this</em> record.</strong> Systems that check "is the user logged in?" but forget "is this their order?" allow anyone to read anyone's data by changing the number in the URL. This exact flaw has produced many of the largest data leaks of the last decade.</p>
+</section>
+
+<section id="s5-2-wrap">
+<h3 id="s5-2">5.2 Passwords done right <span class="time">8 min</span></h3>
+<p>The oldest authentication method is a shared secret: the user and the server both know the password. The obvious design, storing each user's password in the database next to their email, is also the most dangerous thing a product can do. If the database is ever stolen (and databases are stolen constantly), every password is exposed, and since people reuse passwords, so are their bank and email accounts.</p>
+<p>The correct design stores a <dfn class="kw" id="kw-hash" data-def="A fixed-length scramble of some input produced by a one-way mathematical function: the same input always gives the same hash, but the hash cannot be reversed to recover the input. Passwords are stored as hashes so that a stolen database does not reveal them.">hash</dfn> of the password instead. A hash function turns any input into a fixed-length scramble in a way that cannot be reversed. <code>correct-horse-battery</code> might hash to <code>$2b$12$K9xT…</code>. To check a login, the server hashes what the user typed and compares the two scrambles. The server never needs the original password, and a thief who steals the database gets scrambles they cannot turn back into passwords. (Details you may hear: passwords are "salted," meaning a random value is mixed in so identical passwords do not produce identical hashes, and slow algorithms such as bcrypt or argon2 are used so that guessing billions of passwords takes years.)</p>
+<p>The lesson for a product owner is simple and non-negotiable: <strong>if a system can email you your old password, it is storing passwords wrongly.</strong> A correctly built system can only reset a password, never reveal it.</p>
+<p>Passwords alone are weak because people choose bad ones and reuse them. <dfn class="kw" id="kw-mfa" data-def="Multi-Factor Authentication: requiring two or more independent proofs of identity, typically something you know (a password) plus something you have (a code from your phone, a hardware key) or something you are (a fingerprint). Blocks most account takeovers even when the password is stolen.">Multi-factor authentication</dfn> (MFA, or two-factor, 2FA) adds a second, independent proof: something you <em>have</em> (a code from an authenticator app or a hardware key) or something you <em>are</em> (a fingerprint or face) on top of something you <em>know</em> (the password). A stolen password alone then no longer opens the account. Every serious product should offer it, and every business should require it for staff accounts. Newer <em>passkeys</em> go further and replace passwords with a cryptographic key stored on your device, unlocked by fingerprint or face; they are becoming the default on major platforms.</p>
+</section>
+
+<section id="s5-3-wrap">
+<h3 id="s5-3">5.3 Staying logged in: cookies, sessions, and tokens <span class="time">10 min</span></h3>
+<p>Session 4 established that HTTP is stateless: each request arrives with no memory of the last. Yet you log in once and stay logged in for weeks. How does the server recognise you on the second request?</p>
+<p>The mechanism is the <dfn class="kw" id="kw-cookie" data-def="A small piece of text a server asks the browser to store and to send back automatically with every future request to that site. The standard way a website recognises a returning browser, most importantly to keep you logged in.">cookie</dfn>. When you log in successfully, the server's response includes an instruction: "browser, please store this piece of text and send it back to me with every future request." The browser obeys automatically. The text is usually a <dfn class="kw" id="kw-session" data-def="The server's record that a particular user has logged in, identified by a long random session ID that is stored in the user's cookie. On each request the server looks up the ID to learn who is asking. Sessions expire after a period or on logout.">session ID</dfn>: a long random string that means nothing by itself but which the server has recorded in its session store (the Redis box in Session 4) alongside "this is Dana, logged in at 8:14, expires in 14 days." Each request carries the cookie; the server looks up the ID; now it knows who is asking. Log out, and the server deletes the record so the ID becomes worthless.</p>
+<figure>
+<div class="scroll">
+<svg class="seq" viewBox="0 0 720 300" role="img" aria-label="Login sequence: the browser posts email and password; the server checks the hash, creates a session record, and replies with a Set-Cookie header; the browser stores the cookie and sends it with every later request; the server looks up the session ID to identify the user.">
+  <defs>
+    <marker id="arr14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="30" y="16" width="130" height="34" rx="6" class="d-box"/><text x="95" y="38" class="d-tl" text-anchor="middle">Browser</text>
+  <rect x="380" y="16" width="130" height="34" rx="6" class="d-hi"/><text x="445" y="38" class="d-th" text-anchor="middle">Back end</text>
+  <rect x="570" y="16" width="130" height="34" rx="6" class="d-box"/><text x="635" y="38" class="d-tl" text-anchor="middle">Session store</text>
+  <line x1="95" y1="50" x2="95" y2="290" class="d-line-dash"/>
+  <line x1="445" y1="50" x2="445" y2="290" class="d-line-dash"/>
+  <line x1="635" y1="50" x2="635" y2="290" class="d-line-dash"/>
+  <!-- 1 login -->
+  <line x1="100" y1="80" x2="440" y2="80" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="112" cy="70" r="8" class="d-num"/><text x="112" y="73.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="270" y="74" class="d-ts" text-anchor="middle">POST /login  {email, password}   (over HTTPS)</text>
+  <!-- 2 check -->
+  <rect x="365" y="92" width="160" height="30" rx="4" class="d-box-plain"/>
+  <text x="445" y="106" class="d-ts" text-anchor="middle">2. hash(password) matches</text>
+  <text x="445" y="118" class="d-ts" text-anchor="middle">stored hash? yes</text>
+  <!-- 3 store session -->
+  <line x1="450" y1="140" x2="630" y2="140" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="462" cy="130" r="8" class="d-num"/><text x="462" y="133.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="545" y="134" class="d-ts" text-anchor="middle">save: a8f3…c9 = Dana, 14 days</text>
+  <!-- 4 set cookie -->
+  <line x1="440" y1="170" x2="100" y2="170" class="d-line-hi" marker-end="url(#arr14)"/>
+  <circle cx="428" cy="160" r="8" class="d-num"/><text x="428" y="163.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="270" y="164" class="d-ts" text-anchor="middle">200 OK   Set-Cookie: session=a8f3…c9</text>
+  <rect x="30" y="182" width="130" height="24" rx="4" class="d-box-plain"/>
+  <text x="95" y="198" class="d-ts" text-anchor="middle">browser stores cookie</text>
+  <!-- 5 later request -->
+  <line x1="100" y1="230" x2="440" y2="230" class="d-line-hi" marker-end="url(#arr14)"/>
+  <circle cx="112" cy="220" r="8" class="d-num"/><text x="112" y="223.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="270" y="224" class="d-ts" text-anchor="middle">GET /api/orders   Cookie: session=a8f3…c9</text>
+  <!-- 6 lookup -->
+  <line x1="450" y1="255" x2="630" y2="255" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="462" cy="245" r="8" class="d-num"/><text x="462" y="248.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="545" y="249" class="d-ts" text-anchor="middle">who is a8f3…c9?  → Dana</text>
+  <line x1="440" y1="282" x2="100" y2="282" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="428" cy="272" r="8" class="d-num"/><text x="428" y="275.5" class="d-numt" text-anchor="middle">7</text>
+  <text x="270" y="276" class="d-ts" text-anchor="middle">200 OK   Dana's orders only</text>
+</svg>
+</div>
+<figcaption><b>How a login survives stateless HTTP.</b> The password is sent exactly once. Afterwards a random session ID in a cookie stands in for it, and any web server can look the ID up in the shared session store.</figcaption>
+</figure>
+<p>Three consequences worth drawing out:</p>
+<ul>
+  <li><strong>The cookie is as good as the password while it lasts.</strong> Anyone who copies the session cookie can act as Dana until it expires. This is why cookies are marked to be sent only over HTTPS and never be readable by JavaScript, and why sensitive actions (changing the password, paying) often ask for the password again.</li>
+  <li><strong>This is how any web server in a load-balanced pool can serve Dana.</strong> The identity travels with the request; the facts live in the shared store. Stateless servers, from Session 4, depend on exactly this.</li>
+  <li><strong>Cookies are also how advertising tracks people.</strong> The same mechanism that remembers your login lets a third-party advertising server recognise your browser across every site that shows its ads. Cookie-consent banners and privacy laws exist because of that second use, not the first.</li>
+</ul>
+<p>Mobile apps and APIs often use a variant: instead of a random ID that the server looks up, the server issues a <dfn class="kw" id="kw-token" data-def="A string handed to a client after it authenticates, which the client then attaches to each request as proof of identity, instead of sending a password every time. Session IDs, API keys, JSON Web Tokens (JWTs), and OAuth access tokens are all kinds of tokens.">token</dfn>: a signed piece of text that itself says "Dana, valid until Friday" and cannot be forged because it carries a signature only the server could produce. The most common format is the JSON Web Token (JWT, said "jot"). The client sends the token in an <code>Authorization</code> header rather than a cookie. The concept is identical: prove who you are once, receive a credential, present the credential thereafter.</p>
+</section>
+
+<section id="s5-4-wrap">
+<h3 id="s5-4">5.4 HTTP Basic Authentication and API keys <span class="time">7 min</span></h3>
+<p>Before cookies and tokens there was the simplest possible scheme, built into HTTP itself and still in use: <dfn class="kw" id="kw-basic-auth" data-def="The simplest authentication method built into HTTP: the client sends the username and password, encoded (not encrypted) in Base64, in an Authorization header on every request. Acceptable only over HTTPS, and used mainly for internal tools, quick protection of staging sites, and some APIs.">HTTP Basic Authentication</dfn>. When a server requires it, the browser pops up its own plain grey username/password box (you have probably seen one on a router or a staging site). The browser then attaches the credentials to <em>every</em> request:</p>
+<pre><code>GET /admin/reports HTTP/1.1
+Host: www.rosenthalsbakery.com
+Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
+<p>That jumble after <code>Basic</code> is not encryption. It is <dfn class="kw" id="kw-base64" data-def="A way of writing any data using only letters, digits, and a few symbols so it can travel safely in text. It is encoding, not encryption: anyone can decode it instantly. Basic Auth uses it to pack 'username:password' into one header.">Base64</dfn> encoding of the text <code>dana:correct-horse</code>, and anyone can decode it in a second. Basic Auth therefore has two rules and two uses:</p>
+<div class="two-col">
+<div>
+<h4>Rules</h4>
+<ul>
+  <li>Only ever over HTTPS. Over plain HTTP the password crosses the network in the clear on every request.</li>
+  <li>Only for things where a shared, static password is acceptable. There is no logout, no expiry, no second factor.</li>
+</ul>
+</div>
+<div>
+<h4>Where you still meet it</h4>
+<ul>
+  <li>Putting a quick password in front of a staging site so the public cannot see it.</li>
+  <li>Internal tools and admin pages for a handful of staff.</li>
+  <li>Some APIs, where the "username" is an account ID and the "password" is a key. Stripe's API, for instance, accepts your secret key this way.</li>
+</ul>
+</div>
+</div>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 150" role="img" aria-label="A browser sends a request with a Basic Authorization header containing Base64 of username colon password on every request; the server decodes it and checks the password. An HTTPS wrapper around the whole exchange is the only thing keeping it private.">
+  <defs>
+    <marker id="arr15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="20" width="680" height="110" rx="12" class="d-hi" opacity="0.5"/>
+  <text x="360" y="40" class="d-th" text-anchor="middle">HTTPS tunnel: encrypted between browser and server. Without it, the header below is readable by anyone on the network.</text>
+  <rect x="50" y="62" width="110" height="44" rx="6" class="d-box"/><text x="105" y="89" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="560" y="62" width="110" height="44" rx="6" class="d-box"/><text x="615" y="89" class="d-t" text-anchor="middle">Server</text>
+  <line x1="165" y1="84" x2="555" y2="84" class="d-line" marker-end="url(#arr15)"/>
+  <text x="360" y="76" class="d-mono" text-anchor="middle">Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</text>
+  <text x="360" y="102" class="d-ts" text-anchor="middle">= Base64("dana:correct-horse"), sent with every single request</text>
+  <text x="360" y="120" class="d-ts" text-anchor="middle">Encoding is reversible by anyone. It is not a secret; HTTPS is what makes it one.</text>
+</svg>
+</div>
+<figcaption><b>Basic Authentication.</b> The credentials ride along on every request in a trivially reversible encoding. The protection comes entirely from HTTPS.</figcaption>
+</figure>
+<p>A close cousin is the <dfn class="kw" id="kw-api-key" data-def="A long random secret string issued by a service to identify and bill the account calling its API. Sent with each request, kept on the server side of your product, never in front-end code or public repositories. Leaked keys are the most common cause of surprise cloud bills.">API key</dfn>, which we met in Session 3. It is a long random secret issued by a service provider that your back end presents with each call so the provider knows whose account to bill and what it may do. Keys are passwords for programs, and they must be treated as such: stored in server configuration (a file called <code>.env</code> is the convention), never typed into front-end code, and never committed into a Git repository. Automated bots scan GitHub around the clock for accidentally published keys and can spend thousands of dollars of someone's cloud budget within minutes. When you use Claude Code with the Claude API or any other service, this is the single most important habit to build.</p>
+</section>
