@@ -46,7 +46,7 @@ def section_for(pos):
         for spos, kind, sid, text in sessions:
             if spos <= pos:
                 best = (sid, text)
-    return best or ("session-1", "Introduction")
+    return best or ("intro", "Introduction")
 
 # ---------------------------------------------------------------- TOC
 toc = []
@@ -64,7 +64,7 @@ for spos, kind, sid, title in sessions:
             toc.append("</ol>")
     toc.append("</li>")
 toc_html = '<div class="toc-label">Sessions</div><ol>' + "\n".join(toc) + "</ol>"
-doc = doc.replace("<!--TOC-->", toc_html)
+# (inserted after the glossary is built, so heading positions stay valid)
 
 # ---------------------------------------------------------------- glossary
 dfn_re = re.compile(r'<dfn class="kw" id="(kw-[^"]+)" data-def="([^"]*)">(.*?)</dfn>', re.S)
@@ -102,6 +102,7 @@ glossary_html = (
     "<tbody>" + "\n".join(rows) + "</tbody></table></div>"
 )
 doc = doc.replace("<!--GLOSSARY-->", glossary_html)
+doc = doc.replace("<!--TOC-->", toc_html)
 
 # ---------------------------------------------------------------- answers
 review_re = re.compile(r'<div class="review" id="review-(\d+)">(.*?)</div>\s*(?=<)', re.S)
