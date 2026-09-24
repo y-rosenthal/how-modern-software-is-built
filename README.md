@@ -1,4 +1,4 @@
-# How Modern Software Is Built — course module
+# How Modern Software Is Built (in 2026) — course module
 
 Five 75-minute sessions on choosing a programming language and the architecture of websites, mobile apps, desktop
 programs, and embedded software, written for business students.
