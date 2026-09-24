@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Session 3 Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF4;
+  --ink:#1B2430;
+  --ink-2:#4A5666;
+  --line:#CBD4DF;
+  --accent:#0E7C86;
+  --accent-ink:#0A5A62;
+  --accent-soft:#D6EEF0;
+  --review:#FFF3D1;
+  --review-line:#E2B94E;
+  --review-ink:#5C4300;
+  --note:#EEF2F7;
+  --note-line:#8FA3B8;
+  --code-bg:#EDF1F5;
+  --diagram-hi:#0E7C86;
+  --diagram-hi-soft:#D6EEF0;
+  --font-display:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171E;
+    --surface:#1A212B;
+    --surface-2:#232C38;
+    --ink:#E6EBF1;
+    --ink-2:#A6B2C1;
+    --line:#384454;
+    --accent:#4FC1CB;
+    --accent-ink:#8ADCE3;
+    --accent-soft:#173A3E;
+    --review:#3A2E0E;
+    --review-line:#C9A23E;
+    --review-ink:#F4E3B0;
+    --note:#1F2A36;
+    --note-line:#5B7290;
+    --code-bg:#0F141A;
+    --diagram-hi:#4FC1CB;
+    --diagram-hi-soft:#173A3E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171E;
+  --surface:#1A212B;
+  --surface-2:#232C38;
+  --ink:#E6EBF1;
+  --ink-2:#A6B2C1;
+  --line:#384454;
+  --accent:#4FC1CB;
+  --accent-ink:#8ADCE3;
+  --accent-soft:#173A3E;
+  --review:#3A2E0E;
+  --review-line:#C9A23E;
+  --review-ink:#F4E3B0;
+  --note:#1F2A36;
+  --note-line:#5B7290;
+  --code-bg:#0F141A;
+  --diagram-hi:#4FC1CB;
+  --diagram-hi-soft:#173A3E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 64px;
+}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-0.01em}
+h3{font-size:1.35rem;font-weight:700;margin-top:2.6rem;margin-bottom:0.6rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.6rem 0.9rem}
+h4{font-size:1.05rem;font-weight:700;margin-top:1.6rem;margin-bottom:0.3rem}
+p{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem;margin:0 0 1rem}
+li{margin-bottom:0.35rem}
+li>ul,li>ol{margin-top:0.35rem}
+strong{font-weight:600}
+code,pre,kbd{font-family:var(--font-mono);font-size:0.86em}
+code{background:var(--code-bg);padding:0.08em 0.35em;border-radius:4px}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.9rem 1.1rem;
+  overflow-x:auto;
+  line-height:1.5;
+  margin:0.6rem 0 1.2rem;
+}
+pre code{background:none;padding:0;font-size:0.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+/* layout */
+.page{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0 48px}
+@media (min-width:1100px){
+  .page{grid-template-columns:270px minmax(0,1fr)}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow-y:auto;padding-block:32px 40px}
+  .toc summary{display:none}
+  .toc details>*{display:block}
+}
+.toc{font-family:var(--font-display);font-size:0.86rem;line-height:1.4}
+.toc details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0.6rem 0.9rem;margin-block:20px 8px}
+@media (min-width:1100px){.toc details{border:0;background:transparent;padding:0;margin:0}}
+.toc summary{cursor:pointer;font-weight:700;font-size:0.95rem}
+.toc .toc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin:0.8rem 0 0.5rem}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0}
+.toc a{display:block;padding:0.22rem 0.5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .toc-session>a{font-weight:700;margin-top:0.6rem}
+.toc .toc-sub a{color:var(--ink-2);padding-left:1.1rem;font-size:0.82rem}
+.toc .toc-appendix>a{font-weight:600}
+main{min-width:0;max-width:78ch;padding-block:32px 0}
+main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
+
+/* cover */
+.cover{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.eyebrow{font-family:var(--font-display);font-size:0.74rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:0.7rem}
+.cover .lede{font-size:1.15rem;color:var(--ink-2);max-width:60ch;margin-top:1rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:1.2rem}
+.cover-meta b{color:var(--ink);font-weight:700}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.4rem;margin:1.6rem 0}
+.howto h4{margin-top:0}
+.howto ul{margin-bottom:0}
+
+/* session header */
+.session{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+.session .eyebrow{margin-bottom:0.5rem}
+.session .goal{color:var(--ink-2);font-size:1.05rem;margin-top:0.8rem;max-width:64ch}
+.agenda{width:100%;border-collapse:collapse;font-family:var(--font-display);font-size:0.9rem;margin:1.2rem 0 0.6rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.agenda th,.agenda td{padding:0.5rem 0.8rem;text-align:left;border-top:1px solid var(--line)}
+.agenda th{background:var(--surface-2);border-top:0;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2)}
+.agenda td:last-child,.agenda th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agenda tfoot td{font-weight:700}
+.objectives{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0 0}
+.objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
+.objectives ul{margin:0}
+
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
+/* section time tag */
+.time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
+
+/* keywords */
+dfn.kw{
+  font-style:normal;
+  font-weight:600;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:0 0.25em;
+  border-radius:3px;
+  border-bottom:2px solid var(--accent);
+  scroll-margin-top:24px;
+}
+dfn.kw:target{outline:3px solid var(--review-line);outline-offset:2px}
+
+/* analogy + note callouts */
+.note,.analogy,.demo{
+  border-left:4px solid var(--note-line);
+  background:var(--note);
+  padding:0.8rem 1.1rem;
+  border-radius:0 10px 10px 0;
+  margin:1.2rem 0;
+}
+.note .label,.analogy .label,.demo .label,.review .label{
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:0.3rem;
+}
+.note p:last-child,.analogy p:last-child,.demo p:last-child,.note ul:last-child,.demo ol:last-child,.demo ul:last-child{margin-bottom:0}
+.analogy{border-left-color:var(--accent)}
+.ai{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:0.8rem 1.1rem;border-radius:0 10px 10px 0;margin:1.2rem 0}
+.ai .label{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:0.3rem}
+.ai p:last-child{margin-bottom:0}
+.demo{border-left-style:dashed}
+
+/* review box */
+.review{
+  background:var(--review);
+  border:1px solid var(--review-line);
+  color:var(--review-ink);
+  border-radius:12px;
+  padding:1.1rem 1.4rem 1rem;
+  margin:2.5rem 0 1rem;
+  position:relative;
+  scroll-margin-top:24px;
+}
+.review::before{
+  content:"?";
+  position:absolute;top:-14px;left:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--review-line);color:#1B2430;
+  font-family:var(--font-display);font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.review .label{color:var(--review-ink);margin-top:0.2rem}
+.review h4{margin:0 0 0.5rem;color:var(--review-ink)}
+.review ol{margin-bottom:0.5rem}
+.review li{margin-bottom:0.45rem}
+.review a{color:var(--review-ink);font-weight:600}
+.review .answers-link{font-family:var(--font-display);font-size:0.82rem;margin:0.4rem 0 0}
+.review code{background:rgba(0,0,0,0.08)}
+
+/* figures / diagrams */
+figure{margin:1.4rem 0 1.6rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1rem 0.7rem}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);font-family:var(--font-display)}
+figcaption{font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:0.6rem;line-height:1.45}
+figcaption b{color:var(--ink)}
+.d-box{fill:var(--surface-2);stroke:currentColor;stroke-width:1.2}
+.d-box-plain{fill:var(--surface);stroke:currentColor;stroke-width:1.2}
+.d-hi{fill:var(--diagram-hi-soft);stroke:var(--diagram-hi);stroke-width:1.6}
+.d-zone{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:5 4;opacity:0.7}
+.d-line{stroke:currentColor;stroke-width:1.4;fill:none}
+.d-line-hi{stroke:var(--diagram-hi);stroke-width:1.8;fill:none}
+.d-line-dash{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.d-t{font-size:12px;fill:currentColor;font-weight:600}
+.d-ts{font-size:10.5px;fill:currentColor;opacity:0.85}
+.d-tl{font-size:13px;fill:currentColor;font-weight:700}
+.d-th{font-size:12px;fill:var(--diagram-hi);font-weight:700}
+.d-mono{font-family:var(--font-mono);font-size:10.5px;fill:currentColor}
+svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.d-num{fill:var(--diagram-hi)}
+.d-numt{font-size:10px;fill:#fff;font-weight:800}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.6rem 0 1.4rem;background:var(--surface);border:1px solid var(--line)}
+.tbl th,.tbl td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.tbl-wrap{overflow-x:auto;margin:0.6rem 0 1.4rem}
+.tbl-wrap .tbl{margin:0}
+.datatable{border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;background:var(--surface);border:1px solid var(--line);margin:0.4rem 0 1rem}
+.datatable th,.datatable td{padding:0.3rem 0.7rem;border:1px solid var(--line);white-space:nowrap}
+.datatable th{background:var(--surface-2);font-weight:600}
+.datatable caption{caption-side:top;text-align:left;font-family:var(--font-display);font-size:0.82rem;font-weight:700;padding-bottom:0.3rem}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:0.6rem 0 1.2rem}
+.two-col>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0.8rem 1rem}
+.two-col h4{margin-top:0}
+.two-col ul{margin-bottom:0}
+
+/* glossary */
+.glossary{width:100%;border-collapse:collapse;font-size:0.92rem;background:var(--surface);border:1px solid var(--line)}
+.glossary th,.glossary td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.glossary th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.glossary td:first-child{font-family:var(--font-display);font-weight:700;min-width:12ch;width:18%}
+.glossary td:nth-child(2){width:58%;min-width:30ch}
+.glossary td:last-child{font-family:var(--font-display);font-size:0.84rem;min-width:14ch;width:24%}
+.glossary-letter{font-family:var(--font-display);font-weight:800;font-size:0.8rem;letter-spacing:0.1em;color:var(--ink-2);background:var(--ground)}
+.glossary-letter td{border-top:2px solid var(--line)}
+
+/* answers appendix */
+.qa{margin:1.2rem 0 2rem}
+.qa h4{margin-top:0}
+.qa ol{padding-left:1.4rem}
+.qa li{margin-bottom:0.9rem}
+.qa .q{font-weight:600}
+.qa .a{display:block;margin-top:0.25rem;padding:0.5rem 0.9rem;background:var(--review);border-left:3px solid var(--review-line);border-radius:0 8px 8px 0;color:var(--review-ink)}
+.qa .a code{background:rgba(0,0,0,0.08)}
+.backlink{font-family:var(--font-display);font-size:0.82rem}
+
+.appendix{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .toc,.slides-btn{display:none}
+  .page{display:block}
+  main{max-width:none}
+  .session,.appendix{break-before:page}
+  figure,.review,pre,.note,.analogy,.demo{break-inside:avoid}
+  a{color:inherit}
+  dfn.kw{background:#e6f2f3}
+  .review{background:#fff3d1 !important;color:#000}
+}
+
+html,body{height:100%}
+body{margin:0;padding:0;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+.deck{position:relative;height:100%;width:100%}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:2.4vh 5vw 8vh;box-sizing:border-box}
+.slide.active{display:flex}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--font-display);font-size:clamp(12px,1.7vh,17px);color:var(--ink-2);margin-bottom:1.2vh}
+.topbar .crumb{letter-spacing:0.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font-family:var(--font-display);font-weight:700;font-size:clamp(12px,1.7vh,16px);letter-spacing:0.04em;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.3em 0.9em;border-radius:999px;white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.slide h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5.4vh,58px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 2.4vh;text-wrap:balance;max-width:28ch}
+.slide ul{margin:0;padding-left:1.1em;font-size:clamp(17px,3.3vh,34px);line-height:1.35;max-width:38ch}
+.slide li{margin-bottom:1.6vh}
+.slide li b{font-weight:600;color:var(--accent-ink)}
+.slide code{font-family:var(--font-mono);font-size:0.85em;background:var(--code-bg);padding:0.05em 0.3em;border-radius:4px}
+.slide pre{margin:0 0 2vh;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:1.6vh 2vw;font-family:var(--font-mono);font-size:clamp(13px,2.5vh,25px);line-height:1.4;overflow:auto;max-height:52vh}
+.slide .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:0 0 1.5vh}
+.slide figure{margin:0;padding:1.5vh 1.5vw;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.slide figure .scroll{overflow:visible;min-height:0;display:flex;justify-content:center;width:100%}
+.slide figure svg{max-width:100%;display:block;color:var(--ink);font-family:var(--font-display)}
+.slide figcaption{display:none}
+.slide .with-fig ul{font-size:clamp(15px,2.6vh,26px);max-width:none;display:flex;flex-wrap:wrap;gap:0 3vw;list-style:disc}
+.slide .with-fig li{margin-bottom:0.6vh;flex:1 1 40%}
+.slide table{border-collapse:collapse;font-size:clamp(14px,2.6vh,25px);line-height:1.3;background:var(--surface);border:1px solid var(--line);margin-bottom:2vh;max-width:100%}
+.slide th,.slide td{text-align:left;padding:0.9vh 1.4vw;border-top:1px solid var(--line);vertical-align:top}
+.slide th{background:var(--surface-2);font-family:var(--font-display);font-size:0.72em;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.slide .tbl-scroll{overflow:auto;min-height:0;margin-bottom:2vh}
+.slide .takeaway{margin-top:auto;border-left:5px solid var(--accent);background:var(--surface);padding:1.2vh 1.6vw;font-family:var(--font-display);font-weight:600;font-size:clamp(15px,2.7vh,26px);line-height:1.35;border-radius:0 10px 10px 0}
+.slide.title{justify-content:center;padding-bottom:10vh}
+.slide.title .eyebrow{font-family:var(--font-display);font-size:clamp(13px,2vh,18px);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1.5vh}
+.slide.title h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,7.5vh,84px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 2vh;max-width:22ch;text-wrap:balance}
+.slide.title .sub{font-size:clamp(17px,3vh,30px);color:var(--ink-2);max-width:50ch;margin:0 0 3vh}
+.slide.title ol{columns:2;column-gap:4vw;font-family:var(--font-display);font-size:clamp(14px,2.3vh,22px);line-height:1.5;margin:0 0 3vh;padding-left:1.4em;max-width:80ch}
+.slide.title ol a{color:var(--ink);text-decoration:none}
+.slide.title ol a:hover{color:var(--accent-ink);text-decoration:underline}
+.slide.title .links{display:flex;gap:1rem;flex-wrap:wrap}
+.bottombar{position:fixed;left:0;right:0;bottom:0;height:6vh;min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw calc(0px + env(safe-area-inset-bottom,0px));font-family:var(--font-display);font-size:clamp(12px,1.7vh,16px);color:var(--ink-2);background:var(--ground);border-top:1px solid var(--line);box-sizing:border-box}
+.bottombar .nav{display:flex;gap:0.5rem;align-items:center}
+.bottombar button{font:inherit;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0.3em 0.9em;cursor:pointer}
+.bottombar button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.bottombar button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));height:3px;background:var(--accent);width:0;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.progress{transition:none}}
+.hint{font-size:0.9em;opacity:0.8}
+@media (max-width:700px){.slide{padding:2vh 4vw 9vh}.slide.title ol{columns:1}.slide .with-fig li{flex-basis:100%}.hint{display:none}}
+</style>
+<div class="deck">
+<section class="slide title active" id="title" data-title="Session 3"><div class="eyebrow">Session 3 · 75 minutes · slides</div><h1>Dynamic Websites, APIs, and Databases</h1><p class="sub">Inside the back end: server code, APIs and JSON, the relational model, and SQL by example</p><ol><li><a href="#s3-1">3.1 Inside the back end: a Python web server</a></li><li><a href="#s3-2">3.2 APIs and JSON</a></li><li><a href="#s3-3">3.3 Why every product needs a database</a></li><li><a href="#s3-4">3.4 SQL by example</a></li><li><a href="#s3-5">3.5 Beyond tables: NoSQL and ORMs</a></li><li><a href="#s3-6">3.6 The three-tier architecture</a></li></ol><div class="links"><a class="btn primary" href="../#session-3">Open the book chapter</a> <a class="btn" href="session-3.pptx">Download as PowerPoint</a></div><p class="hint">Arrow keys or space to move, F for full screen. Every slide has a Book button back to the full text.</p></section>
+<section class="slide" id="s3-1" data-title="3.1 Inside the back end: a Python web server"><div class="topbar"><span class="crumb">Session 3 · 3.1 Inside the back end: a Python web server · 1/2</span><a class="btn" href="../#s3-1" title="Open this section in the full text">Book ↗</a></div><h2>A complete dynamic web server</h2><pre>from flask import Flask
+from datetime import datetime
+app = Flask(__name__)
+
+@app.route(&quot;/hours&quot;)
+def hours():
+    if 7 &lt;= datetime.now().hour &lt; 18:
+        return &quot;&lt;p&gt;We are &lt;b&gt;open&lt;/b&gt; right now!&lt;/p&gt;&quot;
+    return &quot;&lt;p&gt;We are closed. Back at 7 a.m.&lt;/p&gt;&quot;
+
+app.run(port=5000)</pre><ul><li><b>Flask</b> is a <b>framework</b>: it handles the routine parts of being a server</li><li>Each <b>route</b> connects a path to a function; the function's return value is the response</li></ul></section>
+<section class="slide" id="s3-1-b" data-title="3.1 Inside the back end: a Python web server"><div class="topbar"><span class="crumb">Session 3 · 3.1 Inside the back end: a Python web server · 2/2</span><a class="btn" href="../#s3-1" title="Open this section in the full text">Book ↗</a></div><h2>Localhost, ports, and templates</h2><ul><li><b>localhost</b> means "this computer": browser and server on the same laptop</li><li>A <b>port</b> is a numbered door: 443 for HTTPS, 5000 or 3000 for testing</li><li>Two visitors a minute apart at 5:59 and 6:00 see different pages: that is "dynamic"</li><li>Real back ends fill in <b>templates</b> (HTML with blanks) rather than gluing strings</li></ul></section>
+<section class="slide" id="s3-2" data-title="3.2 APIs and JSON"><div class="topbar"><span class="crumb">Session 3 · 3.2 APIs and JSON · 1/4</span><a class="btn" href="../#s3-2" title="Open this section in the full text">Book ↗</a></div><h2>The menu is the API</h2><ul><li>An <b>API</b> is the defined set of requests a program accepts and the answers it gives</li><li>Callers are often programs, not people: page JavaScript, a mobile app, a partner, an AI</li><li>Each address in an API is an <b>endpoint</b>; answers come back as data, not designed pages</li></ul></section>
+<section class="slide" id="s3-2-b" data-title="3.2 APIs and JSON"><div class="topbar"><span class="crumb">Session 3 · 3.2 APIs and JSON · 2/4</span><a class="btn" href="../#s3-2" title="Open this section in the full text">Book ↗</a></div><h2>JSON: the common tongue of the web</h2><pre>{
+  &quot;products&quot;: [
+    {&quot;id&quot;: 1, &quot;name&quot;: &quot;Sourdough loaf&quot;, &quot;price&quot;: 7.5, &quot;in_stock&quot;: true},
+    {&quot;id&quot;: 2, &quot;name&quot;: &quot;Rye bread&quot;, &quot;price&quot;: 6.0, &quot;in_stock&quot;: false}
+  ]
+}</pre><ul><li>Curly braces: named values. Square brackets: lists. Almost exactly a Python dictionary and list</li></ul></section>
+<section class="slide" id="s3-2-c" data-title="3.2 APIs and JSON"><div class="topbar"><span class="crumb">Session 3 · 3.2 APIs and JSON · 3/4</span><a class="btn" href="../#s3-2" title="Open this section in the full text">Book ↗</a></div><h2>Verbs: nouns in the URL, verbs in the method</h2><div class="tbl-scroll"><table><thead><tr><th>Method</th><th>Meaning</th><th>Bakery example</th><th>CRUD</th></tr></thead><tbody><tr><td>GET</td><td>Read</td><td>GET /api/products</td><td>Read</td></tr><tr><td>POST</td><td>Create</td><td>POST /api/orders</td><td>Create</td></tr><tr><td>PUT / PATCH</td><td>Update</td><td>PATCH /api/orders/88</td><td>Update</td></tr><tr><td>DELETE</td><td>Remove</td><td>DELETE /api/orders/88</td><td>Delete</td></tr></tbody></table></div><div class="takeaway">This style is REST. Most business software is CRUD screens over a database.</div></section>
+<section class="slide with-fig" id="s3-2-d" data-title="3.2 APIs and JSON"><div class="topbar"><span class="crumb">Session 3 · 3.2 APIs and JSON · 4/4</span><a class="btn" href="../#s3-2" title="Open this section in the full text">Book ↗</a></div><h2>APIs in both directions</h2><div class="fig"><figure id="fig-s3-2-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,138.5vh);height:auto;aspect-ratio:720/260" viewBox="0 0 720 260" role="img" aria-label="A back-end API in the middle is called by JavaScript in a web page, by a mobile app, and by a partner company's system; the back end in turn calls third-party APIs such as Stripe and the Claude API.">
+  <defs>
+    <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- callers -->
+  <rect x="20" y="30" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="50" class="d-t" text-anchor="middle">Web page</text>
+  <text x="95" y="66" class="d-ts" text-anchor="middle">JavaScript in the browser</text>
+  <rect x="20" y="107" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="127" class="d-t" text-anchor="middle">Mobile app</text>
+  <text x="95" y="143" class="d-ts" text-anchor="middle">iPhone or Android</text>
+  <rect x="20" y="184" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="204" class="d-t" text-anchor="middle">Partner system</text>
+  <text x="95" y="220" class="d-ts" text-anchor="middle">e.g. a delivery marketplace</text>
+  <!-- api -->
+  <rect x="280" y="60" width="170" height="140" rx="10" class="d-hi"/>
+  <text x="365" y="90" class="d-th" text-anchor="middle">Your back end</text>
+  <text x="365" y="110" class="d-ts" text-anchor="middle">GET  /api/products</text>
+  <text x="365" y="126" class="d-ts" text-anchor="middle">POST /api/orders</text>
+  <text x="365" y="142" class="d-ts" text-anchor="middle">GET  /api/orders/88</text>
+  <text x="365" y="172" class="d-ts" text-anchor="middle">Answers in JSON</text>
+  <!-- arrows in -->
+  <line x1="175" y1="53" x2="275" y2="95" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="175" y1="130" x2="275" y2="130" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="175" y1="207" x2="275" y2="165" class="d-line" marker-end="url(#arr5)"/>
+  <!-- third parties -->
+  <rect x="560" y="45" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="63" class="d-t" text-anchor="middle">Stripe API</text>
+  <text x="630" y="78" class="d-ts" text-anchor="middle">charge a card</text>
+  <rect x="560" y="109" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="127" class="d-t" text-anchor="middle">Claude API</text>
+  <text x="630" y="142" class="d-ts" text-anchor="middle">generate, summarise</text>
+  <rect x="560" y="173" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="191" class="d-t" text-anchor="middle">Email API</text>
+  <text x="630" y="206" class="d-ts" text-anchor="middle">send confirmation</text>
+  <line x1="455" y1="100" x2="555" y2="66" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="455" y1="130" x2="555" y2="130" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="455" y1="160" x2="555" y2="194" class="d-line" marker-end="url(#arr5)"/>
+  <text x="95" y="252" class="d-ts" text-anchor="middle">Your clients call you…</text>
+  <text x="630" y="240" class="d-ts" text-anchor="middle">…and you call other companies' APIs</text>
+</svg>
+</div>
+<figcaption><b>APIs in both directions.</b> Your back end offers an API to your own front ends and to partners, and it consumes other companies' APIs for payments, AI, email, maps, and more. Being on both sides is normal.</figcaption>
+</figure></div><ul><li>You offer an API to your front ends and partners; you consume <b>third-party APIs</b> (Stripe, Claude, email) instead of building</li><li>An <b>API key</b> identifies your account to a third party. It lives on your server, never in front-end code</li></ul></section>
+<section class="slide" id="s3-3" data-title="3.3 Why every product needs a database"><div class="topbar"><span class="crumb">Session 3 · 3.3 Why every product needs a database · 1/2</span><a class="btn" href="../#s3-3" title="Open this section in the full text">Book ↗</a></div><h2>Why not just save to a file?</h2><ul><li><b>Many writers at once</b>: two customers buying the last challah must not both succeed</li><li><b>Speed at scale</b>: an <b>index</b> finds one order in ten million in milliseconds</li><li><b>Reliability</b>: a <b>transaction</b> is all-or-nothing, even if the power fails halfway</li><li><b>Questions</b>: "who ordered rye three times last quarter?" is one line</li><li>The <b>database</b> is a separate program (PostgreSQL, MySQL, SQLite) your back end talks to</li></ul></section>
+<section class="slide with-fig" id="s3-3-b" data-title="3.3 Why every product needs a database"><div class="topbar"><span class="crumb">Session 3 · 3.3 Why every product needs a database · 2/2</span><a class="btn" href="../#s3-3" title="Open this section in the full text">Book ↗</a></div><h2>The relational model</h2><div class="fig"><figure id="fig-s3-3-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,180.0vh);height:auto;aspect-ratio:720/200" viewBox="0 0 720 200" role="img" aria-label="Three tables: customers, orders, and products. The orders table's customer_id column points to the customers table's primary key, and its product_id column points to the products table's primary key.">
+  <defs>
+    <marker id="arr6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--diagram-hi)"/></marker>
+  </defs>
+  <!-- customers -->
+  <rect x="20" y="30" width="180" height="130" rx="6" class="d-box-plain"/>
+  <rect x="20" y="30" width="180" height="26" rx="6" class="d-box"/>
+  <text x="110" y="48" class="d-tl" text-anchor="middle">customers</text>
+  <text x="34" y="78" class="d-mono" style="font-weight:700">customer_id  (PK)</text>
+  <text x="34" y="98" class="d-mono">name</text>
+  <text x="34" y="118" class="d-mono">email</text>
+  <text x="34" y="138" class="d-mono">city</text>
+  <!-- orders -->
+  <rect x="270" y="20" width="180" height="170" rx="6" class="d-box-plain"/>
+  <rect x="270" y="20" width="180" height="26" rx="6" class="d-hi"/>
+  <text x="360" y="38" class="d-th" text-anchor="middle">orders</text>
+  <text x="284" y="68" class="d-mono" style="font-weight:700">order_id  (PK)</text>
+  <text x="284" y="88" class="d-mono" style="font-weight:700">customer_id  (FK)</text>
+  <text x="284" y="108" class="d-mono" style="font-weight:700">product_id  (FK)</text>
+  <text x="284" y="128" class="d-mono">quantity</text>
+  <text x="284" y="148" class="d-mono">ordered_at</text>
+  <text x="284" y="168" class="d-mono">status</text>
+  <!-- products -->
+  <rect x="520" y="30" width="180" height="110" rx="6" class="d-box-plain"/>
+  <rect x="520" y="30" width="180" height="26" rx="6" class="d-box"/>
+  <text x="610" y="48" class="d-tl" text-anchor="middle">products</text>
+  <text x="534" y="78" class="d-mono" style="font-weight:700">product_id  (PK)</text>
+  <text x="534" y="98" class="d-mono">name</text>
+  <text x="534" y="118" class="d-mono">price</text>
+  <!-- arrows -->
+  <line x1="270" y1="84" x2="205" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
+  <text x="238" y="66" class="d-ts" text-anchor="middle">refers to</text>
+  <line x1="450" y1="104" x2="515" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
+  <text x="484" y="66" class="d-ts" text-anchor="middle">refers to</text>
+  <text x="360" y="196" class="d-ts" text-anchor="middle">PK = primary key   FK = foreign key.  One customer can have many orders; each order has exactly one customer.</text>
+</svg>
+</div>
+<figcaption><b>A schema for the bakery.</b> Orders do not copy customer or product details; they point at them by key. Change Dana's email once and every order she ever placed reflects it.</figcaption>
+</figure></div><ul><li><b>Tables</b> of rows and columns; each table holds one kind of thing</li><li><b>Primary key</b>: the unique ID of a row. <b>Foreign key</b>: a column pointing at another table's row</li><li>Change Dana's email once; every order she placed reflects it</li></ul><div class="takeaway">The table design (the schema) is really a design of the business.</div></section>
+<section class="slide" id="s3-4" data-title="3.4 SQL by example"><div class="topbar"><span class="crumb">Session 3 · 3.4 SQL by example · 1/4</span><a class="btn" href="../#s3-4" title="Open this section in the full text">Book ↗</a></div><h2>Reading: SELECT</h2><pre>SELECT name, email FROM customers WHERE city = &#x27;Boston&#x27;;
+
+SELECT status, COUNT(*) AS how_many
+FROM orders
+GROUP BY status;</pre><ul><li>SELECT picks columns, FROM picks the table, WHERE filters rows</li><li>COUNT, SUM, AVG, MIN, MAX are <b>aggregate functions</b>: every dashboard is a stack of these</li></ul></section>
+<section class="slide" id="s3-4-b" data-title="3.4 SQL by example"><div class="topbar"><span class="crumb">Session 3 · 3.4 SQL by example · 2/4</span><a class="btn" href="../#s3-4" title="Open this section in the full text">Book ↗</a></div><h2>Combining tables: JOIN</h2><pre>SELECT customers.name, products.name, orders.quantity
+FROM orders
+JOIN customers ON orders.customer_id = customers.customer_id
+JOIN products  ON orders.product_id  = products.product_id
+WHERE orders.status = &#x27;placed&#x27;;</pre><ul><li>A <b>JOIN</b> stitches rows together using the keys, so "Dana Levi, Rye bread, 1" comes out readable</li></ul></section>
+<section class="slide" id="s3-4-c" data-title="3.4 SQL by example"><div class="topbar"><span class="crumb">Session 3 · 3.4 SQL by example · 3/4</span><a class="btn" href="../#s3-4" title="Open this section in the full text">Book ↗</a></div><h2>Writing: INSERT, UPDATE, DELETE</h2><pre>INSERT INTO orders (customer_id, product_id, quantity, status)
+VALUES (3, 1, 2, &#x27;placed&#x27;);
+
+UPDATE orders SET status = &#x27;ready&#x27; WHERE order_id = 88;
+
+DELETE FROM orders WHERE order_id = 89;</pre><ul><li><code>DELETE FROM orders;</code> with no WHERE deletes every order in the company</li><li>CREATE TABLE defines columns, <b>data types</b>, keys, and <b>constraints</b> the database enforces</li></ul></section>
+<section class="slide" id="s3-4-d" data-title="3.4 SQL by example"><div class="topbar"><span class="crumb">Session 3 · 3.4 SQL by example · 4/4</span><a class="btn" href="../#s3-4" title="Open this section in the full text">Book ↗</a></div><h2>Which database?</h2><div class="tbl-scroll"><table><thead><tr><th>Product</th><th>Type</th><th>Typical use</th></tr></thead><tbody><tr><td>SQLite</td><td>Relational, single file</td><td>Prototypes, phone apps; built into Python</td></tr><tr><td>PostgreSQL</td><td>Relational server</td><td>Default for new web products</td></tr><tr><td>MySQL</td><td>Relational server</td><td>Older web products, WordPress</td></tr><tr><td>SQL Server, Oracle</td><td>Relational server</td><td>Large enterprises, finance</td></tr><tr><td>MongoDB</td><td>Document (NoSQL)</td><td>Flexible data shapes</td></tr><tr><td>Redis</td><td>Key-value, in memory</td><td>Caching, sessions</td></tr></tbody></table></div><div class="takeaway">You will not write SQL in this course. You will read it and say what it does.</div></section>
+<section class="slide" id="s3-5" data-title="3.5 Beyond tables: NoSQL and ORMs"><div class="topbar"><span class="crumb">Session 3 · 3.5 Beyond tables: NoSQL and ORMs</span><a class="btn" href="../#s3-5" title="Open this section in the full text">Book ↗</a></div><h2>NoSQL and ORMs</h2><ul><li><b>NoSQL</b> relaxes the rules: a <b>document database</b> (MongoDB) stores JSON-like records with any fields</li><li>Price of flexibility: fewer guarantees, clumsier joins. Rule of thumb: <b>start relational</b></li><li>An <b>ORM</b> lets Python treat rows as objects and writes the SQL behind the scenes</li><li>Claude Code will almost certainly use an ORM; the concepts underneath are unchanged</li></ul></section>
+<section class="slide" id="s3-6" data-title="3.6 The three-tier architecture"><div class="topbar"><span class="crumb">Session 3 · 3.6 The three-tier architecture · 1/3</span><a class="btn" href="../#s3-6" title="Open this section in the full text">Book ↗</a></div><h2>Presentation, application, data</h2><ul><li><b>Presentation tier</b>: the front end in the browser or app</li><li><b>Application tier</b>: the back-end program; where <b>business logic</b> lives (prices, permissions, workflows)</li><li><b>Data tier</b>: the database</li></ul></section>
+<section class="slide with-fig" id="s3-6-b" data-title="3.6 The three-tier architecture"><div class="topbar"><span class="crumb">Session 3 · 3.6 The three-tier architecture · 2/3</span><a class="btn" href="../#s3-6" title="Open this section in the full text">Book ↗</a></div><h2>One order through three tiers</h2><div class="fig"><figure id="fig-s3-6-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,144.0vh);height:auto;aspect-ratio:720/330" class="seq" viewBox="0 0 720 330" role="img" aria-label="An order placed in the browser travels to the back end as a POST request, the back end checks stock and price, writes to the database with SQL, the database confirms, the back end calls the payment and email APIs, and returns a JSON confirmation the browser displays.">
+  <defs>
+    <marker id="arr7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- tier headers -->
+  <rect x="20" y="14" width="200" height="40" rx="6" class="d-box"/>
+  <text x="120" y="31" class="d-tl" text-anchor="middle">Presentation tier</text>
+  <text x="120" y="46" class="d-ts" text-anchor="middle">Browser: HTML, CSS, JavaScript</text>
+  <rect x="260" y="14" width="200" height="40" rx="6" class="d-hi"/>
+  <text x="360" y="31" class="d-th" text-anchor="middle">Application tier</text>
+  <text x="360" y="46" class="d-ts" text-anchor="middle">Back end: Python + framework</text>
+  <rect x="500" y="14" width="200" height="40" rx="6" class="d-box"/>
+  <text x="600" y="31" class="d-tl" text-anchor="middle">Data tier</text>
+  <text x="600" y="46" class="d-ts" text-anchor="middle">Database: PostgreSQL</text>
+  <line x1="120" y1="54" x2="120" y2="320" class="d-line-dash"/>
+  <line x1="360" y1="54" x2="360" y2="320" class="d-line-dash"/>
+  <line x1="600" y1="54" x2="600" y2="320" class="d-line-dash"/>
+  <!-- 1 -->
+  <line x1="125" y1="86" x2="355" y2="86" class="d-line-hi" marker-end="url(#arr7)"/>
+  <circle cx="137" cy="76" r="8" class="d-num"/><text x="137" y="79.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="240" y="80" class="d-ts" text-anchor="middle">POST /api/orders  {product: 3, qty: 2}</text>
+  <!-- 2 logic -->
+  <rect x="285" y="100" width="150" height="34" rx="4" class="d-box-plain"/>
+  <text x="360" y="115" class="d-ts" text-anchor="middle">2. Business logic: is Dana</text>
+  <text x="360" y="128" class="d-ts" text-anchor="middle">logged in? in stock? price?</text>
+  <!-- 3 sql -->
+  <line x1="365" y1="158" x2="595" y2="158" class="d-line" marker-end="url(#arr7)"/>
+  <circle cx="377" cy="148" r="8" class="d-num"/><text x="377" y="151.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="482" y="152" class="d-ts" text-anchor="middle">INSERT INTO orders … ; UPDATE stock …</text>
+  <line x1="595" y1="186" x2="365" y2="186" class="d-line" marker-end="url(#arr7)"/>
+  <circle cx="583" cy="176" r="8" class="d-num"/><text x="583" y="179.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="482" y="180" class="d-ts" text-anchor="middle">Saved. New order_id = 90</text>
+  <!-- 5 third party -->
+  <rect x="285" y="204" width="150" height="46" rx="4" class="d-box-plain"/>
+  <text x="360" y="221" class="d-ts" text-anchor="middle">5. Call Stripe API to charge;</text>
+  <text x="360" y="234" class="d-ts" text-anchor="middle">call email API to confirm</text>
+  <text x="360" y="246" class="d-ts" text-anchor="middle" opacity="0.7">(third-party APIs, off to the side)</text>
+  <!-- 6 -->
+  <line x1="355" y1="276" x2="125" y2="276" class="d-line-hi" marker-end="url(#arr7)"/>
+  <circle cx="343" cy="266" r="8" class="d-num"/><text x="343" y="269.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="240" y="270" class="d-ts" text-anchor="middle">201 Created  {order_id: 90}</text>
+  <rect x="45" y="290" width="150" height="26" rx="4" class="d-hi"/>
+  <text x="120" y="307" class="d-th" text-anchor="middle">7. Show "Order #90 placed"</text>
+</svg>
+</div>
+<figcaption><b>One order through three tiers.</b> The browser never touches the database and never sees the payment key. Everything that must be trusted happens in the application tier, on the server.</figcaption>
+</figure></div></section>
+<section class="slide" id="s3-6-c" data-title="3.6 The three-tier architecture"><div class="topbar"><span class="crumb">Session 3 · 3.6 The three-tier architecture · 3/3</span><a class="btn" href="../#s3-6" title="Open this section in the full text">Book ↗</a></div><h2>Three consequences</h2><ul><li>The browser never touches the database directly; the back end checks identity and applies rules</li><li>Each tier can be changed independently: redesign the front end without touching the data</li><li>Each tier can live on different hardware: today one laptop, tomorrow ten servers (Session 4)</li></ul><div class="takeaway">Anything in the browser can be altered by the user. Rules and secrets live on the server.</div></section>
+</div>
+<div class="progress" id="progress"></div>
+<div class="bottombar"><span id="counter">1 / 1</span><span class="hint">Dynamic Websites, APIs, and Databases</span><span class="nav"><button id="prevbtn" type="button" aria-label="Previous slide">‹ Prev</button><button id="nextbtn" type="button" aria-label="Next slide">Next ›</button><button id="fullbtn" type="button" aria-label="Toggle full screen">Full screen</button></span></div>
+<script>var DECK_TITLE="Session 3 Slides";
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=0, counter=document.getElementById('counter'), bar=document.getElementById('progress');
+  function show(n, push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(push!==false){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){}}
+    document.title=slides[i].getAttribute('data-title')+' · '+DECK_TITLE;
+  }
+  function fromHash(){
+    var h=location.hash.replace('#','');
+    var k=-1; slides.forEach(function(s,idx){if(s.id===h)k=idx;});
+    show(k<0?0:k,false);
+  }
+  window.next=function(){show(i+1);};
+  window.prev=function(){show(i-1);};
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); show(i+1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); show(i-1); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(slides.length-1); break;
+      case 'f': case 'F': toggleFull(); break;
+    }
+  });
+  function toggleFull(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+    }catch(e){}
+  }
+  document.getElementById('fullbtn').addEventListener('click',toggleFull);
+  document.getElementById('prevbtn').addEventListener('click',function(){show(i-1);});
+  document.getElementById('nextbtn').addEventListener('click',function(){show(i+1);});
+  window.addEventListener('hashchange',fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

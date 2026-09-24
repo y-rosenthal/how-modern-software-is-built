@@ -150,6 +150,13 @@ main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
 .objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
 .objectives ul{margin:0}
 
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
 /* section time tag */
 .time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
 
@@ -273,7 +280,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
 @media print{
   body{background:#fff;color:#000;font-size:11pt}
-  .toc{display:none}
+  .toc,.slides-btn{display:none}
   .page{display:block}
   main{max-width:none}
   .session,.appendix{break-before:page}
@@ -369,6 +376,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
       <li><strong>Keywords students should be able to define</strong> are highlighted like <dfn class="kw" id="kw-architecture" data-def="The overall structure of a piece of software: what its major parts are, what each part is responsible for, and how the parts communicate.">architecture</dfn>. Every keyword is collected in <a href="#glossary">Appendix A</a> with a short definition and a link back to where it is introduced.</li>
       <li><strong>Review questions</strong> appear at the end of each session in a yellow box marked with a question mark. The questions and their answers are repeated in <a href="#answers">Appendix B</a>.</li>
       <li><strong>Callouts</strong> in grey are instructor notes, analogies you can use in class, and suggested live demos. Demos are optional; each session works as a pure lecture. Callouts with a teal edge labelled "In the age of AI" say how AI-assisted development changes the point just made.</li>
+      <li><strong>Slides.</strong> Every section heading has a <span class="slides-btn">Slides</span> button that opens that section as a slide deck; every slide has a Book button that returns to the same section here. Each session header also offers the deck as a PowerPoint download. Teach from the slides and drop into the full text whenever a question calls for detail.</li>
       <li><strong>Diagrams</strong> are drawn so that you can talk through them left to right or top to bottom. Each caption states the single point the picture is making.</li>
     </ul>
   </div>
@@ -377,7 +385,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </header>
 
 <section class="session" id="session-1">
-  <div class="eyebrow">Session 1 · 75 minutes</div>
+  <div class="eyebrow">Session 1 · 75 minutes <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html" title="Open this session as slides">Slides</a> <a class="slides-btn alt" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>
   <h2>Choosing a Programming Language</h2>
   <p class="goal">Before we look at how software is structured, we look at what it is written in. There are hundreds of programming languages, and the choice among them is one of the first decisions any product team makes and one of the hardest to undo. This session explains what the choice depends on: what each language was designed for, how popular and mature it is, what ready-made building blocks exist for it, how fast it runs, and where it can run. For each factor we ask a new question: how much does it still matter now that an AI assistant can write the code?</p>
 
@@ -409,7 +417,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-1-wrap">
-<h3 id="s1-1">1.1 What a programming language is, and why there are so many <span class="time">8 min</span></h3>
+<h3 id="s1-1">1.1 What a programming language is, and why there are so many <span class="time">8 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-1" title="Open this section as slides">Slides</a></h3>
 <p>A computer's processor understands only <dfn class="kw" id="kw-machine-code" data-def="The numeric instructions a processor executes directly. Nobody writes it by hand any more; compilers and interpreters produce it from human-readable source code.">machine code</dfn>: numbers that mean "add these two values," "copy this to memory," "jump to that instruction." Nobody writes that by hand. A <dfn class="kw" id="kw-programming-language" data-def="A precise, human-readable notation for giving instructions to a computer. Programs written in it (source code) are translated into machine code by a compiler or run by an interpreter. Python, JavaScript, Java, C++, and SQL are programming languages.">programming language</dfn> is a human-readable notation for those instructions, with a precise grammar (its <dfn class="kw" id="kw-syntax" data-def="The grammar rules of a programming language: which symbols, words, and arrangements are valid. A syntax error is a sentence the language cannot parse, like a missing bracket.">syntax</dfn>) so that a program can translate it into machine code without ambiguity. What a programmer writes is called <dfn class="kw" id="kw-source-code" data-def="The human-readable text of a program, as written in a programming language and stored in files such as app.py or index.js. It is what developers edit, review, and keep in version control.">source code</dfn>.</p>
 <p>Two translation strategies exist, and the difference will matter later in this session:</p>
 <ul>
@@ -428,7 +436,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-2-wrap">
-<h3 id="s1-2">1.2 Fit for purpose: what each language was designed to do <span class="time">12 min</span></h3>
+<h3 id="s1-2">1.2 Fit for purpose: what each language was designed to do <span class="time">12 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-2" title="Open this section as slides">Slides</a></h3>
 <p>The first question is the simplest: was this language built for the job? Languages divide into <dfn class="kw" id="kw-general-purpose" data-def="A programming language designed to write any kind of program: Python, JavaScript, Java, C#, C++, Go, Rust. Contrast with a domain-specific language, built for one job.">general-purpose languages</dfn>, which can write almost any kind of program, and <dfn class="kw" id="kw-domain-specific" data-def="A language built for one narrow job and unsuitable for others: SQL for querying databases, HTML for describing page structure, CSS for styling, regular expressions for matching text patterns.">domain-specific languages</dfn>, which are excellent at one narrow thing and useless outside it.</p>
 <p>SQL is the clearest example of the second kind. It is superb at describing questions about tables ("all Boston customers who ordered rye twice last quarter") and it is the right tool for that everywhere it comes up. But it has no way to draw a button, listen for a click, send an email, or lay out a page. Nobody writes a website in SQL for the same reason nobody writes a novel in the notation of chess: the language simply cannot express the ideas. HTML and CSS are also domain-specific: they describe structure and appearance and are not, strictly, programming languages at all, since they cannot express logic such as "if the order is over 50 dollars, show the discount."</p>
 <p>Among general-purpose languages the fit is softer but real. Each has a home turf where its design, its tooling, and its community are strongest, and using it elsewhere is possible but uphill. The table maps the languages you will hear about to what they are typically used for. A few terms in it (front end, back end, operating system, native, embedded) are explained properly in later sessions; each is highlighted and defined there, and the glossary in Appendix A links to every one.</p>
@@ -452,7 +460,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
   </tbody>
 </table>
 </div>
-<figure>
+<figure id="fig-s1-2-1">
 <div class="scroll">
 <svg viewBox="0 0 720 300" role="img" aria-label="A map of where each language runs: HTML, CSS, JavaScript, and TypeScript in the browser; Python, JavaScript, Java, C#, Go, Ruby, and PHP on the server; SQL in the database; Swift, Kotlin, and cross-platform frameworks on phones; C, C++, and Rust inside devices; Python and R for data analysis.">
   <defs>
@@ -504,7 +512,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-3-wrap">
-<h3 id="s1-3">1.3 Popularity, maturity, and community <span class="time">10 min</span></h3>
+<h3 id="s1-3">1.3 Popularity, maturity, and community <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-3" title="Open this section as slides">Slides</a></h3>
 <p>Two languages can be equally capable on paper and yet one is a far better business choice, because a language is not just a notation. It is a community of people using it, a body of documentation and answered questions, a supply of developers who can be hired, and a track record of being maintained. Together these are the language's <dfn class="kw" id="kw-maturity" data-def="How long a language or tool has been in serious use, how stable and well-documented it is, how many known problems have been fixed, and how confident one can be that it will still be supported in ten years.">maturity</dfn> and popularity, and they matter for concrete reasons:</p>
 <ul>
   <li><strong>Hiring.</strong> A product written in a popular language can be worked on by millions of developers; one written in an obscure language depends on a few thousand, who cost more and take longer to find. When the original developer leaves, this becomes urgent.</li>
@@ -519,7 +527,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-4-wrap">
-<h3 id="s1-4">1.4 The ecosystem: packages and libraries <span class="time">10 min</span></h3>
+<h3 id="s1-4">1.4 The ecosystem: packages and libraries <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-4" title="Open this section as slides">Slides</a></h3>
 <p>No serious program is written from scratch. Sending an email, reading a spreadsheet, charging a credit card, resizing an image, talking to a database, drawing a chart: for any language worth using, someone has already written each of these and published it for free. A language's <dfn class="kw" id="kw-ecosystem" data-def="Everything that surrounds a language beyond the language itself: its libraries and frameworks, the package manager that distributes them, its tools, hosting support, documentation, and community. Often a bigger factor in language choice than the language's own features.">ecosystem</dfn> is that collection of ready-made parts plus the tools for finding and installing them, and it is frequently the deciding factor between two otherwise similar languages.</p>
 <p>The mechanics are worth knowing because they come up daily. Libraries are distributed through a <dfn class="kw" id="kw-package-manager" data-def="A tool that downloads, installs, and updates libraries for a language from a central registry, and records which ones a project depends on. pip and uv for Python, npm for JavaScript, Maven for Java, cargo for Rust.">package manager</dfn>, which fetches them from a central registry and keeps track of which versions your project uses. Python has <code>pip</code> (and a newer, faster tool called <code>uv</code>) drawing from a registry called PyPI with over half a million packages. JavaScript has <code>npm</code>, with more than two million. When a developer says "we added a <dfn class="kw" id="kw-dependency" data-def="A library or package that a project relies on and that must be installed for the project to run. Projects commonly have dozens or hundreds, recorded in a file the package manager reads.">dependency</dfn>," they mean the project now relies on someone else's package.</p>
 <p>Almost all of these packages are <dfn class="kw" id="kw-open-source" data-def="Software whose source code is published for anyone to read, use, modify, and redistribute, usually free of charge under a licence. Most programming languages, libraries, and much infrastructure (Linux, PostgreSQL) are open source.">open source</dfn>: published freely for anyone to use, inspect, and improve. Open source is why a two-person startup can build on the same foundations as a bank. It is also a <dfn class="kw" id="kw-supply-chain" data-def="The chain of other people's packages that a product depends on, each of which may depend on more. A weakness or malicious change anywhere in the chain becomes a weakness in the product, so mature ecosystems scan dependencies for known problems.">software supply chain</dfn>. A package you depend on may itself depend on fifty others, each maintained by volunteers who may stop, and occasionally one is abandoned or, rarely, deliberately sabotaged. Mature ecosystems have tooling that flags known-vulnerable packages, which is one more reason maturity matters.</p>
@@ -541,7 +549,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-5-wrap">
-<h3 id="s1-5">1.5 Speed and memory: when performance matters <span class="time">10 min</span></h3>
+<h3 id="s1-5">1.5 Speed and memory: when performance matters <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-5" title="Open this section as slides">Slides</a></h3>
 <p>Languages differ enormously in how fast the programs written in them run and how much memory they use. Compiled languages such as C, C++, and Rust are typically ten to a hundred times faster than interpreted ones such as Python at raw computation, and use a fraction of the memory, because there is no interpreter in the way and the programmer controls exactly how data is laid out. Java, C#, and Go sit between the two.</p>
 <p>The instinct is to want the fastest, and it is usually wrong. What matters is <em>where the time actually goes</em>:</p>
 <ul>
@@ -567,9 +575,9 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-6-wrap">
-<h3 id="s1-6">1.6 Platforms and portability <span class="time">12 min</span></h3>
+<h3 id="s1-6">1.6 Platforms and portability <span class="time">12 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-6" title="Open this section as slides">Slides</a></h3>
 <p>A <dfn class="kw" id="kw-platform" data-def="The combination of hardware and operating system a program runs on: Windows on an Intel laptop, macOS on Apple silicon, Linux on a server, iOS on an iPhone, Android on a Samsung phone, or a browser. Software must be built or packaged separately for each platform it targets unless something in between hides the difference.">platform</dfn> is the combination of processor and operating system a program runs on: Windows on an Intel laptop, macOS on an Apple chip, <dfn class="kw" id="kw-linux" data-def="A free, open-source operating system that runs the vast majority of servers, cloud infrastructure, and embedded devices (Android is built on it). Rarely seen on desktops, but under almost everything on the internet.">Linux</dfn> on a cloud server, iOS on an iPhone, Android on a Samsung phone. Machine code for one is gibberish to another, for two independent reasons. The <dfn class="kw" id="kw-cpu-architecture" data-def="The family of a processor, which determines the machine code it understands. The two that matter today are x86 (Intel and AMD, most PCs and servers) and ARM (all phones, Apple silicon Macs, and a growing share of servers). Compiled programs must be built separately for each.">processor architecture</dfn> differs (Intel and AMD chips speak x86; phones, Apple silicon Macs, and a growing share of servers speak ARM), and the operating system differs in how programs ask for files, windows, and the network. Getting the same software onto several platforms is a real cost, and languages handle it in three different ways.</p>
-<figure>
+<figure id="fig-s1-6-1">
 <div class="scroll">
 <svg viewBox="0 0 740 330" role="img" aria-label="Three strategies for reaching Windows, macOS, and Linux: C++ source is compiled separately into three different executables; Java source is compiled once into bytecode that a virtual machine on each platform runs; Python source is not compiled at all and is run by an interpreter installed on each platform.">
   <defs>
@@ -636,7 +644,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s1-7-wrap">
-<h3 id="s1-7">1.7 Making the decision in the age of AI <span class="time">8 min</span></h3>
+<h3 id="s1-7">1.7 Making the decision in the age of AI <span class="time">8 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-1.html#s1-7" title="Open this section as slides">Slides</a></h3>
 <p><dfn class="kw" id="kw-ai-assisted-development" data-def="Building software with an AI model doing much of the writing, explaining, and debugging of code under a person's direction, using tools such as Claude Code. Shifts the human's work from typing code toward specifying, reviewing, testing, and deciding.">AI-assisted development</dfn> changes who types the code but not which language the code should be in. Pulling the session together, here is how each factor shifts:</p>
 <div class="tbl-wrap">
 <table class="tbl">
@@ -676,7 +684,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
   <p class="answers-link">Answers are in <a href="#answers-1">Appendix B, Session 1</a>.</p>
 </div>
 <section class="session" id="session-2">
-  <div class="eyebrow">Session 2 · 75 minutes</div>
+  <div class="eyebrow">Session 2 · 75 minutes <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html" title="Open this session as slides">Slides</a> <a class="slides-btn alt" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>
   <h2>From a File on Your Laptop to a Page on the Internet</h2>
   <p class="goal">We start with the simplest possible website, a single text file opened in a browser, and follow it all the way to being served to strangers over the internet. Along the way we meet the browser, the three languages of a web page, addresses, servers, and the request-and-response conversation that every website depends on.</p>
 
@@ -707,7 +715,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s2-1-wrap">
-<h3 id="s2-1">2.1 Why architecture is a business topic <span class="time">5 min</span></h3>
+<h3 id="s2-1">2.1 Why architecture is a business topic <span class="time">5 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-1" title="Open this section as slides">Slides</a></h3>
 <p>When an architect designs a building, they decide where the load-bearing walls go, how people move between floors, and where the plumbing runs. Change those decisions after the concrete is poured and the cost is enormous. Software has the same property. <strong>Architecture</strong> is the set of big structural decisions about a piece of software: what its major parts are, what each part is responsible for, and how the parts talk to each other.</p>
 <p>Three reasons a business student should care:</p>
 <ul>
@@ -720,7 +728,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s2-2-wrap">
-<h3 id="s2-2">2.2 Clients, servers, and programs <span class="time">10 min</span></h3>
+<h3 id="s2-2">2.2 Clients, servers, and programs <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-2" title="Open this section as slides">Slides</a></h3>
 <p>Almost every piece of modern software follows one pattern: one computer asks, another computer answers. The computer that asks is the <dfn class="kw" id="kw-client" data-def="The computer or program that asks for something, such as your laptop's browser requesting a web page.">client</dfn>. The computer that answers is the <dfn class="kw" id="kw-server" data-def="A computer, or a program on a computer, that waits for requests from clients and answers them. Servers are ordinary computers, usually in a data center, running around the clock.">server</dfn>. Together this is the <dfn class="kw" id="kw-client-server" data-def="The dominant pattern for networked software: many clients send requests to a server, and the server sends back responses.">client–server model</dfn>.</p>
 <p>Two things students often get wrong about servers:</p>
 <ul>
@@ -729,7 +737,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </ul>
 <div class="analogy"><span class="label">Analogy</span><p>A restaurant. You (the client) sit at a table and ask the waiter for a menu. The kitchen (the server) prepares what you ask for and sends it out. You never enter the kitchen and you don't need to know how it is organized to place an order. The menu is the agreed-upon list of what you may ask for. We will reuse this restaurant repeatedly; the menu becomes the API in Session 3.</p></div>
 
-<figure>
+<figure id="fig-s2-2-1">
 <div class="scroll">
 <svg viewBox="0 0 660 210" role="img" aria-label="A client laptop sends a request to a server; the server sends back a response.">
   <defs>
@@ -774,7 +782,7 @@ svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-wi
 </section>
 
 <section id="s2-3-wrap">
-<h3 id="s2-3">2.3 A web page is three languages <span class="time">15 min</span></h3>
+<h3 id="s2-3">2.3 A web page is three languages <span class="time">15 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-3" title="Open this section as slides">Slides</a></h3>
 <p>Here is a surprising fact: a web page is a plain text file. You can open it in Notepad. If you save a text file with the name <code>index.html</code>, type a few lines into it, and double-click it, your browser will display it as a web page. No internet connection, no server, no company involved.</p>
 <p>The text inside that file is written in up to three languages, each with a separate job.</p>
 
@@ -815,7 +823,7 @@ button.addEventListener("click", function () {
 <p>In words: find the element on the page whose id is <code>order-button</code>; when it is clicked, show a message. Students in a Python course will notice that this looks like a programming language because it is one. The syntax differs from Python (curly braces, semicolons) but the ideas are the same: variables, functions, conditions, loops.</p>
 <div class="note"><span class="label">Common confusion</span><p>JavaScript and Java are unrelated languages that share half a name for 1990s marketing reasons. Java runs on servers and in Android apps. JavaScript runs in browsers (and, since 2009, on servers too, through a program called Node.js). When people say "JS" they mean JavaScript.</p></div>
 
-<figure>
+<figure id="fig-s2-3-1">
 <div class="scroll">
 <svg viewBox="0 0 680 230" role="img" aria-label="Three text files, HTML, CSS, and JavaScript, are read by the browser, which renders the finished page on screen.">
   <defs>
@@ -859,7 +867,7 @@ button.addEventListener("click", function () {
 </section>
 
 <section id="s2-4-wrap">
-<h3 id="s2-4">2.4 The static website on your own computer <span class="time">5 min</span></h3>
+<h3 id="s2-4">2.4 The static website on your own computer <span class="time">5 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-4" title="Open this section as slides">Slides</a></h3>
 <p>A website made only of files like the ones above, files that are written once and sent to every visitor exactly as they are, is a <dfn class="kw" id="kw-static-site" data-def="A website made of fixed files (HTML, CSS, JavaScript, images) that are delivered to every visitor exactly as stored. Nothing is computed per visitor and no data is saved on the server.">static website</dfn>. The word "static" means the content does not change depending on who is looking or when. A brochure site for a bakery, a personal portfolio, a documentation site, and a landing page are all naturally static.</p>
 <p>The essential point for this session: a static website needs no server at all to work on your own computer. The browser reads the files straight off your disk. This is the zero-cost, zero-infrastructure starting point from which everything else in this module is built up.</p>
 <div class="demo"><span class="label">Live demo (3 minutes)</span>
@@ -874,12 +882,12 @@ button.addEventListener("click", function () {
 </section>
 
 <section id="s2-5-wrap">
-<h3 id="s2-5">2.5 How the internet delivers a page <span class="time">20 min</span></h3>
+<h3 id="s2-5">2.5 How the internet delivers a page <span class="time">20 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-5" title="Open this section as slides">Slides</a></h3>
 <p>Suppose the bakery's files are now sitting on a server somewhere. A customer types <code>https://www.rosenthalsbakery.com/menu.html</code> into their browser. In the roughly half a second before the page appears, a lot happens. We take it piece by piece.</p>
 
 <h4 id="s2-5-url">The address: anatomy of a URL</h4>
 <p>The thing you type is a <dfn class="kw" id="kw-url" data-def="Uniform Resource Locator, the full address of something on the web. It names the protocol (https), the domain (which server), and the path (which page or file on that server).">URL</dfn> (Uniform Resource Locator). It has parts, and each part answers a different question.</p>
-<figure>
+<figure id="fig-s2-5-1">
 <div class="scroll">
 <svg viewBox="0 0 720 190" role="img" aria-label="The URL https://www.rosenthalsbakery.com/menu.html?lang=en broken into protocol, domain, path, and query string.">
   <text x="360" y="60" class="d-mono" text-anchor="middle" style="font-size:19px;font-weight:600">https://www.rosenthalsbakery.com/menu.html?lang=en</text>
@@ -950,7 +958,7 @@ Content-Length: 5120
 </div>
 <p>One page usually triggers many requests. The HTML arrives first; as the browser reads it, it discovers it also needs <code>style.css</code>, <code>app.js</code>, and <code>storefront.jpg</code>, and sends a separate request for each. A typical commercial home page today makes 50 to 150 requests. This is why "the number of requests" is a real performance metric and why the CDN in Session 4 matters.</p>
 
-<figure>
+<figure id="fig-s2-5-2">
 <div class="scroll">
 <svg class="seq" viewBox="0 0 720 300" role="img" aria-label="Sequence of a page load: browser asks DNS for the IP address, receives it, sends an HTTP GET to the web server, receives HTML, then requests the CSS, JavaScript, and image files and renders the page.">
   <defs>
@@ -1001,7 +1009,7 @@ Content-Length: 5120
 </section>
 
 <section id="s2-6-wrap">
-<h3 id="s2-6">2.6 Front end, back end, and the limits of static sites <span class="time">10 min</span></h3>
+<h3 id="s2-6">2.6 Front end, back end, and the limits of static sites <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-6" title="Open this section as slides">Slides</a></h3>
 <p>Two words you will hear in every conversation about software: <dfn class="kw" id="kw-frontend" data-def="The part of an application that runs on the user's device and that the user sees and interacts with: the HTML, CSS, and JavaScript in the browser, or the screens of a mobile app.">front end</dfn> and <dfn class="kw" id="kw-backend" data-def="The part of an application that runs on servers, out of the user's sight: the code that applies business rules, talks to the database, processes payments, and answers the front end's requests.">back end</dfn>. The front end is everything that runs on the user's device and that they can see and touch: the HTML, CSS, and JavaScript we have been discussing. The back end is everything that runs on the server, out of sight: the code that decides what to send, checks who you are, records your order, charges your card.</p>
 <p>A static website is front end only. That is precisely why it is cheap, and precisely why it cannot do certain things:</p>
 <ul>
@@ -1012,7 +1020,7 @@ Content-Length: 5120
 </ul>
 <p>Every one of those needs is met by adding a back end: a program on the server that receives requests, runs logic, reads and writes stored data, and produces a response tailored to the visitor. A website with a back end is a <dfn class="kw" id="kw-dynamic-site" data-def="A website whose pages are produced by a program on the server at the moment of each request, so that content can depend on who is asking, what they asked for, and what is stored in a database.">dynamic website</dfn>: its pages are generated at the moment they are requested, so they can be different for every person and every moment.</p>
 
-<figure>
+<figure id="fig-s2-6-1">
 <div class="scroll">
 <svg viewBox="0 0 720 250" role="img" aria-label="Side by side: a static site's server returns a stored file unchanged; a dynamic site's server runs a program that consults a database and builds a page for this request.">
   <defs>
@@ -1058,7 +1066,7 @@ Content-Length: 5120
 </section>
 
 <section id="s2-7-wrap">
-<h3 id="s2-7">2.7 Where Python fits <span class="time">5 min</span></h3>
+<h3 id="s2-7">2.7 Where Python fits <span class="time">5 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-2.html#s2-7" title="Open this section as slides">Slides</a></h3>
 <p>You are learning Python in parallel with this course, so it is worth saying exactly where it fits into the picture. The browser can run only JavaScript. Python does not run in the browser. Python runs on <em>your</em> computer when you run a script, and it runs on <em>servers</em> as back-end code. When a Python program on a server answers web requests, it is the "Program" box in the diagram above.</p>
 <p>Python is one of the most popular back-end languages in the world, used at Instagram, Spotify, Netflix, Dropbox, and nearly every AI company. In Session 3 you will see a complete, working Python web server in about ten lines. The Python skills from your other course are directly the skills of writing back ends.</p>
 <div class="tbl-wrap">
@@ -1092,7 +1100,7 @@ Content-Length: 5120
   <p class="answers-link">Answers are in <a href="#answers-2">Appendix B, Session 2</a>.</p>
 </div>
 <section class="session" id="session-3">
-  <div class="eyebrow">Session 3 · 75 minutes</div>
+  <div class="eyebrow">Session 3 · 75 minutes <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html" title="Open this session as slides">Slides</a> <a class="slides-btn alt" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>
   <h2>Dynamic Websites, APIs, and Databases</h2>
   <p class="goal">Session 2 ended with a program running on the server. This session opens that box. We see what a back end actually looks like, how the front end talks to it through an API, why almost every product needs a database, and what SQL is, illustrated with a bakery that finally takes orders.</p>
 
@@ -1122,7 +1130,7 @@ Content-Length: 5120
 </section>
 
 <section id="s3-1-wrap">
-<h3 id="s3-1">3.1 Inside the back end: a Python web server <span class="time">12 min</span></h3>
+<h3 id="s3-1">3.1 Inside the back end: a Python web server <span class="time">12 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-1" title="Open this section as slides">Slides</a></h3>
 <p>Here is a complete dynamic web server written in Python, using a popular framework called <dfn class="kw" id="kw-flask" data-def="A small, widely used Python web framework, favoured for learning and for small services. Used for the examples in this module. Django and FastAPI are its larger and newer Python cousins.">Flask</dfn>. It is short enough to read in full.</p>
 <pre><code>from flask import Flask
 from datetime import datetime
@@ -1161,7 +1169,7 @@ app.run(port=5000)</code></pre>
 </section>
 
 <section id="s3-2-wrap">
-<h3 id="s3-2">3.2 APIs and JSON: how programs talk to programs <span class="time">15 min</span></h3>
+<h3 id="s3-2">3.2 APIs and JSON: how programs talk to programs <span class="time">15 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-2" title="Open this section as slides">Slides</a></h3>
 <p>The Flask example returned HTML for a human to read. But increasingly the thing making the request is not a human's browser rendering a page. It is another program: JavaScript in the page asking for "just the data," a mobile app, a partner's system, or an AI assistant. For those callers, the server returns raw data instead of a designed page. The set of requests a server understands, and the shape of the answers it gives, is its <dfn class="kw" id="kw-api" data-def="Application Programming Interface. The defined set of requests a program accepts and the responses it gives, so that other programs can use it without knowing how it works inside. A web API is reached over HTTP and usually speaks JSON.">API</dfn> (Application Programming Interface).</p>
 <div class="analogy"><span class="label">Analogy</span><p>Back to the restaurant. The <em>menu</em> is the API. It lists exactly what you may order and what you will get. You do not need to see the kitchen, and the kitchen can be reorganised without changing the menu. A menu written in a standard format lets anyone order, including delivery apps that were never imagined when the restaurant opened.</p></div>
 <p>A web API is reached over HTTP just like a page, but its <dfn class="kw" id="kw-endpoint" data-def="One specific address in an API, such as GET /api/products or POST /api/orders, that performs one operation. An API is a collection of endpoints.">endpoints</dfn> (individual addresses) return data rather than HTML. Here is the bakery adding one:</p>
@@ -1201,7 +1209,7 @@ def list_products():
 <p>The four verbs map to the four things any system does with data, remembered by the acronym <dfn class="kw" id="kw-crud" data-def="Create, Read, Update, Delete: the four basic operations any application performs on stored data. Most business software is, at heart, CRUD screens over a database.">CRUD</dfn>: Create, Read, Update, Delete. A surprising fraction of all business software is CRUD screens over a database: customers, invoices, tickets, inventory. Recognising a product as "mostly CRUD" is a useful signal that it is well understood and inexpensive to build.</p>
 
 <h4 id="s3-2-who">Who calls APIs?</h4>
-<figure>
+<figure id="fig-s3-2-1">
 <div class="scroll">
 <svg viewBox="0 0 720 260" role="img" aria-label="A back-end API in the middle is called by JavaScript in a web page, by a mobile app, and by a partner company's system; the back end in turn calls third-party APIs such as Stripe and the Claude API.">
   <defs>
@@ -1252,7 +1260,7 @@ def list_products():
 </section>
 
 <section id="s3-3-wrap">
-<h3 id="s3-3">3.3 Why every product needs a database <span class="time">10 min</span></h3>
+<h3 id="s3-3">3.3 Why every product needs a database <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-3" title="Open this section as slides">Slides</a></h3>
 <p>The <code>/api/products</code> example had its data typed directly into the program. That breaks the moment a real business touches it: the baker cannot edit Python to change a price, and an order placed by a customer has nowhere to be saved. The server needs somewhere to <em>store</em> data that survives restarts, can be changed by the program, and can be searched. That somewhere is a <dfn class="kw" id="kw-database" data-def="A program dedicated to storing, organising, and retrieving data reliably, so that many users and programs can read and write it at the same time without losing or corrupting anything. Almost every dynamic application has one.">database</dfn>.</p>
 <p>Why not just save to a file, the way you might save a spreadsheet? Because a database solves problems a file cannot:</p>
 <ul>
@@ -1304,7 +1312,7 @@ def list_products():
   <li>Every row has a <dfn class="kw" id="kw-primary-key" data-def="A column whose value uniquely identifies each row in a table, such as customer_id. No two rows share one, and it never changes, so it can be used to refer to that row from anywhere.">primary key</dfn>, a column whose value is unique for that row and never changes: <code>customer_id</code>, <code>product_id</code>, <code>order_id</code>. Names are not good keys because two customers can share one and people change theirs.</li>
   <li>Instead of copying Dana's name and email into every order she places, the order stores only her <code>customer_id</code>. A column that holds the primary key of a row in <em>another</em> table is a <dfn class="kw" id="kw-foreign-key" data-def="A column in one table that holds the primary key of a row in another table, linking the two. The customer_id in an orders table is a foreign key pointing to the customers table.">foreign key</dfn>. The orders table has two: <code>customer_id</code> and <code>product_id</code>. This is what "relational" refers to: tables related through keys.</li>
 </ul>
-<figure>
+<figure id="fig-s3-3-1">
 <div class="scroll">
 <svg viewBox="0 0 720 200" role="img" aria-label="Three tables: customers, orders, and products. The orders table's customer_id column points to the customers table's primary key, and its product_id column points to the products table's primary key.">
   <defs>
@@ -1349,7 +1357,7 @@ def list_products():
 </section>
 
 <section id="s3-4-wrap">
-<h3 id="s3-4">3.4 SQL by example <span class="time">15 min</span></h3>
+<h3 id="s3-4">3.4 SQL by example <span class="time">15 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-4" title="Open this section as slides">Slides</a></h3>
 <p>Relational databases are all controlled with one language, <dfn class="kw" id="kw-sql" data-def="Structured Query Language, the standard language for asking questions of and making changes to a relational database. Statements read almost like English: SELECT, FROM, WHERE, INSERT, UPDATE, DELETE, JOIN.">SQL</dfn> (Structured Query Language, said "sequel" or "S-Q-L"). It was designed in the 1970s to be readable by business analysts, and it largely is. You are not expected to write SQL in this course; you are expected to recognise it, read simple statements, and know what it can do. Claude Code will write the SQL, but you will be reviewing what it writes and asking for the right things.</p>
 <p>A request to a database is a <dfn class="kw" id="kw-query" data-def="A question or instruction sent to a database, written in SQL. 'Running a query' means asking the database for data or telling it to change data.">query</dfn>. Six examples cover most of what a business ever needs.</p>
 
@@ -1419,7 +1427,7 @@ DELETE FROM orders WHERE order_id = 89;</code></pre>
 </section>
 
 <section id="s3-5-wrap">
-<h3 id="s3-5">3.5 Beyond tables: NoSQL and ORMs <span class="time">8 min</span></h3>
+<h3 id="s3-5">3.5 Beyond tables: NoSQL and ORMs <span class="time">8 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-5" title="Open this section as slides">Slides</a></h3>
 <h4>NoSQL databases</h4>
 <p>Not all data fits neatly into fixed columns. A product catalogue where every product has different attributes (shoes have sizes, laptops have memory) fights the relational model. <dfn class="kw" id="kw-nosql" data-def="A family of databases that do not use the table-and-SQL model. Document databases (MongoDB) store JSON-like records with flexible shapes; key-value stores (Redis) hold simple lookups very fast. Chosen for flexibility or speed at very large scale.">NoSQL</dfn> databases relax the rules. The most common kind, a <dfn class="kw" id="kw-document-database" data-def="A NoSQL database that stores each record as a self-describing JSON-like document with whatever fields it needs, instead of a row in a fixed table. MongoDB is the best-known example.">document database</dfn> such as MongoDB, stores each record as a JSON-like document with whatever fields it needs:</p>
 <pre><code>{
@@ -1442,7 +1450,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s3-6-wrap">
-<h3 id="s3-6">3.6 Putting it together: the three-tier architecture <span class="time">10 min</span></h3>
+<h3 id="s3-6">3.6 Putting it together: the three-tier architecture <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-3.html#s3-6" title="Open this section as slides">Slides</a></h3>
 <p>We now have three distinct kinds of component, and the standard name for arranging them is the <dfn class="kw" id="kw-three-tier" data-def="The classic structure of a web application in three layers: the presentation tier (front end in the browser or app), the application or logic tier (back-end program), and the data tier (database). Each tier can be built, scaled, and replaced separately.">three-tier architecture</dfn>:</p>
 <ol>
   <li><strong>Presentation tier</strong>: the front end. HTML, CSS, and JavaScript in the browser (or the screens of a phone app). Shows things to people and collects their input.</li>
@@ -1450,7 +1458,7 @@ boston = Customer.query.filter_by(city="Boston").all()
   <li><strong>Data tier</strong>: the database. Stores and retrieves the facts.</li>
 </ol>
 <p>Follow one order through all three tiers. Dana clicks "Order 2 challahs":</p>
-<figure>
+<figure id="fig-s3-6-1">
 <div class="scroll">
 <svg class="seq" viewBox="0 0 720 330" role="img" aria-label="An order placed in the browser travels to the back end as a POST request, the back end checks stock and price, writes to the database with SQL, the database confirms, the back end calls the payment and email APIs, and returns a JSON confirmation the browser displays.">
   <defs>
@@ -1525,7 +1533,7 @@ boston = Customer.query.filter_by(city="Boston").all()
   <p class="answers-link">Answers are in <a href="#answers-3">Appendix B, Session 3</a>.</p>
 </div>
 <section class="session" id="session-4">
-  <div class="eyebrow">Session 4 · 75 minutes</div>
+  <div class="eyebrow">Session 4 · 75 minutes <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html" title="Open this session as slides">Slides</a> <a class="slides-btn alt" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>
   <h2>Hosting, Scaling, and the Cloud</h2>
   <p class="goal">So far everything has run on one laptop. This session moves the bakery onto the internet and then grows it, one step at a time, from a single rented server to the distributed architecture used by companies serving millions of people. Each step is motivated by a specific problem the previous step could not solve, and each step has a price tag.</p>
 
@@ -1557,7 +1565,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-1-wrap">
-<h3 id="s4-1">4.1 From localhost to production <span class="time">10 min</span></h3>
+<h3 id="s4-1">4.1 From localhost to production <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-1" title="Open this section as slides">Slides</a></h3>
 <p>The bakery's back end works beautifully at <code>http://localhost:5000</code>. Moving it to a place where customers can reach it is called <dfn class="kw" id="kw-deployment" data-def="The act of putting a version of your software onto servers where real users can reach it. 'We deployed on Tuesday' means Tuesday's version went live.">deployment</dfn>. "Deploy" is one of the most frequently used verbs in a software team, and it means exactly this: take the code that works here and make it run there.</p>
 <p>Serious teams do not deploy straight from a laptop to customers. Code passes through <dfn class="kw" id="kw-environment" data-def="A complete, separate copy of the application and its supporting services used for one purpose. Development (the programmer's own machine), staging (a private replica of production for testing), and production (the live system real users use) are the standard three.">environments</dfn>, each a full copy of the application with its own database:</p>
 <div class="tbl-wrap">
@@ -1586,7 +1594,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-2-wrap">
-<h3 id="s4-2">4.2 Step 1: everything on one server <span class="time">10 min</span></h3>
+<h3 id="s4-2">4.2 Step 1: everything on one server <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-2" title="Open this section as slides">Slides</a></h3>
 <p>The simplest deployment is to rent one computer in a data center and install everything on it. Cloud companies rent these by the hour or month as <dfn class="kw" id="kw-vps" data-def="Virtual Private Server: a rented slice of a physical server in a data center that behaves like your own dedicated computer, with its own operating system, IP address, and disk. The cheapest way to run a back end on the internet; typically 5 to 50 dollars a month.">virtual private servers</dfn> (VPS) from providers such as DigitalOcean, Linode, Hetzner, or Amazon's EC2, for as little as 5 dollars a month. "Virtual" because one powerful physical machine is carved into several independent virtual ones, each of which feels to its renter like a whole computer.</p>
 <p>On that one machine you install:</p>
 <ul>
@@ -1595,7 +1603,7 @@ boston = Customer.query.filter_by(city="Boston").all()
   <li>Your back-end program (the Python/Flask app), listening on an internal port such as 5000.</li>
   <li>The database (PostgreSQL), listening on its own internal port, 5432 by convention.</li>
 </ul>
-<figure>
+<figure id="fig-s4-2-1">
 <div class="scroll">
 <svg viewBox="0 0 720 250" role="img" aria-label="Browsers on the internet connect through DNS to one rented server that runs the web server program, the back-end application, and the database together.">
   <defs>
@@ -1643,9 +1651,9 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-3-wrap">
-<h3 id="s4-3">4.3 Step 2: give the database its own machine <span class="time">10 min</span></h3>
+<h3 id="s4-3">4.3 Step 2: give the database its own machine <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-3" title="Open this section as slides">Slides</a></h3>
 <p>The first thing to move off the shared server is the database. It goes onto a second machine, a dedicated <dfn class="kw" id="kw-database-server" data-def="A machine (or managed cloud service) whose only job is to run the database, separate from the servers that run the application. Allows the two to be sized, secured, and scaled independently.">database server</dfn>, and the back end connects to it over the network instead of talking to it on the same box.</p>
-<figure>
+<figure id="fig-s4-3-1">
 <div class="scroll">
 <svg viewBox="0 0 720 260" role="img" aria-label="Two servers: a public web server running Nginx and the Python back end, and a database server reachable only over a private network. Customers reach the web server; only the web server reaches the database.">
   <defs>
@@ -1697,13 +1705,13 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-4-wrap">
-<h3 id="s4-4">4.4 Step 3: many web servers behind a load balancer <span class="time">15 min</span></h3>
+<h3 id="s4-4">4.4 Step 3: many web servers behind a load balancer <span class="time">15 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-4" title="Open this section as slides">Slides</a></h3>
 <p>The bakery is featured on a national morning show. Ten thousand people open the site in the same minute. The single web server, already the busiest machine, runs out of capacity and starts answering with 503 errors. There are two ways to add capacity, and their names are worth knowing because they come up in every scaling conversation.</p>
 <ul>
   <li><dfn class="kw" id="kw-vertical-scaling" data-def="Adding capacity by making one machine bigger: more processor cores, more memory, faster disks. Simple, but has a hard ceiling and the machine remains a single point of failure.">Vertical scaling</dfn> ("scaling up"): replace the machine with a bigger one. Simple, no code changes. But the biggest machine money can buy is still finite, price grows faster than capacity, and there is still exactly one of it.</li>
   <li><dfn class="kw" id="kw-horizontal-scaling" data-def="Adding capacity by running more copies of a server side by side and spreading requests across them. No ceiling in principle, and losing one copy does not take the service down. Requires a load balancer and stateless servers.">Horizontal scaling</dfn> ("scaling out"): keep the machines modest but run several identical copies of the web server. Twice the traffic, twice the servers. In principle there is no ceiling; this is how every large internet company works.</li>
 </ul>
-<figure>
+<figure id="fig-s4-4-1">
 <div class="scroll">
 <svg viewBox="0 0 720 200" role="img" aria-label="Vertical scaling replaces a small server with one large server. Horizontal scaling keeps servers small and adds more of them.">
   <defs>
@@ -1737,7 +1745,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 
 <h4 id="s4-4-lb">The load balancer</h4>
 <p>Several web servers create an immediate question: the domain name resolves to <em>one</em> IP address, so which server does a customer's request go to? The answer is a new component that sits in front of all of them, the <dfn class="kw" id="kw-load-balancer" data-def="A component that receives all incoming requests and distributes them across a pool of identical servers, so that no one server is overloaded and a failed server is skipped automatically. The public address of a scaled website points at its load balancer.">load balancer</dfn>. The public address belongs to the load balancer. It accepts every request and forwards each to one of the servers behind it, spreading the work evenly (<dfn class="kw" id="kw-round-robin" data-def="The simplest way of sharing work among several servers: send each new request to the next server in turn, then start again from the first.">round-robin</dfn>, or to whichever is least busy). It also performs <dfn class="kw" id="kw-health-check" data-def="A small request a load balancer sends to each server every few seconds to confirm it is alive and responding correctly. A server that fails its health check is removed from rotation until it recovers.">health checks</dfn>: every few seconds it pings each server, and if one stops answering it simply stops sending it traffic. Customers never notice.</p>
-<figure>
+<figure id="fig-s4-4-2">
 <div class="scroll">
 <svg viewBox="0 0 720 300" role="img" aria-label="Customers connect to a load balancer, which distributes requests across three identical web servers, one of which is marked failed and skipped. All web servers connect to one database server and one shared session store.">
   <defs>
@@ -1794,7 +1802,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-5-wrap">
-<h3 id="s4-5">4.5 Step 4: caches, CDNs, and storage <span class="time">10 min</span></h3>
+<h3 id="s4-5">4.5 Step 4: caches, CDNs, and storage <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-5" title="Open this section as slides">Slides</a></h3>
 <p>With the servers scaled, the next bottlenecks are usually the database and the distance between servers and customers. Three components address them.</p>
 <h4>Cache</h4>
 <p>A <dfn class="kw" id="kw-cache" data-def="A fast temporary copy of data that is expensive to compute or fetch, kept close to where it is needed so the next request for it is answered instantly. Caches exist in the browser, on servers (Redis), and in CDNs. The hard part is knowing when the copy is out of date.">cache</dfn> is a fast, temporary copy of something that was expensive to produce. The bakery's product list is requested thousands of times a minute and changes twice a day. Running the same SQL query thousands of times is wasteful; the back end runs it once, keeps the result in memory (typically in Redis, the same in-memory store used for sessions), and hands out the copy for the next 60 seconds. Database load drops by a thousand-fold. Caches appear everywhere: your browser caches images so it does not re-download them, servers cache query results, and the CDN below is a cache too. Their one hard problem is <dfn class="kw" id="kw-stale" data-def="Describes cached data that no longer matches the real, current value because the original changed after the copy was made. Deciding how long a cache may serve a copy before refreshing it is the central difficulty of caching.">staleness</dfn>: the copy can be out of date, so someone must decide how long a copy may live and when to throw it away.</p>
@@ -1805,7 +1813,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 <h4>Read replicas</h4>
 <p>Finally, the database itself can be partially scaled. Most applications read far more than they write. A <dfn class="kw" id="kw-replica" data-def="A live copy of the database that is continuously kept up to date from the primary. Read replicas answer read-only queries to take load off the primary; a standby replica takes over if the primary fails.">read replica</dfn> is a continuously updated copy of the primary database that answers read-only queries (product lists, order history, reports) while all writes still go to the one primary. A replica also serves as a hot spare: if the primary fails, the replica is promoted and the site carries on. Splitting writes across several databases (called <dfn class="kw" id="kw-sharding" data-def="Dividing one database into several independent pieces, each holding a slice of the data (customers A to M on one server, N to Z on another), so that writes as well as reads can be spread across machines. Complex; used only at very large scale.">sharding</dfn>) is the hard, expensive step that only very large companies take; it is beyond this course, but you should know the word.</p>
 
-<figure>
+<figure id="fig-s4-5-1">
 <div class="scroll">
 <svg viewBox="0 0 760 360" role="img" aria-label="Full architecture: customers reach a CDN and a load balancer; the load balancer feeds several stateless web servers; the servers use a Redis cache, a primary database with a read replica, object storage for files, and call third-party APIs.">
   <defs>
@@ -1871,7 +1879,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-6-wrap">
-<h3 id="s4-6">4.6 The cloud menu: IaaS, PaaS, SaaS, serverless <span class="time">10 min</span></h3>
+<h3 id="s4-6">4.6 The cloud menu: IaaS, PaaS, SaaS, serverless <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-6" title="Open this section as slides">Slides</a></h3>
 <p>Everything above can be rented rather than owned, and <dfn class="kw" id="kw-cloud" data-def="Renting computing (servers, databases, storage, networking) from a provider's data centers over the internet, paid by usage, instead of buying and running your own hardware. The big three providers are Amazon Web Services, Microsoft Azure, and Google Cloud.">cloud computing</dfn> is simply the name for that arrangement: someone else owns the data centers and you pay for what you use. Amazon Web Services (AWS), Microsoft Azure, and Google Cloud are the giants; there are many smaller, simpler providers. The real decision is not which brand but <em>how much of the work you want to do yourself</em>, and the industry describes that choice in layers.</p>
 <div class="tbl-wrap">
 <table class="tbl">
@@ -1890,14 +1898,14 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s4-7-wrap">
-<h3 id="s4-7">4.7 Shipping code safely <span class="time">5 min</span></h3>
+<h3 id="s4-7">4.7 Shipping code safely <span class="time">5 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-4.html#s4-7" title="Open this section as slides">Slides</a></h3>
 <p>Three practices make it possible to change a live product without breaking it, and you will see all three in any team you work with.</p>
 <ul>
   <li><dfn class="kw" id="kw-version-control" data-def="A system that records every change to a project's code, who made it, and why, so that changes can be reviewed, combined, and undone. Git is the universal tool; GitHub and GitLab host Git repositories online for teams.">Version control</dfn>. Every change to the code is recorded, with author and reason, and can be undone. The tool is <dfn class="kw" id="kw-git" data-def="The universal version-control program. It records every change to a project's files as a history that can be inspected, shared, and rolled back. GitHub and GitLab are websites that host Git repositories.">Git</dfn>; GitHub and GitLab host the shared copies. A <dfn class="kw" id="kw-repository" data-def="One project's complete files and their full change history as stored by Git, on a developer's machine or on GitHub. Usually shortened to 'repo'.">repository</dfn> ("repo") is one project's history. Claude Code works inside Git repositories and can <dfn class="kw" id="kw-commit" data-def="To record a set of changes in version control as one named, permanent step in the project's history, with a message saying what was changed and why. Also the noun for that recorded step.">commit</dfn> changes for you; knowing that the history exists, and that anything can be rolled back, is what makes experimenting safe.</li>
   <li><dfn class="kw" id="kw-ci-cd" data-def="Continuous Integration / Continuous Deployment: automation that, every time code is changed, runs the tests and, if they pass, deploys the new version, so releases are frequent, small, and low-risk. GitHub Actions is a common tool.">CI/CD</dfn> (Continuous Integration / Continuous Deployment). Automation that runs the <dfn class="kw" id="kw-automated-tests" data-def="Programs written to check that the product's code behaves correctly, run automatically on every change. If a change breaks an existing behaviour, a test fails and the change is stopped before it reaches users.">automated tests</dfn> every time code changes and, if they pass, deploys it. Instead of a risky quarterly release, teams ship small changes many times a day. On a PaaS this is often built in: connect your GitHub repo, and every change to the <dfn class="kw" id="kw-branch" data-def="A parallel line of development inside a Git repository. Work happens on a branch without disturbing the main branch, and is merged in when ready. The main branch is normally what gets deployed to production.">main branch</dfn> goes live within minutes.</li>
   <li><dfn class="kw" id="kw-monitoring" data-def="Continuously collecting measurements and log messages from a running system (errors, response times, traffic, server health) and alerting people when something goes wrong, so problems are found before customers report them.">Monitoring</dfn> and logging. Servers write a line to a <dfn class="kw" id="kw-log" data-def="A running text record that a program writes as it works: each request handled, each error, each notable event, with a timestamp. The first place engineers look when something goes wrong.">log</dfn> for every request and every error; monitoring tools (Datadog, Sentry, Grafana) collect them, chart them, and page someone at 2 a.m. if the error rate jumps. A product without monitoring finds out about outages from angry customers.</li>
 </ul>
-<figure>
+<figure id="fig-s4-7-1">
 <div class="scroll">
 <svg viewBox="0 0 720 130" role="img" aria-label="Pipeline: a developer commits code to GitHub; automated tests run; the code deploys to staging for checks; then it deploys to production; monitoring watches production and feeds back to the developer.">
   <defs>
@@ -1948,7 +1956,7 @@ boston = Customer.query.filter_by(city="Boston").all()
   <p class="answers-link">Answers are in <a href="#answers-4">Appendix B, Session 4</a>.</p>
 </div>
 <section class="session" id="session-5">
-  <div class="eyebrow">Session 5 · 75 minutes</div>
+  <div class="eyebrow">Session 5 · 75 minutes <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html" title="Open this session as slides">Slides</a> <a class="slides-btn alt" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>
   <h2>Identity, Security, and Software Beyond the Browser</h2>
   <p class="goal">Every architecture so far has quietly assumed the server knows who is asking. This session explains how it finds out: passwords, cookies and sessions, Basic Auth, and OAuth, the mechanism behind every "Sign in with Google" button. We then widen the lens from websites to phone apps, installed programs, and embedded devices, and finish with where AI services fit in the picture.</p>
 
@@ -1982,7 +1990,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s5-1-wrap">
-<h3 id="s5-1">5.1 Authentication versus authorization <span class="time">8 min</span></h3>
+<h3 id="s5-1">5.1 Authentication versus authorization <span class="time">8 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-1" title="Open this section as slides">Slides</a></h3>
 <p>Two words that sound alike and are constantly confused, even by professionals. Keep them apart with two questions.</p>
 <ul>
   <li><dfn class="kw" id="kw-authentication" data-def="Verifying that someone is who they claim to be, typically by checking a password, a code from their phone, a fingerprint, or a token issued by a trusted identity provider. Answers 'Who are you?' Often shortened to 'authn'.">Authentication</dfn> answers <em>"Who are you?"</em> It is the act of proving identity: a password, a code from your phone, a fingerprint, or a login through Google. Shortened to "authn" or just "auth".</li>
@@ -1994,7 +2002,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s5-2-wrap">
-<h3 id="s5-2">5.2 Passwords done right <span class="time">8 min</span></h3>
+<h3 id="s5-2">5.2 Passwords done right <span class="time">8 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-2" title="Open this section as slides">Slides</a></h3>
 <p>The oldest authentication method is a shared secret: the user and the server both know the password. The obvious design, storing each user's password in the database next to their email, is also the most dangerous thing a product can do. If the database is ever stolen (and databases are stolen constantly), every password is exposed, and since people reuse passwords, so are their bank and email accounts.</p>
 <p>The correct design stores a <dfn class="kw" id="kw-hash" data-def="A fixed-length scramble of some input produced by a one-way mathematical function: the same input always gives the same hash, but the hash cannot be reversed to recover the input. Passwords are stored as hashes so that a stolen database does not reveal them.">hash</dfn> of the password instead. A hash function turns any input into a fixed-length scramble in a way that cannot be reversed. <code>correct-horse-battery</code> might hash to <code>$2b$12$K9xT…</code>. To check a login, the server hashes what the user typed and compares the two scrambles. The server never needs the original password, and a thief who steals the database gets scrambles they cannot turn back into passwords. (Details you may hear: passwords are "<dfn class="kw" id="kw-salt" data-def="A random value mixed into a password before hashing so that two users with the same password get different hashes, which defeats precomputed lists of common password hashes.">salted</dfn>," meaning a random value is mixed in so identical passwords do not produce identical hashes, and slow algorithms such as bcrypt or argon2 are used so that guessing billions of passwords takes years.)</p>
 <p>The lesson for a product owner is simple and non-negotiable: <strong>if a system can email you your old password, it is storing passwords wrongly.</strong> A correctly built system can only reset a password, never reveal it.</p>
@@ -2002,10 +2010,10 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s5-3-wrap">
-<h3 id="s5-3">5.3 Staying logged in: cookies, sessions, and tokens <span class="time">10 min</span></h3>
+<h3 id="s5-3">5.3 Staying logged in: cookies, sessions, and tokens <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-3" title="Open this section as slides">Slides</a></h3>
 <p>Session 4 established that HTTP is stateless: each request arrives with no memory of the last. Yet you log in once and stay logged in for weeks. How does the server recognise you on the second request?</p>
 <p>The mechanism is the <dfn class="kw" id="kw-cookie" data-def="A small piece of text a server asks the browser to store and to send back automatically with every future request to that site. The standard way a website recognises a returning browser, most importantly to keep you logged in.">cookie</dfn>. When you log in successfully, the server's response includes an instruction: "browser, please store this piece of text and send it back to me with every future request." The browser obeys automatically. The text is usually a <dfn class="kw" id="kw-session" data-def="The server's record that a particular user has logged in, identified by a long random session ID that is stored in the user's cookie. On each request the server looks up the ID to learn who is asking. Sessions expire after a period or on logout.">session ID</dfn>: a long random string that means nothing by itself but which the server has recorded in its session store (the Redis box in Session 4) alongside "this is Dana, logged in at 8:14, expires in 14 days." Each request carries the cookie; the server looks up the ID; now it knows who is asking. Log out, and the server deletes the record so the ID becomes worthless.</p>
-<figure>
+<figure id="fig-s5-3-1">
 <div class="scroll">
 <svg class="seq" viewBox="0 0 720 300" role="img" aria-label="Login sequence: the browser posts email and password; the server checks the hash, creates a session record, and replies with a Set-Cookie header; the browser stores the cookie and sends it with every later request; the server looks up the session ID to identify the user.">
   <defs>
@@ -2060,7 +2068,7 @@ boston = Customer.query.filter_by(city="Boston").all()
 </section>
 
 <section id="s5-4-wrap">
-<h3 id="s5-4">5.4 HTTP Basic Authentication and API keys <span class="time">7 min</span></h3>
+<h3 id="s5-4">5.4 HTTP Basic Authentication and API keys <span class="time">7 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-4" title="Open this section as slides">Slides</a></h3>
 <p>Before cookies and tokens there was the simplest possible scheme, built into HTTP itself and still in use: <dfn class="kw" id="kw-basic-auth" data-def="The simplest authentication method built into HTTP: the client sends the username and password, encoded (not encrypted) in Base64, in an Authorization header on every request. Acceptable only over HTTPS, and used mainly for internal tools, quick protection of staging sites, and some APIs.">HTTP Basic Authentication</dfn>. When a server requires it, the browser pops up its own plain grey username/password box (you have probably seen one on a router or a staging site). The browser then attaches the credentials to <em>every</em> request:</p>
 <pre><code>GET /admin/reports HTTP/1.1
 Host: www.rosenthalsbakery.com
@@ -2083,7 +2091,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </ul>
 </div>
 </div>
-<figure>
+<figure id="fig-s5-4-1">
 <div class="scroll">
 <svg viewBox="0 0 720 150" role="img" aria-label="A browser sends a request with a Basic Authorization header containing Base64 of username colon password on every request; the server decodes it and checks the password. An HTTPS wrapper around the whole exchange is the only thing keeping it private.">
   <defs>
@@ -2105,7 +2113,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </section>
 
 <section id="s5-5-wrap">
-<h3 id="s5-5">5.5 OAuth: how "Sign in with Google" works <span class="time">15 min</span></h3>
+<h3 id="s5-5">5.5 OAuth: how "Sign in with Google" works <span class="time">15 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-5" title="Open this section as slides">Slides</a></h3>
 <p>Two problems appear the moment products start working together. First, a new app wants to let users sign up without inventing yet another password, so it offers "Sign in with Google" or "Continue with Apple." Second, an app wants to <em>use</em> another service on the user's behalf: a scheduling tool that reads your Google Calendar, an accounting app that pulls transactions from your bank, a Claude integration that reads your Notion pages. The naive solution to both, asking the user to type their Google password into the new app, is catastrophic: the app would then hold a password that opens everything, forever, and the user could revoke it only by changing the password everywhere.</p>
 <p><dfn class="kw" id="kw-oauth" data-def="OAuth 2.0: the standard protocol that lets a user grant one application limited access to their account at another service (or prove their identity to it) without ever sharing their password. The user is sent to the trusted service to approve specific permissions, and the application receives a scoped, revocable access token instead of the password. Behind every 'Sign in with Google' button.">OAuth 2.0</dfn> solves both problems with one idea: the user never gives the app their password. Instead, the user is sent to the service they already trust (Google), approves a specific, limited request there, and the trusted service hands the app a special-purpose key.</p>
 <div class="analogy"><span class="label">Analogy</span><p>A valet key. You would not hand a valet the master key to your car, house, and safe. A valet key starts the engine, opens the driver's door, and does nothing else; you can have it cancelled without changing any other lock. OAuth issues valet keys for online accounts. The key is called an <em>access token</em>; the "engine only" restriction is called a <em>scope</em>.</p></div>
@@ -2125,7 +2133,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </div>
 
 <h4 id="s5-5-flow">The authorization-code flow, step by step</h4>
-<figure>
+<figure id="fig-s5-5-1">
 <div class="scroll">
 <svg class="seq" viewBox="0 0 740 420" role="img" aria-label="OAuth authorization code flow: the user clicks Sign in with Google in the bakery app; the app redirects the browser to Google with its client ID and requested scopes; the user logs in at Google and approves; Google redirects back to the app with a one-time code; the app's back end exchanges the code plus its client secret for an access token; the app uses the token to fetch the user's profile; the app logs the user in.">
   <defs>
@@ -2154,7 +2162,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
   <!-- 2 redirect -->
   <line x1="310" y1="116" x2="90" y2="116" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="298" cy="106" r="8" class="d-num"/><text x="298" y="109.5" class="d-numt" text-anchor="middle">2</text>
-  <text x="190" y="110" class="d-ts" text-anchor="middle">redirect to Google: client_id + scopes (email, profile)</text>
+  <text x="180" y="110" class="d-ts" text-anchor="middle">redirect to Google with client_id + scopes</text>
   <!-- 3 to google -->
   <line x1="90" y1="150" x2="540" y2="150" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="102" cy="140" r="8" class="d-num"/><text x="102" y="143.5" class="d-numt" text-anchor="middle">3</text>
@@ -2174,10 +2182,10 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
   <!-- 7 exchange -->
   <line x1="320" y1="280" x2="540" y2="280" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="332" cy="270" r="8" class="d-num"/><text x="332" y="273.5" class="d-numt" text-anchor="middle">7</text>
-  <text x="430" y="274" class="d-ts" text-anchor="middle">server-to-server: code + client_secret</text>
+  <text x="440" y="274" class="d-ts" text-anchor="middle">code + client_secret (server to server)</text>
   <line x1="540" y1="308" x2="320" y2="308" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="528" cy="298" r="8" class="d-num"/><text x="528" y="301.5" class="d-numt" text-anchor="middle">8</text>
-  <text x="430" y="302" class="d-ts" text-anchor="middle">tokens: access (1 hour), ID, refresh</text>
+  <text x="425" y="302" class="d-ts" text-anchor="middle">tokens: access (1 h), ID, refresh</text>
   <!-- 9 use token -->
   <line x1="320" y1="342" x2="675" y2="342" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="332" cy="332" r="8" class="d-num"/><text x="332" y="335.5" class="d-numt" text-anchor="middle">9</text>
@@ -2187,7 +2195,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
   <!-- 10 -->
   <line x1="310" y1="398" x2="90" y2="398" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="298" cy="388" r="8" class="d-num"/><text x="298" y="391.5" class="d-numt" text-anchor="middle">10</text>
-  <text x="200" y="392" class="d-ts" text-anchor="middle">bakery sets its own session cookie</text>
+  <text x="195" y="392" class="d-ts" text-anchor="middle">bakery sets a session cookie</text>
 </svg>
 </div>
 <figcaption><b>The OAuth authorization-code flow.</b> Dana's Google password is typed only at Google. The bakery receives a one-time code in the browser and swaps it for a token in a private server-to-server call, so the token itself never passes through the browser.</figcaption>
@@ -2214,7 +2222,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </section>
 
 <section id="s5-6-wrap">
-<h3 id="s5-6">5.6 Security basics every product owner should know <span class="time">7 min</span></h3>
+<h3 id="s5-6">5.6 Security basics every product owner should know <span class="time">7 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-6" title="Open this section as slides">Slides</a></h3>
 <p>You do not need to be a security engineer, but a handful of ideas will let you ask the right questions and recognise the most common mistakes, several of which have already appeared in this module.</p>
 <ul>
   <li><strong>Encrypt in transit and at rest.</strong> HTTPS everywhere (in transit); encrypted disks and database volumes (at rest). Every cloud provider offers the latter as a checkbox. Turn it on.</li>
@@ -2228,7 +2236,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </section>
 
 <section id="s5-7-wrap">
-<h3 id="s5-7">5.7 Beyond the browser: mobile, desktop, embedded <span class="time">10 min</span></h3>
+<h3 id="s5-7">5.7 Beyond the browser: mobile, desktop, embedded <span class="time">10 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-7" title="Open this section as slides">Slides</a></h3>
 <p>Everything so far has assumed the client is a browser. Most software you use is not a website, and yet almost all of it is built from the same parts. The distinction that matters is <em>where the front end runs</em>; the back end and the database are the same story.</p>
 <div class="tbl-wrap">
 <table class="tbl">
@@ -2244,7 +2252,7 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
   </tbody>
 </table>
 </div>
-<figure>
+<figure id="fig-s5-7-1">
 <div class="scroll">
 <svg viewBox="0 0 720 270" role="img" aria-label="Five kinds of client, a browser, an iPhone app, an Android app, a desktop app, and a smart oven, all send requests to the same back-end API, which uses the same database.">
   <defs>
@@ -2284,9 +2292,9 @@ Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</code></pre>
 </section>
 
 <section id="s5-8-wrap">
-<h3 id="s5-8">5.8 Where AI fits <span class="time">5 min</span></h3>
+<h3 id="s5-8">5.8 Where AI fits <span class="time">5 min</span> <a class="slides-btn" href="https://y-rosenthal.github.io/how-modern-software-is-built/slides/session-5.html#s5-8" title="Open this section as slides">Slides</a></h3>
 <p>Since this course is about building products with AI, the last question is where a model such as Claude sits in everything above. The answer is reassuringly familiar: <strong>an <dfn class="kw" id="kw-ai-model" data-def="A program, trained on enormous amounts of text and code, that produces text in response to a prompt. Claude, GPT, and Gemini are large language models (LLMs), the kind of AI model this course builds with. Reached by a product through the provider's API.">AI model</dfn> is a third-party API called from your back end.</strong> It is the Claude API box that has been sitting at the edge of the diagrams since Session 3.</p>
-<figure>
+<figure id="fig-s5-8-1">
 <div class="scroll">
 <svg viewBox="0 0 720 200" role="img" aria-label="The user's browser sends a question to the bakery back end; the back end adds context from its database, calls the Claude API with its secret API key, receives the model's answer, and returns it to the browser. The API key never leaves the server.">
   <defs>

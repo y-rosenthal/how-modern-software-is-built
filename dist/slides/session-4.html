@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Session 4 Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF4;
+  --ink:#1B2430;
+  --ink-2:#4A5666;
+  --line:#CBD4DF;
+  --accent:#0E7C86;
+  --accent-ink:#0A5A62;
+  --accent-soft:#D6EEF0;
+  --review:#FFF3D1;
+  --review-line:#E2B94E;
+  --review-ink:#5C4300;
+  --note:#EEF2F7;
+  --note-line:#8FA3B8;
+  --code-bg:#EDF1F5;
+  --diagram-hi:#0E7C86;
+  --diagram-hi-soft:#D6EEF0;
+  --font-display:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171E;
+    --surface:#1A212B;
+    --surface-2:#232C38;
+    --ink:#E6EBF1;
+    --ink-2:#A6B2C1;
+    --line:#384454;
+    --accent:#4FC1CB;
+    --accent-ink:#8ADCE3;
+    --accent-soft:#173A3E;
+    --review:#3A2E0E;
+    --review-line:#C9A23E;
+    --review-ink:#F4E3B0;
+    --note:#1F2A36;
+    --note-line:#5B7290;
+    --code-bg:#0F141A;
+    --diagram-hi:#4FC1CB;
+    --diagram-hi-soft:#173A3E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171E;
+  --surface:#1A212B;
+  --surface-2:#232C38;
+  --ink:#E6EBF1;
+  --ink-2:#A6B2C1;
+  --line:#384454;
+  --accent:#4FC1CB;
+  --accent-ink:#8ADCE3;
+  --accent-soft:#173A3E;
+  --review:#3A2E0E;
+  --review-line:#C9A23E;
+  --review-ink:#F4E3B0;
+  --note:#1F2A36;
+  --note-line:#5B7290;
+  --code-bg:#0F141A;
+  --diagram-hi:#4FC1CB;
+  --diagram-hi-soft:#173A3E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 64px;
+}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-0.01em}
+h3{font-size:1.35rem;font-weight:700;margin-top:2.6rem;margin-bottom:0.6rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.6rem 0.9rem}
+h4{font-size:1.05rem;font-weight:700;margin-top:1.6rem;margin-bottom:0.3rem}
+p{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem;margin:0 0 1rem}
+li{margin-bottom:0.35rem}
+li>ul,li>ol{margin-top:0.35rem}
+strong{font-weight:600}
+code,pre,kbd{font-family:var(--font-mono);font-size:0.86em}
+code{background:var(--code-bg);padding:0.08em 0.35em;border-radius:4px}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.9rem 1.1rem;
+  overflow-x:auto;
+  line-height:1.5;
+  margin:0.6rem 0 1.2rem;
+}
+pre code{background:none;padding:0;font-size:0.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+/* layout */
+.page{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0 48px}
+@media (min-width:1100px){
+  .page{grid-template-columns:270px minmax(0,1fr)}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow-y:auto;padding-block:32px 40px}
+  .toc summary{display:none}
+  .toc details>*{display:block}
+}
+.toc{font-family:var(--font-display);font-size:0.86rem;line-height:1.4}
+.toc details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0.6rem 0.9rem;margin-block:20px 8px}
+@media (min-width:1100px){.toc details{border:0;background:transparent;padding:0;margin:0}}
+.toc summary{cursor:pointer;font-weight:700;font-size:0.95rem}
+.toc .toc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin:0.8rem 0 0.5rem}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0}
+.toc a{display:block;padding:0.22rem 0.5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .toc-session>a{font-weight:700;margin-top:0.6rem}
+.toc .toc-sub a{color:var(--ink-2);padding-left:1.1rem;font-size:0.82rem}
+.toc .toc-appendix>a{font-weight:600}
+main{min-width:0;max-width:78ch;padding-block:32px 0}
+main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
+
+/* cover */
+.cover{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.eyebrow{font-family:var(--font-display);font-size:0.74rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:0.7rem}
+.cover .lede{font-size:1.15rem;color:var(--ink-2);max-width:60ch;margin-top:1rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:1.2rem}
+.cover-meta b{color:var(--ink);font-weight:700}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.4rem;margin:1.6rem 0}
+.howto h4{margin-top:0}
+.howto ul{margin-bottom:0}
+
+/* session header */
+.session{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+.session .eyebrow{margin-bottom:0.5rem}
+.session .goal{color:var(--ink-2);font-size:1.05rem;margin-top:0.8rem;max-width:64ch}
+.agenda{width:100%;border-collapse:collapse;font-family:var(--font-display);font-size:0.9rem;margin:1.2rem 0 0.6rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.agenda th,.agenda td{padding:0.5rem 0.8rem;text-align:left;border-top:1px solid var(--line)}
+.agenda th{background:var(--surface-2);border-top:0;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2)}
+.agenda td:last-child,.agenda th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agenda tfoot td{font-weight:700}
+.objectives{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0 0}
+.objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
+.objectives ul{margin:0}
+
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
+/* section time tag */
+.time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
+
+/* keywords */
+dfn.kw{
+  font-style:normal;
+  font-weight:600;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:0 0.25em;
+  border-radius:3px;
+  border-bottom:2px solid var(--accent);
+  scroll-margin-top:24px;
+}
+dfn.kw:target{outline:3px solid var(--review-line);outline-offset:2px}
+
+/* analogy + note callouts */
+.note,.analogy,.demo{
+  border-left:4px solid var(--note-line);
+  background:var(--note);
+  padding:0.8rem 1.1rem;
+  border-radius:0 10px 10px 0;
+  margin:1.2rem 0;
+}
+.note .label,.analogy .label,.demo .label,.review .label{
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:0.3rem;
+}
+.note p:last-child,.analogy p:last-child,.demo p:last-child,.note ul:last-child,.demo ol:last-child,.demo ul:last-child{margin-bottom:0}
+.analogy{border-left-color:var(--accent)}
+.ai{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:0.8rem 1.1rem;border-radius:0 10px 10px 0;margin:1.2rem 0}
+.ai .label{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:0.3rem}
+.ai p:last-child{margin-bottom:0}
+.demo{border-left-style:dashed}
+
+/* review box */
+.review{
+  background:var(--review);
+  border:1px solid var(--review-line);
+  color:var(--review-ink);
+  border-radius:12px;
+  padding:1.1rem 1.4rem 1rem;
+  margin:2.5rem 0 1rem;
+  position:relative;
+  scroll-margin-top:24px;
+}
+.review::before{
+  content:"?";
+  position:absolute;top:-14px;left:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--review-line);color:#1B2430;
+  font-family:var(--font-display);font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.review .label{color:var(--review-ink);margin-top:0.2rem}
+.review h4{margin:0 0 0.5rem;color:var(--review-ink)}
+.review ol{margin-bottom:0.5rem}
+.review li{margin-bottom:0.45rem}
+.review a{color:var(--review-ink);font-weight:600}
+.review .answers-link{font-family:var(--font-display);font-size:0.82rem;margin:0.4rem 0 0}
+.review code{background:rgba(0,0,0,0.08)}
+
+/* figures / diagrams */
+figure{margin:1.4rem 0 1.6rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1rem 0.7rem}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);font-family:var(--font-display)}
+figcaption{font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:0.6rem;line-height:1.45}
+figcaption b{color:var(--ink)}
+.d-box{fill:var(--surface-2);stroke:currentColor;stroke-width:1.2}
+.d-box-plain{fill:var(--surface);stroke:currentColor;stroke-width:1.2}
+.d-hi{fill:var(--diagram-hi-soft);stroke:var(--diagram-hi);stroke-width:1.6}
+.d-zone{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:5 4;opacity:0.7}
+.d-line{stroke:currentColor;stroke-width:1.4;fill:none}
+.d-line-hi{stroke:var(--diagram-hi);stroke-width:1.8;fill:none}
+.d-line-dash{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.d-t{font-size:12px;fill:currentColor;font-weight:600}
+.d-ts{font-size:10.5px;fill:currentColor;opacity:0.85}
+.d-tl{font-size:13px;fill:currentColor;font-weight:700}
+.d-th{font-size:12px;fill:var(--diagram-hi);font-weight:700}
+.d-mono{font-family:var(--font-mono);font-size:10.5px;fill:currentColor}
+svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.d-num{fill:var(--diagram-hi)}
+.d-numt{font-size:10px;fill:#fff;font-weight:800}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.6rem 0 1.4rem;background:var(--surface);border:1px solid var(--line)}
+.tbl th,.tbl td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.tbl-wrap{overflow-x:auto;margin:0.6rem 0 1.4rem}
+.tbl-wrap .tbl{margin:0}
+.datatable{border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;background:var(--surface);border:1px solid var(--line);margin:0.4rem 0 1rem}
+.datatable th,.datatable td{padding:0.3rem 0.7rem;border:1px solid var(--line);white-space:nowrap}
+.datatable th{background:var(--surface-2);font-weight:600}
+.datatable caption{caption-side:top;text-align:left;font-family:var(--font-display);font-size:0.82rem;font-weight:700;padding-bottom:0.3rem}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:0.6rem 0 1.2rem}
+.two-col>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0.8rem 1rem}
+.two-col h4{margin-top:0}
+.two-col ul{margin-bottom:0}
+
+/* glossary */
+.glossary{width:100%;border-collapse:collapse;font-size:0.92rem;background:var(--surface);border:1px solid var(--line)}
+.glossary th,.glossary td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.glossary th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.glossary td:first-child{font-family:var(--font-display);font-weight:700;min-width:12ch;width:18%}
+.glossary td:nth-child(2){width:58%;min-width:30ch}
+.glossary td:last-child{font-family:var(--font-display);font-size:0.84rem;min-width:14ch;width:24%}
+.glossary-letter{font-family:var(--font-display);font-weight:800;font-size:0.8rem;letter-spacing:0.1em;color:var(--ink-2);background:var(--ground)}
+.glossary-letter td{border-top:2px solid var(--line)}
+
+/* answers appendix */
+.qa{margin:1.2rem 0 2rem}
+.qa h4{margin-top:0}
+.qa ol{padding-left:1.4rem}
+.qa li{margin-bottom:0.9rem}
+.qa .q{font-weight:600}
+.qa .a{display:block;margin-top:0.25rem;padding:0.5rem 0.9rem;background:var(--review);border-left:3px solid var(--review-line);border-radius:0 8px 8px 0;color:var(--review-ink)}
+.qa .a code{background:rgba(0,0,0,0.08)}
+.backlink{font-family:var(--font-display);font-size:0.82rem}
+
+.appendix{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .toc,.slides-btn{display:none}
+  .page{display:block}
+  main{max-width:none}
+  .session,.appendix{break-before:page}
+  figure,.review,pre,.note,.analogy,.demo{break-inside:avoid}
+  a{color:inherit}
+  dfn.kw{background:#e6f2f3}
+  .review{background:#fff3d1 !important;color:#000}
+}
+
+html,body{height:100%}
+body{margin:0;padding:0;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+.deck{position:relative;height:100%;width:100%}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:2.4vh 5vw 8vh;box-sizing:border-box}
+.slide.active{display:flex}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--font-display);font-size:clamp(12px,1.7vh,17px);color:var(--ink-2);margin-bottom:1.2vh}
+.topbar .crumb{letter-spacing:0.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font-family:var(--font-display);font-weight:700;font-size:clamp(12px,1.7vh,16px);letter-spacing:0.04em;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.3em 0.9em;border-radius:999px;white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.slide h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5.4vh,58px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 2.4vh;text-wrap:balance;max-width:28ch}
+.slide ul{margin:0;padding-left:1.1em;font-size:clamp(17px,3.3vh,34px);line-height:1.35;max-width:38ch}
+.slide li{margin-bottom:1.6vh}
+.slide li b{font-weight:600;color:var(--accent-ink)}
+.slide code{font-family:var(--font-mono);font-size:0.85em;background:var(--code-bg);padding:0.05em 0.3em;border-radius:4px}
+.slide pre{margin:0 0 2vh;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:1.6vh 2vw;font-family:var(--font-mono);font-size:clamp(13px,2.5vh,25px);line-height:1.4;overflow:auto;max-height:52vh}
+.slide .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:0 0 1.5vh}
+.slide figure{margin:0;padding:1.5vh 1.5vw;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.slide figure .scroll{overflow:visible;min-height:0;display:flex;justify-content:center;width:100%}
+.slide figure svg{max-width:100%;display:block;color:var(--ink);font-family:var(--font-display)}
+.slide figcaption{display:none}
+.slide .with-fig ul{font-size:clamp(15px,2.6vh,26px);max-width:none;display:flex;flex-wrap:wrap;gap:0 3vw;list-style:disc}
+.slide .with-fig li{margin-bottom:0.6vh;flex:1 1 40%}
+.slide table{border-collapse:collapse;font-size:clamp(14px,2.6vh,25px);line-height:1.3;background:var(--surface);border:1px solid var(--line);margin-bottom:2vh;max-width:100%}
+.slide th,.slide td{text-align:left;padding:0.9vh 1.4vw;border-top:1px solid var(--line);vertical-align:top}
+.slide th{background:var(--surface-2);font-family:var(--font-display);font-size:0.72em;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.slide .tbl-scroll{overflow:auto;min-height:0;margin-bottom:2vh}
+.slide .takeaway{margin-top:auto;border-left:5px solid var(--accent);background:var(--surface);padding:1.2vh 1.6vw;font-family:var(--font-display);font-weight:600;font-size:clamp(15px,2.7vh,26px);line-height:1.35;border-radius:0 10px 10px 0}
+.slide.title{justify-content:center;padding-bottom:10vh}
+.slide.title .eyebrow{font-family:var(--font-display);font-size:clamp(13px,2vh,18px);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1.5vh}
+.slide.title h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,7.5vh,84px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 2vh;max-width:22ch;text-wrap:balance}
+.slide.title .sub{font-size:clamp(17px,3vh,30px);color:var(--ink-2);max-width:50ch;margin:0 0 3vh}
+.slide.title ol{columns:2;column-gap:4vw;font-family:var(--font-display);font-size:clamp(14px,2.3vh,22px);line-height:1.5;margin:0 0 3vh;padding-left:1.4em;max-width:80ch}
+.slide.title ol a{color:var(--ink);text-decoration:none}
+.slide.title ol a:hover{color:var(--accent-ink);text-decoration:underline}
+.slide.title .links{display:flex;gap:1rem;flex-wrap:wrap}
+.bottombar{position:fixed;left:0;right:0;bottom:0;height:6vh;min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw calc(0px + env(safe-area-inset-bottom,0px));font-family:var(--font-display);font-size:clamp(12px,1.7vh,16px);color:var(--ink-2);background:var(--ground);border-top:1px solid var(--line);box-sizing:border-box}
+.bottombar .nav{display:flex;gap:0.5rem;align-items:center}
+.bottombar button{font:inherit;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0.3em 0.9em;cursor:pointer}
+.bottombar button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.bottombar button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));height:3px;background:var(--accent);width:0;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.progress{transition:none}}
+.hint{font-size:0.9em;opacity:0.8}
+@media (max-width:700px){.slide{padding:2vh 4vw 9vh}.slide.title ol{columns:1}.slide .with-fig li{flex-basis:100%}.hint{display:none}}
+</style>
+<div class="deck">
+<section class="slide title active" id="title" data-title="Session 4"><div class="eyebrow">Session 4 · 75 minutes · slides</div><h1>Hosting, Scaling, and the Cloud</h1><p class="sub">From one rented server to the distributed architecture behind products serving millions</p><ol><li><a href="#s4-1">4.1 From localhost to production</a></li><li><a href="#s4-2">4.2 Step 1: everything on one server</a></li><li><a href="#s4-3">4.3 Step 2: the database gets its own machine</a></li><li><a href="#s4-4">4.4 Step 3: many web servers behind a load balancer</a></li><li><a href="#s4-5">4.5 Step 4: caches, CDNs, and storage</a></li><li><a href="#s4-6">4.6 The cloud menu</a></li><li><a href="#s4-7">4.7 Shipping code safely</a></li></ol><div class="links"><a class="btn primary" href="../#session-4">Open the book chapter</a> <a class="btn" href="session-4.pptx">Download as PowerPoint</a></div><p class="hint">Arrow keys or space to move, F for full screen. Every slide has a Book button back to the full text.</p></section>
+<section class="slide" id="s4-1" data-title="4.1 From localhost to production"><div class="topbar"><span class="crumb">Session 4 · 4.1 From localhost to production · 1/2</span><a class="btn" href="../#s4-1" title="Open this section in the full text">Book ↗</a></div><h2>Deploying, and the three environments</h2><div class="tbl-scroll"><table><thead><tr><th>Environment</th><th>Who uses it</th><th>Purpose</th></tr></thead><tbody><tr><td>Development</td><td>Each programmer, own machine</td><td>Write and try code; break things</td></tr><tr><td>Staging</td><td>The team, testers</td><td>Private replica of production to check a release</td></tr><tr><td>Production</td><td>Real customers</td><td>The actual business; real, protected data</td></tr></tbody></table></div><ul><li><b>Deployment</b>: putting a version where real users can reach it</li><li>"It works on my machine" is why staging exists</li></ul></section>
+<section class="slide" id="s4-1-b" data-title="4.1 From localhost to production"><div class="topbar"><span class="crumb">Session 4 · 4.1 From localhost to production · 2/2</span><a class="btn" href="../#s4-1" title="Open this section in the full text">Book ↗</a></div><h2>Uptime and latency</h2><div class="tbl-scroll"><table><thead><tr><th>Uptime</th><th>Downtime per year</th><th>Typical of</th></tr></thead><tbody><tr><td>99%</td><td>About 3.7 days</td><td>Hobby site on one cheap server</td></tr><tr><td>99.9%</td><td>About 8.8 hours</td><td>Small business with sensible hosting</td></tr><tr><td>99.99%</td><td>About 53 minutes</td><td>Payments, banking, large SaaS</td></tr><tr><td>99.999%</td><td>About 5 minutes</td><td>Telecom; very expensive</td></tr></tbody></table></div><div class="takeaway">Each extra nine costs dramatically more. Latency: users notice anything over ~100 ms.</div></section>
+<section class="slide with-fig" id="s4-2" data-title="4.2 Step 1: everything on one server"><div class="topbar"><span class="crumb">Session 4 · 4.2 Step 1: everything on one server · 1/2</span><a class="btn" href="../#s4-2" title="Open this section in the full text">Book ↗</a></div><h2>Rent one computer and install everything</h2><div class="fig"><figure id="fig-s4-2-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,144.0vh);height:auto;aspect-ratio:720/250" viewBox="0 0 720 250" role="img" aria-label="Browsers on the internet connect through DNS to one rented server that runs the web server program, the back-end application, and the database together.">
+  <defs>
+    <marker id="arr8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- users -->
+  <rect x="20" y="60" width="110" height="36" rx="6" class="d-box"/><text x="75" y="83" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="106" width="110" height="36" rx="6" class="d-box"/><text x="75" y="129" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="152" width="110" height="36" rx="6" class="d-box"/><text x="75" y="175" class="d-t" text-anchor="middle">Phone app</text>
+  <text x="75" y="215" class="d-ts" text-anchor="middle">Customers, anywhere</text>
+  <!-- internet -->
+  <text x="205" y="118" class="d-ts" text-anchor="middle">the internet</text>
+  <line x1="135" y1="124" x2="275" y2="124" class="d-line-hi" marker-end="url(#arr8)"/>
+  <text x="205" y="142" class="d-ts" text-anchor="middle">HTTPS, port 443</text>
+  <!-- server -->
+  <rect x="280" y="20" width="420" height="210" rx="12" class="d-zone"/>
+  <text x="490" y="42" class="d-tl" text-anchor="middle">One rented server (VPS), Linux, IP 203.0.113.7</text>
+  <rect x="300" y="70" width="110" height="110" rx="6" class="d-hi"/>
+  <text x="355" y="115" class="d-th" text-anchor="middle">Web server</text>
+  <text x="355" y="132" class="d-ts" text-anchor="middle">Nginx</text>
+  <text x="355" y="148" class="d-ts" text-anchor="middle">HTTPS, static files</text>
+  <rect x="440" y="70" width="110" height="110" rx="6" class="d-box"/>
+  <text x="495" y="115" class="d-t" text-anchor="middle">Back end</text>
+  <text x="495" y="132" class="d-ts" text-anchor="middle">Python app</text>
+  <text x="495" y="148" class="d-ts" text-anchor="middle">port 5000</text>
+  <rect x="580" y="70" width="105" height="110" rx="6" class="d-box"/>
+  <text x="632" y="115" class="d-t" text-anchor="middle">Database</text>
+  <text x="632" y="132" class="d-ts" text-anchor="middle">PostgreSQL</text>
+  <text x="632" y="148" class="d-ts" text-anchor="middle">port 5432</text>
+  <line x1="415" y1="125" x2="435" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <line x1="555" y1="125" x2="575" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <text x="490" y="210" class="d-ts" text-anchor="middle">All three programs share one processor, one memory, one disk, one power supply</text>
+</svg>
+</div>
+<figcaption><b>Step 1: the single-server deployment.</b> Simple, cheap, and enough for thousands of daily visitors. Every component shares the same hardware, so every component shares the same fate.</figcaption>
+</figure></div><ul><li>A <b>VPS</b> for 5 to 50 dollars a month, running <b>Linux</b>: web server (Nginx) + Python app + PostgreSQL</li><li>Enough for tens of thousands of visits a day</li></ul></section>
+<section class="slide" id="s4-2-b" data-title="4.2 Step 1: everything on one server"><div class="topbar"><span class="crumb">Session 4 · 4.2 Step 1: everything on one server · 2/2</span><a class="btn" href="../#s4-2" title="Open this section in the full text">Book ↗</a></div><h2>Why it eventually breaks</h2><ul><li><b>Single point of failure</b>: disk dies, site and data vanish together</li><li><b>Resource contention</b>: a heavy report query slows the website for everyone</li><li><b>Hard ceiling</b>: the only upgrade is a bigger machine</li><li><b>Security blast radius</b>: break into the web server, you are sitting on the customer data</li></ul><div class="takeaway">Take each next step when the problem is real, not before.</div></section>
+<section class="slide with-fig" id="s4-3" data-title="4.3 Step 2: the database gets its own machine"><div class="topbar"><span class="crumb">Session 4 · 4.3 Step 2: the database gets its own machine · 1/2</span><a class="btn" href="../#s4-3" title="Open this section in the full text">Book ↗</a></div><h2>Separate the data tier</h2><div class="fig"><figure id="fig-s4-3-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,138.5vh);height:auto;aspect-ratio:720/260" viewBox="0 0 720 260" role="img" aria-label="Two servers: a public web server running Nginx and the Python back end, and a database server reachable only over a private network. Customers reach the web server; only the web server reaches the database.">
+  <defs>
+    <marker id="arr9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="95" width="110" height="36" rx="6" class="d-box"/><text x="75" y="118" class="d-t" text-anchor="middle">Customers</text>
+  <line x1="135" y1="113" x2="195" y2="113" class="d-line-hi" marker-end="url(#arr9)"/>
+  <text x="165" y="104" class="d-ts" text-anchor="middle">HTTPS</text>
+  <!-- web server -->
+  <rect x="200" y="30" width="220" height="170" rx="12" class="d-zone"/>
+  <text x="310" y="52" class="d-tl" text-anchor="middle">Web server (public IP)</text>
+  <rect x="220" y="75" width="80" height="100" rx="6" class="d-hi"/>
+  <text x="260" y="120" class="d-th" text-anchor="middle">Nginx</text>
+  <text x="260" y="138" class="d-ts" text-anchor="middle">HTTPS, static</text>
+  <rect x="320" y="75" width="80" height="100" rx="6" class="d-box"/>
+  <text x="360" y="120" class="d-t" text-anchor="middle">Back end</text>
+  <text x="360" y="138" class="d-ts" text-anchor="middle">Python</text>
+  <line x1="305" y1="125" x2="315" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <!-- db server -->
+  <rect x="500" y="30" width="200" height="170" rx="12" class="d-zone"/>
+  <text x="600" y="52" class="d-tl" text-anchor="middle">Database server (private IP)</text>
+  <rect x="540" y="75" width="120" height="100" rx="6" class="d-box"/>
+  <text x="600" y="115" class="d-t" text-anchor="middle">PostgreSQL</text>
+  <text x="600" y="133" class="d-ts" text-anchor="middle">more memory,</text>
+  <text x="600" y="147" class="d-ts" text-anchor="middle">fast disks, backups</text>
+  <line x1="405" y1="125" x2="535" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <text x="470" y="116" class="d-ts" text-anchor="middle">SQL over the</text>
+  <text x="470" y="145" class="d-ts" text-anchor="middle">private network</text>
+  <!-- blocked -->
+  <line x1="75" y1="150" x2="75" y2="230" class="d-line-dash"/>
+  <line x1="75" y1="230" x2="580" y2="230" class="d-line-dash"/>
+  <line x1="580" y1="230" x2="580" y2="212" class="d-line-dash"/>
+  <circle cx="330" cy="230" r="11" fill="var(--surface)" stroke="currentColor" stroke-width="1.4"/>
+  <line x1="324" y1="224" x2="336" y2="236" stroke="currentColor" stroke-width="2"/>
+  <line x1="336" y1="224" x2="324" y2="236" stroke="currentColor" stroke-width="2"/>
+  <text x="330" y="253" class="d-ts" text-anchor="middle">No path from the internet to the database. Only the web server may connect.</text>
+</svg>
+</div>
+<figcaption><b>Step 2: the database moves to its own machine on a private network.</b> The public internet can reach the web server but not the database. Each machine can now be sized for its own job.</figcaption>
+</figure></div><ul><li>The <b>database server</b> sits on a <b>private network</b>; a <b>firewall</b> lets only the web server connect</li><li>No path from the internet to the data</li></ul></section>
+<section class="slide" id="s4-3-b" data-title="4.3 Step 2: the database gets its own machine"><div class="topbar"><span class="crumb">Session 4 · 4.3 Step 2: the database gets its own machine · 2/2</span><a class="btn" href="../#s4-3" title="Open this section in the full text">Book ↗</a></div><h2>Why the second bill is worth it</h2><ul><li>Right-sized hardware: databases want memory and fast disks; web servers want cores and <b>bandwidth</b></li><li>Security: a second wall for an attacker; nobody stumbles across the records from outside</li><li>Independent maintenance: rebuild the web server without touching a byte of data</li><li>It unlocks Step 3: many web servers sharing one database</li><li>In practice: a <b>managed database</b> (RDS, Supabase, Neon) with backups, patches, and <b>failover</b> done for you</li></ul></section>
+<section class="slide with-fig" id="s4-4" data-title="4.4 Step 3: many web servers behind a load balancer"><div class="topbar"><span class="crumb">Session 4 · 4.4 Step 3: many web servers behind a load balancer · 1/3</span><a class="btn" href="../#s4-4" title="Open this section in the full text">Book ↗</a></div><h2>Two ways to add capacity</h2><div class="fig"><figure id="fig-s4-4-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,180.0vh);height:auto;aspect-ratio:720/200" viewBox="0 0 720 200" role="img" aria-label="Vertical scaling replaces a small server with one large server. Horizontal scaling keeps servers small and adds more of them.">
+  <defs>
+    <marker id="arr10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <text x="180" y="26" class="d-tl" text-anchor="middle">Vertical: one bigger machine</text>
+  <rect x="60" y="110" width="60" height="60" rx="6" class="d-box"/>
+  <text x="90" y="145" class="d-ts" text-anchor="middle">4 GB</text>
+  <line x1="130" y1="140" x2="185" y2="140" class="d-line" marker-end="url(#arr10)"/>
+  <rect x="195" y="50" width="120" height="120" rx="6" class="d-hi"/>
+  <text x="255" y="105" class="d-th" text-anchor="middle">64 GB</text>
+  <text x="255" y="125" class="d-ts" text-anchor="middle">still only one</text>
+  <text x="180" y="192" class="d-ts" text-anchor="middle">Ceiling: the largest machine that exists</text>
+  <line x1="365" y1="20" x2="365" y2="190" class="d-line-dash"/>
+  <text x="545" y="26" class="d-tl" text-anchor="middle">Horizontal: more identical machines</text>
+  <rect x="410" y="110" width="60" height="60" rx="6" class="d-box"/>
+  <text x="440" y="145" class="d-ts" text-anchor="middle">4 GB</text>
+  <line x1="480" y1="140" x2="520" y2="140" class="d-line" marker-end="url(#arr10)"/>
+  <rect x="530" y="110" width="44" height="60" rx="6" class="d-hi"/>
+  <rect x="584" y="110" width="44" height="60" rx="6" class="d-hi"/>
+  <rect x="638" y="110" width="44" height="60" rx="6" class="d-hi"/>
+  <text x="552" y="145" class="d-ts" text-anchor="middle">4 GB</text>
+  <text x="606" y="145" class="d-ts" text-anchor="middle">4 GB</text>
+  <text x="660" y="145" class="d-ts" text-anchor="middle">4 GB</text>
+  <text x="606" y="96" class="d-ts" text-anchor="middle">… and as many more as needed</text>
+  <text x="545" y="192" class="d-ts" text-anchor="middle">Ceiling: none in principle. Losing one copy is survivable.</text>
+</svg>
+</div>
+<figcaption><b>Two ways to add capacity.</b> Vertical scaling is a bigger box; horizontal scaling is more boxes. Modern architecture is built around the second.</figcaption>
+</figure></div><ul><li><b>Vertical scaling</b>: a bigger machine. Simple; a ceiling; still one of it</li><li><b>Horizontal scaling</b>: more identical machines. No ceiling in principle; losing one is survivable</li></ul></section>
+<section class="slide with-fig" id="s4-4-b" data-title="4.4 Step 3: many web servers behind a load balancer"><div class="topbar"><span class="crumb">Session 4 · 4.4 Step 3: many web servers behind a load balancer · 2/3</span><a class="btn" href="../#s4-4" title="Open this section in the full text">Book ↗</a></div><h2>Horizontal scaling with a load balancer</h2><div class="fig"><figure id="fig-s4-4-2-slide">
+<div class="scroll">
+<svg style="width:min(88vw,120.0vh);height:auto;aspect-ratio:720/300" viewBox="0 0 720 300" role="img" aria-label="Customers connect to a load balancer, which distributes requests across three identical web servers, one of which is marked failed and skipped. All web servers connect to one database server and one shared session store.">
+  <defs>
+    <marker id="arr11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="115" width="100" height="40" rx="6" class="d-box"/><text x="70" y="140" class="d-t" text-anchor="middle">Customers</text>
+  <line x1="125" y1="135" x2="175" y2="135" class="d-line-hi" marker-end="url(#arr11)"/>
+  <text x="150" y="126" class="d-ts" text-anchor="middle">HTTPS</text>
+  <!-- LB -->
+  <rect x="180" y="95" width="110" height="80" rx="8" class="d-hi"/>
+  <text x="235" y="128" class="d-th" text-anchor="middle">Load balancer</text>
+  <text x="235" y="146" class="d-ts" text-anchor="middle">public IP</text>
+  <text x="235" y="160" class="d-ts" text-anchor="middle">health checks</text>
+  <!-- servers -->
+  <rect x="350" y="30" width="120" height="56" rx="6" class="d-box"/>
+  <text x="410" y="54" class="d-t" text-anchor="middle">Web server 1</text>
+  <text x="410" y="72" class="d-ts" text-anchor="middle">Nginx + Python</text>
+  <rect x="350" y="106" width="120" height="56" rx="6" class="d-box"/>
+  <text x="410" y="130" class="d-t" text-anchor="middle">Web server 2</text>
+  <text x="410" y="148" class="d-ts" text-anchor="middle">Nginx + Python</text>
+  <rect x="350" y="182" width="120" height="56" rx="6" class="d-box" opacity="0.45"/>
+  <text x="410" y="206" class="d-t" text-anchor="middle" opacity="0.6">Web server 3</text>
+  <text x="410" y="224" class="d-ts" text-anchor="middle">failed: skipped</text>
+  <line x1="295" y1="120" x2="345" y2="60" class="d-line" marker-end="url(#arr11)"/>
+  <line x1="295" y1="135" x2="345" y2="134" class="d-line" marker-end="url(#arr11)"/>
+  <line x1="295" y1="150" x2="345" y2="208" class="d-line-dash" opacity="0.6"/>
+  <line x1="333" y1="196" x2="343" y2="206" stroke="currentColor" stroke-width="2"/>
+  <line x1="343" y1="196" x2="333" y2="206" stroke="currentColor" stroke-width="2"/>
+  <text x="410" y="264" class="d-ts" text-anchor="middle">Identical copies of the same code.</text>
+  <text x="410" y="278" class="d-ts" text-anchor="middle">Add a fourth in minutes.</text>
+  <!-- db + session -->
+  <rect x="560" y="55" width="140" height="70" rx="6" class="d-box"/>
+  <text x="630" y="85" class="d-t" text-anchor="middle">Database server</text>
+  <text x="630" y="103" class="d-ts" text-anchor="middle">PostgreSQL (one copy)</text>
+  <rect x="560" y="150" width="140" height="70" rx="6" class="d-box-plain"/>
+  <text x="630" y="180" class="d-t" text-anchor="middle">Session store</text>
+  <text x="630" y="198" class="d-ts" text-anchor="middle">Redis: who is logged in</text>
+  <line x1="475" y1="58" x2="555" y2="82" class="d-line" marker-end="url(#arr11)"/>
+  <line x1="475" y1="134" x2="555" y2="98" class="d-line" marker-end="url(#arr11)"/>
+  <line x1="475" y1="70" x2="555" y2="176" class="d-line-dash"/>
+  <line x1="475" y1="146" x2="555" y2="188" class="d-line-dash"/>
+  <text x="630" y="246" class="d-ts" text-anchor="middle">Shared state lives here,</text>
+  <text x="630" y="260" class="d-ts" text-anchor="middle">not on any web server</text>
+</svg>
+</div>
+<figcaption><b>Step 3: horizontal scaling.</b> The load balancer is the only public address. Web servers are interchangeable and disposable; anything that must be remembered between requests lives in the shared database or session store.</figcaption>
+</figure></div><ul><li>The <b>load balancer</b> owns the public address and spreads requests; <b>health checks</b> skip a dead server</li></ul></section>
+<section class="slide" id="s4-4-c" data-title="4.4 Step 3: many web servers behind a load balancer"><div class="topbar"><span class="crumb">Session 4 · 4.4 Step 3: many web servers behind a load balancer · 3/3</span><a class="btn" href="../#s4-4" title="Open this section in the full text">Book ↗</a></div><h2>The catch: servers must be stateless</h2><ul><li>Dana logs in on server 1; her next click lands on server 2, which has never heard of her</li><li><b>Stateless</b> servers remember nothing between requests; shared facts live in the database or Redis</li><li>Interchangeable servers can be added at 9 a.m. and removed after lunch: costs become <b>elastic</b></li><li>Duplicates at every layer = <b>high availability</b>: how three and four nines are bought</li></ul><div class="takeaway">Ask before launch: "Can we run two copies of this?"</div></section>
+<section class="slide" id="s4-5" data-title="4.5 Step 4: caches, CDNs, and storage"><div class="topbar"><span class="crumb">Session 4 · 4.5 Step 4: caches, CDNs, and storage · 1/2</span><a class="btn" href="../#s4-5" title="Open this section in the full text">Book ↗</a></div><h2>Four more components</h2><ul><li><b>Cache</b>: a fast temporary copy of something expensive (a product list in Redis for 60 seconds). Hard problem: <b>staleness</b></li><li><b>CDN</b>: copies of images, CSS, JS in hundreds of cities; Singapore gets the image from Singapore</li><li><b>Object storage</b> (S3): unlimited files by URL; uploads never live on a web server's disk</li><li><b>Read replica</b>: a live copy of the database that answers reads and stands by as a spare</li></ul></section>
+<section class="slide with-fig" id="s4-5-b" data-title="4.5 Step 4: caches, CDNs, and storage"><div class="topbar"><span class="crumb">Session 4 · 4.5 Step 4: caches, CDNs, and storage · 2/2</span><a class="btn" href="../#s4-5" title="Open this section in the full text">Book ↗</a></div><h2>The standard architecture of a serious web product</h2><div class="fig"><figure id="fig-s4-5-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,105.6vh);height:auto;aspect-ratio:760/360" viewBox="0 0 760 360" role="img" aria-label="Full architecture: customers reach a CDN and a load balancer; the load balancer feeds several stateless web servers; the servers use a Redis cache, a primary database with a read replica, object storage for files, and call third-party APIs.">
+  <defs>
+    <marker id="arr12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- users -->
+  <rect x="20" y="150" width="90" height="44" rx="6" class="d-box"/>
+  <text x="65" y="170" class="d-t" text-anchor="middle">Customers</text>
+  <text x="65" y="186" class="d-ts" text-anchor="middle">web + mobile</text>
+  <!-- CDN -->
+  <rect x="160" y="40" width="120" height="60" rx="8" class="d-box-plain"/>
+  <text x="220" y="66" class="d-t" text-anchor="middle">CDN</text>
+  <text x="220" y="84" class="d-ts" text-anchor="middle">images, CSS, JS</text>
+  <line x1="115" y1="160" x2="155" y2="80" class="d-line" marker-end="url(#arr12)"/>
+  <text x="112" y="112" class="d-ts" text-anchor="end">static files</text>
+  <!-- LB -->
+  <rect x="160" y="140" width="120" height="60" rx="8" class="d-hi"/>
+  <text x="220" y="166" class="d-th" text-anchor="middle">Load balancer</text>
+  <text x="220" y="184" class="d-ts" text-anchor="middle">HTTPS ends here</text>
+  <line x1="115" y1="172" x2="155" y2="172" class="d-line-hi" marker-end="url(#arr12)"/>
+  <!-- private zone -->
+  <rect x="320" y="20" width="420" height="320" rx="12" class="d-zone"/>
+  <text x="530" y="38" class="d-ts" text-anchor="middle">Private network: not reachable from the internet</text>
+  <!-- web servers -->
+  <rect x="340" y="120" width="110" height="34" rx="5" class="d-box"/><text x="395" y="142" class="d-t" text-anchor="middle">Web server</text>
+  <rect x="340" y="160" width="110" height="34" rx="5" class="d-box"/><text x="395" y="182" class="d-t" text-anchor="middle">Web server</text>
+  <rect x="340" y="200" width="110" height="34" rx="5" class="d-box"/><text x="395" y="222" class="d-t" text-anchor="middle">Web server</text>
+  <text x="395" y="254" class="d-ts" text-anchor="middle">stateless, N copies</text>
+  <line x1="285" y1="160" x2="335" y2="137" class="d-line" marker-end="url(#arr12)"/>
+  <line x1="285" y1="172" x2="335" y2="177" class="d-line" marker-end="url(#arr12)"/>
+  <line x1="285" y1="184" x2="335" y2="217" class="d-line" marker-end="url(#arr12)"/>
+  <!-- cache -->
+  <rect x="510" y="60" width="110" height="46" rx="5" class="d-box-plain"/>
+  <text x="565" y="79" class="d-t" text-anchor="middle">Redis</text>
+  <text x="565" y="95" class="d-ts" text-anchor="middle">cache + sessions</text>
+  <line x1="455" y1="128" x2="505" y2="90" class="d-line" marker-end="url(#arr12)"/>
+  <!-- db -->
+  <rect x="510" y="130" width="110" height="52" rx="5" class="d-box"/>
+  <text x="565" y="151" class="d-t" text-anchor="middle">Database</text>
+  <text x="565" y="168" class="d-ts" text-anchor="middle">primary (writes)</text>
+  <rect x="640" y="130" width="90" height="52" rx="5" class="d-box-plain"/>
+  <text x="685" y="151" class="d-t" text-anchor="middle">Replica</text>
+  <text x="685" y="168" class="d-ts" text-anchor="middle">reads, standby</text>
+  <line x1="625" y1="156" x2="635" y2="156" class="d-line" marker-end="url(#arr12)"/>
+  <line x1="455" y1="172" x2="505" y2="158" class="d-line" marker-end="url(#arr12)"/>
+  <!-- object storage -->
+  <rect x="510" y="210" width="110" height="46" rx="5" class="d-box-plain"/>
+  <text x="565" y="229" class="d-t" text-anchor="middle">Object storage</text>
+  <text x="565" y="245" class="d-ts" text-anchor="middle">uploads, PDFs</text>
+  <line x1="455" y1="212" x2="505" y2="230" class="d-line" marker-end="url(#arr12)"/>
+  <line x1="510" y1="215" x2="280" y2="100" class="d-line-dash"/>
+  <text x="400" y="88" class="d-ts" text-anchor="middle">CDN pulls files from storage</text>
+  <!-- third party -->
+  <rect x="510" y="280" width="110" height="46" rx="5" class="d-box-plain"/>
+  <text x="565" y="299" class="d-t" text-anchor="middle">Third-party APIs</text>
+  <text x="565" y="315" class="d-ts" text-anchor="middle">Stripe, Claude, email</text>
+  <line x1="455" y1="228" x2="505" y2="296" class="d-line" marker-end="url(#arr12)"/>
+</svg>
+</div>
+<figcaption><b>Step 4: the standard architecture of a serious web product.</b> Every box here can be rented as a managed service. Compare with the single server in Step 1: same three tiers, each one now duplicated, cached, or moved closer to the user.</figcaption>
+</figure></div><ul><li>Still three tiers: each one now duplicated, cached, or moved closer to the user</li></ul></section>
+<section class="slide" id="s4-6" data-title="4.6 The cloud menu"><div class="topbar"><span class="crumb">Session 4 · 4.6 The cloud menu · 1/2</span><a class="btn" href="../#s4-6" title="Open this section in the full text">Book ↗</a></div><h2>How much of the work do you want to do yourself?</h2><div class="tbl-scroll"><table><thead><tr><th>Layer</th><th>You get</th><th>You manage</th><th>Examples</th></tr></thead><tbody><tr><td>IaaS</td><td>Virtual machines, disks</td><td>Everything on them</td><td>EC2, DigitalOcean</td></tr><tr><td>PaaS</td><td>&quot;Here is my code; run it&quot;</td><td>Just code and data</td><td>Render, Railway, Vercel, Fly.io</td></tr><tr><td>SaaS</td><td>A finished product</td><td>Your settings</td><td>Gmail, Shopify, Slack</td></tr><tr><td>Serverless</td><td>Run this function on demand</td><td>The function</td><td>AWS Lambda, Cloudflare Workers</td></tr></tbody></table></div><div class="takeaway">Pizza: rent a kitchen, a meal kit, delivery, or a vending machine that bakes one slice.</div></section>
+<section class="slide" id="s4-6-b" data-title="4.6 The cloud menu"><div class="topbar"><span class="crumb">Session 4 · 4.6 The cloud menu · 2/2</span><a class="btn" href="../#s4-6" title="Open this section in the full text">Book ↗</a></div><h2>Containers, and the advice for this course</h2><ul><li>A <b>container</b> (Docker) packages a program with everything it needs, so it runs identically everywhere</li><li>Kubernetes runs thousands of containers; almost never the right first choice for a small team</li><li>For a Claude Code prototype: a PaaS plus a managed database, 0 to 50 dollars a month, no servers to log into</li></ul></section>
+<section class="slide with-fig" id="s4-7" data-title="4.7 Shipping code safely"><div class="topbar"><span class="crumb">Session 4 · 4.7 Shipping code safely</span><a class="btn" href="../#s4-7" title="Open this section in the full text">Book ↗</a></div><h2>How code reaches customers</h2><div class="fig"><figure id="fig-s4-7-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,276.9vh);height:auto;aspect-ratio:720/130" viewBox="0 0 720 130" role="img" aria-label="Pipeline: a developer commits code to GitHub; automated tests run; the code deploys to staging for checks; then it deploys to production; monitoring watches production and feeds back to the developer.">
+  <defs>
+    <marker id="arr13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="15" y="30" width="110" height="50" rx="6" class="d-box"/>
+  <text x="70" y="51" class="d-t" text-anchor="middle">Developer</text>
+  <text x="70" y="67" class="d-ts" text-anchor="middle">commits to Git</text>
+  <line x1="130" y1="55" x2="155" y2="55" class="d-line" marker-end="url(#arr13)"/>
+  <rect x="160" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
+  <text x="215" y="51" class="d-t" text-anchor="middle">Tests run</text>
+  <text x="215" y="67" class="d-ts" text-anchor="middle">automatically (CI)</text>
+  <line x1="275" y1="55" x2="300" y2="55" class="d-line" marker-end="url(#arr13)"/>
+  <rect x="305" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
+  <text x="360" y="51" class="d-t" text-anchor="middle">Staging</text>
+  <text x="360" y="67" class="d-ts" text-anchor="middle">team checks it</text>
+  <line x1="420" y1="55" x2="445" y2="55" class="d-line" marker-end="url(#arr13)"/>
+  <rect x="450" y="30" width="110" height="50" rx="6" class="d-hi"/>
+  <text x="505" y="51" class="d-th" text-anchor="middle">Production</text>
+  <text x="505" y="67" class="d-ts" text-anchor="middle">deployed (CD)</text>
+  <line x1="565" y1="55" x2="590" y2="55" class="d-line" marker-end="url(#arr13)"/>
+  <rect x="595" y="30" width="110" height="50" rx="6" class="d-box-plain"/>
+  <text x="650" y="51" class="d-t" text-anchor="middle">Monitoring</text>
+  <text x="650" y="67" class="d-ts" text-anchor="middle">errors, latency</text>
+  <path d="M650,85 L650,108 L70,108 L70,90" class="d-line-dash" marker-end="url(#arr13)"/>
+  <text x="360" y="122" class="d-ts" text-anchor="middle">alerts and bug reports flow back to the developer</text>
+</svg>
+</div>
+<figcaption><b>How code reaches customers.</b> Each arrow is automated. A change that fails its tests never reaches staging; one that misbehaves in production is caught by monitoring and rolled back through version control.</figcaption>
+</figure></div><ul><li><b>Version control</b> (Git, GitHub): every change recorded and reversible</li><li><b>CI/CD</b>: tests run on every change; if they pass, it deploys. Small, frequent, low-risk releases</li><li><b>Monitoring</b> and logs: find out about outages before customers do</li></ul></section>
+</div>
+<div class="progress" id="progress"></div>
+<div class="bottombar"><span id="counter">1 / 1</span><span class="hint">Hosting, Scaling, and the Cloud</span><span class="nav"><button id="prevbtn" type="button" aria-label="Previous slide">‹ Prev</button><button id="nextbtn" type="button" aria-label="Next slide">Next ›</button><button id="fullbtn" type="button" aria-label="Toggle full screen">Full screen</button></span></div>
+<script>var DECK_TITLE="Session 4 Slides";
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=0, counter=document.getElementById('counter'), bar=document.getElementById('progress');
+  function show(n, push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(push!==false){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){}}
+    document.title=slides[i].getAttribute('data-title')+' · '+DECK_TITLE;
+  }
+  function fromHash(){
+    var h=location.hash.replace('#','');
+    var k=-1; slides.forEach(function(s,idx){if(s.id===h)k=idx;});
+    show(k<0?0:k,false);
+  }
+  window.next=function(){show(i+1);};
+  window.prev=function(){show(i-1);};
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); show(i+1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); show(i-1); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(slides.length-1); break;
+      case 'f': case 'F': toggleFull(); break;
+    }
+  });
+  function toggleFull(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+    }catch(e){}
+  }
+  document.getElementById('fullbtn').addEventListener('click',toggleFull);
+  document.getElementById('prevbtn').addEventListener('click',function(){show(i-1);});
+  document.getElementById('nextbtn').addEventListener('click',function(){show(i+1);});
+  window.addEventListener('hashchange',fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

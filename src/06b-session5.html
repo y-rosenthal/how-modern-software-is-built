@@ -48,7 +48,7 @@
   <!-- 2 redirect -->
   <line x1="310" y1="116" x2="90" y2="116" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="298" cy="106" r="8" class="d-num"/><text x="298" y="109.5" class="d-numt" text-anchor="middle">2</text>
-  <text x="190" y="110" class="d-ts" text-anchor="middle">redirect to Google: client_id + scopes (email, profile)</text>
+  <text x="180" y="110" class="d-ts" text-anchor="middle">redirect to Google with client_id + scopes</text>
   <!-- 3 to google -->
   <line x1="90" y1="150" x2="540" y2="150" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="102" cy="140" r="8" class="d-num"/><text x="102" y="143.5" class="d-numt" text-anchor="middle">3</text>
@@ -68,10 +68,10 @@
   <!-- 7 exchange -->
   <line x1="320" y1="280" x2="540" y2="280" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="332" cy="270" r="8" class="d-num"/><text x="332" y="273.5" class="d-numt" text-anchor="middle">7</text>
-  <text x="430" y="274" class="d-ts" text-anchor="middle">server-to-server: code + client_secret</text>
+  <text x="440" y="274" class="d-ts" text-anchor="middle">code + client_secret (server to server)</text>
   <line x1="540" y1="308" x2="320" y2="308" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="528" cy="298" r="8" class="d-num"/><text x="528" y="301.5" class="d-numt" text-anchor="middle">8</text>
-  <text x="430" y="302" class="d-ts" text-anchor="middle">tokens: access (1 hour), ID, refresh</text>
+  <text x="425" y="302" class="d-ts" text-anchor="middle">tokens: access (1 h), ID, refresh</text>
   <!-- 9 use token -->
   <line x1="320" y1="342" x2="675" y2="342" class="d-line" marker-end="url(#arr16)"/>
   <circle cx="332" cy="332" r="8" class="d-num"/><text x="332" y="335.5" class="d-numt" text-anchor="middle">9</text>
@@ -81,7 +81,7 @@
   <!-- 10 -->
   <line x1="310" y1="398" x2="90" y2="398" class="d-line-hi" marker-end="url(#arr16)"/>
   <circle cx="298" cy="388" r="8" class="d-num"/><text x="298" y="391.5" class="d-numt" text-anchor="middle">10</text>
-  <text x="200" y="392" class="d-ts" text-anchor="middle">bakery sets its own session cookie</text>
+  <text x="195" y="392" class="d-ts" text-anchor="middle">bakery sets a session cookie</text>
 </svg>
 </div>
 <figcaption><b>The OAuth authorization-code flow.</b> Dana's Google password is typed only at Google. The bakery receives a one-time code in the browser and swaps it for a token in a private server-to-server call, so the token itself never passes through the browser.</figcaption>

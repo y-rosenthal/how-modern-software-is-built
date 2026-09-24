@@ -7,6 +7,8 @@ review-question boxes. Writes:
 
   course.html        - page fragment (what the Claude Artifact tool publishes)
   dist/index.html    - standalone page for self-hosting (GitHub Pages)
+  dist/slides/*.html - one HTML slide deck per session (from slides/session*.py)
+  dist/slides/*.pptx - PowerPoint export of each deck (needs .venv with python-pptx; skip with --no-pptx)
   dist/*.pdf         - PDF export, when Chrome is installed (skip with --no-pdf)
 """
 import glob
@@ -18,9 +20,53 @@ from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "src")
+SITE = "https://y-rosenthal.github.io/how-modern-software-is-built/"
+sys.path.insert(0, os.path.join(ROOT, "slides"))
+import render as slides_render  # noqa: E402
 
 parts = sorted(glob.glob(os.path.join(SRC, "*.html")))
 doc = "\n".join(open(p, encoding="utf-8").read() for p in parts)
+
+# ---------------------------------------------------------------- figure ids
+# Every <figure> inside a section wrapper gets id="fig-<section>-<n>" so the
+# slide decks can embed the same diagram.
+def _number_figures(doc):
+    chunks = re.split(r'(<section id="s\d-\d-wrap">)', doc)
+    out, sec = [], None
+    for chunk in chunks:
+        m = re.match(r'<section id="(s\d-\d)-wrap">', chunk)
+        if m:
+            sec = m.group(1)
+            out.append(chunk)
+            continue
+        if sec:
+            k = [0]
+            def repl(_m):
+                k[0] += 1
+                return f'<figure id="fig-{sec}-{k[0]}">'
+            chunk = re.sub(r"<figure>", repl, chunk)
+        out.append(chunk)
+    return "".join(out)
+
+doc = _number_figures(doc)
+
+# ---------------------------------------------------------------- slide buttons
+def _add_slide_buttons(doc, base):
+    """Add Slides buttons next to every section heading and session header.
+    `base` is the prefix for deck links ("" for the site, SITE for the artifact)."""
+    def h3(m):
+        sid = m.group(1)
+        n = sid[1]
+        return (m.group(0)[:-5] +
+                f' <a class="slides-btn" href="{base}slides/session-{n}.html#{sid}" title="Open this section as slides">Slides</a></h3>')
+    doc = re.sub(r'<h3 id="(s\d-\d)">.*?</h3>', h3, doc, flags=re.S)
+    def eyebrow(m):
+        n = m.group(1)
+        return (f'<div class="eyebrow">Session {n} · 75 minutes'
+                f' <a class="slides-btn" href="{base}slides/session-{n}.html" title="Open this session as slides">Slides</a>'
+                f' <a class="slides-btn alt" href="{base}slides/session-{n}.pptx" title="Download this session as a PowerPoint file">PowerPoint</a></div>')
+    doc = re.sub(r'<div class="eyebrow">Session (\d) · 75 minutes</div>', eyebrow, doc)
+    return doc
 
 # ---------------------------------------------------------------- headings
 heading_re = re.compile(r'<h([23]) id="([^"]+)">(.*?)</h\1>', re.S)
@@ -163,21 +209,76 @@ if b.errors or b.stack:
 DIST = os.path.join(ROOT, "dist")
 os.makedirs(DIST, exist_ok=True)
 
-# Fragment used to publish the page as a Claude artifact.
-open(os.path.join(ROOT, "course.html"), "w", encoding="utf-8").write(doc)
+# Fragment used to publish the page as a Claude artifact (absolute deck links).
+open(os.path.join(ROOT, "course.html"), "w", encoding="utf-8").write(_add_slide_buttons(doc, SITE))
 
 # Standalone page for self-hosting (GitHub Pages serves dist/index.html).
-standalone = (
-    "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
-    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-    "<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>\n"
-    "</head>\n<body>\n" + doc + "\n</body>\n</html>\n"
-)
+def _standalone(fragment):
+    return (
+        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+        "<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>\n"
+        "</head>\n<body>\n" + fragment + "\n</body>\n</html>\n"
+    )
+
+site_doc = _add_slide_buttons(doc, "")
 index_path = os.path.join(DIST, "index.html")
-open(index_path, "w", encoding="utf-8").write(standalone)
+open(index_path, "w", encoding="utf-8").write(_standalone(site_doc))
+
+# ---------------------------------------------------------------- slide decks
+SLIDES_DIR = os.path.join(DIST, "slides")
+os.makedirs(SLIDES_DIR, exist_ok=True)
+head_css = slides_render.head_css_from(open(os.path.join(SRC, "00-head.html"), encoding="utf-8").read())
+figures = slides_render.extract_figures(doc)
+sessions = slides_render.load_sessions()
+n_slides = 0
+for session in sessions:
+    deck = slides_render.render_deck(session, figures, head_css, book_href="../", pptx_href=f"session-{session['n']}.pptx")
+    open(os.path.join(SLIDES_DIR, f"session-{session['n']}.html"), "w", encoding="utf-8").write(_standalone(deck))
+    n_slides += 1 + sum(len(sec["slides"]) for sec in session["sections"])
+# every book section must have slides, and every deck section must exist in the book
+book_sections = set(re.findall(r'<h3 id="(s\d-\d)">', doc))
+deck_sections = {sec["id"] for se in sessions for sec in se["sections"]}
+if book_sections != deck_sections:
+    sys.exit(f"section mismatch between book and slides: {sorted(book_sections ^ deck_sections)}")
+
+# ---------------------------------------------------------------- figure PNGs + PowerPoint
+import hashlib, json, shutil, subprocess
+chrome = next((c for c in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser") if shutil.which(c)), None)
+FIG_CACHE = os.path.join(ROOT, "build", "figs")
+os.makedirs(FIG_CACHE, exist_ok=True)
+fig_pngs = {}
+if chrome and "--no-pptx" not in sys.argv:
+    for fid, fhtml in figures.items():
+        m = re.search(r'viewBox="0 0 (\d+) (\d+)"', fhtml)
+        w, h = (int(m.group(1)), int(m.group(2))) if m else (720, 300)
+        digest = hashlib.md5((fhtml + head_css).encode()).hexdigest()[:12]
+        png = os.path.join(FIG_CACHE, f"{fid}-{digest}.png")
+        fig_pngs[fid] = png
+        if os.path.exists(png):
+            continue
+        wrapper = os.path.join(FIG_CACHE, f"{fid}.html")
+        open(wrapper, "w", encoding="utf-8").write(
+            "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><style>" + head_css +
+            f"body{{margin:0;padding:0;background:#fff}}figure{{margin:0;border:0;padding:16px;border-radius:0;background:#fff}}"
+            f"figcaption{{display:none}}.scroll{{overflow:visible}}figure svg{{width:{w}px;height:{h}px;max-width:none}}"
+            "</style></head><body>" + fhtml + "</body></html>")
+        subprocess.run([chrome, "--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
+                        "--force-device-scale-factor=2", f"--window-size={w + 32},{h + 32}",
+                        f"--screenshot={png}", f"file://{wrapper}"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+venv_py = os.path.join(ROOT, ".venv", "bin", "python")
+pptx_note = "pptx skipped"
+if "--no-pptx" not in sys.argv and os.path.exists(venv_py):
+    spec = {"site": SITE, "figures": fig_pngs, "out_dir": SLIDES_DIR, "sessions": sessions}
+    spec_path = os.path.join(ROOT, "build", "pptx-spec.json")
+    json.dump(spec, open(spec_path, "w"), indent=1)
+    r = subprocess.run([venv_py, os.path.join(ROOT, "slides", "render_pptx.py"), spec_path], capture_output=True, text=True)
+    pptx_note = "pptx written" if r.returncode == 0 else "pptx FAILED: " + r.stderr.strip().splitlines()[-1]
+elif "--no-pptx" not in sys.argv:
+    pptx_note = "pptx skipped (no .venv with python-pptx; see README)"
 
 # PDF export, if a Chrome/Chromium binary is available.
-import shutil, subprocess
 chrome = next((c for c in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser") if shutil.which(c)), None)
 pdf_path = os.path.join(DIST, "Web-Architecture-Course.pdf")
 if chrome and "--no-pdf" not in sys.argv:
@@ -191,4 +292,4 @@ else:
 words = len(re.sub(r"<[^>]+>", " ", doc).split())
 print(f"ok: {len(entries)} keywords, {len(qa_blocks)} review sets, "
       f"{sum(len(re.findall('<li><span class=\"q\">', q)) for q in qa_blocks)} questions, "
-      f"~{words} words, {len(doc)//1024} KB -> dist/index.html; {pdf_note}")
+      f"~{words} words, {len(doc)//1024} KB -> dist/index.html; {len(sessions)} decks, {n_slides} slides; {pptx_note}; {pdf_note}")

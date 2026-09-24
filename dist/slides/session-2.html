@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Session 2 Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF4;
+  --ink:#1B2430;
+  --ink-2:#4A5666;
+  --line:#CBD4DF;
+  --accent:#0E7C86;
+  --accent-ink:#0A5A62;
+  --accent-soft:#D6EEF0;
+  --review:#FFF3D1;
+  --review-line:#E2B94E;
+  --review-ink:#5C4300;
+  --note:#EEF2F7;
+  --note-line:#8FA3B8;
+  --code-bg:#EDF1F5;
+  --diagram-hi:#0E7C86;
+  --diagram-hi-soft:#D6EEF0;
+  --font-display:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171E;
+    --surface:#1A212B;
+    --surface-2:#232C38;
+    --ink:#E6EBF1;
+    --ink-2:#A6B2C1;
+    --line:#384454;
+    --accent:#4FC1CB;
+    --accent-ink:#8ADCE3;
+    --accent-soft:#173A3E;
+    --review:#3A2E0E;
+    --review-line:#C9A23E;
+    --review-ink:#F4E3B0;
+    --note:#1F2A36;
+    --note-line:#5B7290;
+    --code-bg:#0F141A;
+    --diagram-hi:#4FC1CB;
+    --diagram-hi-soft:#173A3E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171E;
+  --surface:#1A212B;
+  --surface-2:#232C38;
+  --ink:#E6EBF1;
+  --ink-2:#A6B2C1;
+  --line:#384454;
+  --accent:#4FC1CB;
+  --accent-ink:#8ADCE3;
+  --accent-soft:#173A3E;
+  --review:#3A2E0E;
+  --review-line:#C9A23E;
+  --review-ink:#F4E3B0;
+  --note:#1F2A36;
+  --note-line:#5B7290;
+  --code-bg:#0F141A;
+  --diagram-hi:#4FC1CB;
+  --diagram-hi-soft:#173A3E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 64px;
+}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-0.01em}
+h3{font-size:1.35rem;font-weight:700;margin-top:2.6rem;margin-bottom:0.6rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.6rem 0.9rem}
+h4{font-size:1.05rem;font-weight:700;margin-top:1.6rem;margin-bottom:0.3rem}
+p{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem;margin:0 0 1rem}
+li{margin-bottom:0.35rem}
+li>ul,li>ol{margin-top:0.35rem}
+strong{font-weight:600}
+code,pre,kbd{font-family:var(--font-mono);font-size:0.86em}
+code{background:var(--code-bg);padding:0.08em 0.35em;border-radius:4px}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.9rem 1.1rem;
+  overflow-x:auto;
+  line-height:1.5;
+  margin:0.6rem 0 1.2rem;
+}
+pre code{background:none;padding:0;font-size:0.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+/* layout */
+.page{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0 48px}
+@media (min-width:1100px){
+  .page{grid-template-columns:270px minmax(0,1fr)}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow-y:auto;padding-block:32px 40px}
+  .toc summary{display:none}
+  .toc details>*{display:block}
+}
+.toc{font-family:var(--font-display);font-size:0.86rem;line-height:1.4}
+.toc details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0.6rem 0.9rem;margin-block:20px 8px}
+@media (min-width:1100px){.toc details{border:0;background:transparent;padding:0;margin:0}}
+.toc summary{cursor:pointer;font-weight:700;font-size:0.95rem}
+.toc .toc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin:0.8rem 0 0.5rem}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0}
+.toc a{display:block;padding:0.22rem 0.5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .toc-session>a{font-weight:700;margin-top:0.6rem}
+.toc .toc-sub a{color:var(--ink-2);padding-left:1.1rem;font-size:0.82rem}
+.toc .toc-appendix>a{font-weight:600}
+main{min-width:0;max-width:78ch;padding-block:32px 0}
+main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
+
+/* cover */
+.cover{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.eyebrow{font-family:var(--font-display);font-size:0.74rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:0.7rem}
+.cover .lede{font-size:1.15rem;color:var(--ink-2);max-width:60ch;margin-top:1rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:1.2rem}
+.cover-meta b{color:var(--ink);font-weight:700}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.4rem;margin:1.6rem 0}
+.howto h4{margin-top:0}
+.howto ul{margin-bottom:0}
+
+/* session header */
+.session{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+.session .eyebrow{margin-bottom:0.5rem}
+.session .goal{color:var(--ink-2);font-size:1.05rem;margin-top:0.8rem;max-width:64ch}
+.agenda{width:100%;border-collapse:collapse;font-family:var(--font-display);font-size:0.9rem;margin:1.2rem 0 0.6rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.agenda th,.agenda td{padding:0.5rem 0.8rem;text-align:left;border-top:1px solid var(--line)}
+.agenda th{background:var(--surface-2);border-top:0;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2)}
+.agenda td:last-child,.agenda th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agenda tfoot td{font-weight:700}
+.objectives{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0 0}
+.objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
+.objectives ul{margin:0}
+
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
+/* section time tag */
+.time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
+
+/* keywords */
+dfn.kw{
+  font-style:normal;
+  font-weight:600;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:0 0.25em;
+  border-radius:3px;
+  border-bottom:2px solid var(--accent);
+  scroll-margin-top:24px;
+}
+dfn.kw:target{outline:3px solid var(--review-line);outline-offset:2px}
+
+/* analogy + note callouts */
+.note,.analogy,.demo{
+  border-left:4px solid var(--note-line);
+  background:var(--note);
+  padding:0.8rem 1.1rem;
+  border-radius:0 10px 10px 0;
+  margin:1.2rem 0;
+}
+.note .label,.analogy .label,.demo .label,.review .label{
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:0.3rem;
+}
+.note p:last-child,.analogy p:last-child,.demo p:last-child,.note ul:last-child,.demo ol:last-child,.demo ul:last-child{margin-bottom:0}
+.analogy{border-left-color:var(--accent)}
+.ai{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:0.8rem 1.1rem;border-radius:0 10px 10px 0;margin:1.2rem 0}
+.ai .label{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:0.3rem}
+.ai p:last-child{margin-bottom:0}
+.demo{border-left-style:dashed}
+
+/* review box */
+.review{
+  background:var(--review);
+  border:1px solid var(--review-line);
+  color:var(--review-ink);
+  border-radius:12px;
+  padding:1.1rem 1.4rem 1rem;
+  margin:2.5rem 0 1rem;
+  position:relative;
+  scroll-margin-top:24px;
+}
+.review::before{
+  content:"?";
+  position:absolute;top:-14px;left:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--review-line);color:#1B2430;
+  font-family:var(--font-display);font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.review .label{color:var(--review-ink);margin-top:0.2rem}
+.review h4{margin:0 0 0.5rem;color:var(--review-ink)}
+.review ol{margin-bottom:0.5rem}
+.review li{margin-bottom:0.45rem}
+.review a{color:var(--review-ink);font-weight:600}
+.review .answers-link{font-family:var(--font-display);font-size:0.82rem;margin:0.4rem 0 0}
+.review code{background:rgba(0,0,0,0.08)}
+
+/* figures / diagrams */
+figure{margin:1.4rem 0 1.6rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1rem 0.7rem}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);font-family:var(--font-display)}
+figcaption{font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:0.6rem;line-height:1.45}
+figcaption b{color:var(--ink)}
+.d-box{fill:var(--surface-2);stroke:currentColor;stroke-width:1.2}
+.d-box-plain{fill:var(--surface);stroke:currentColor;stroke-width:1.2}
+.d-hi{fill:var(--diagram-hi-soft);stroke:var(--diagram-hi);stroke-width:1.6}
+.d-zone{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:5 4;opacity:0.7}
+.d-line{stroke:currentColor;stroke-width:1.4;fill:none}
+.d-line-hi{stroke:var(--diagram-hi);stroke-width:1.8;fill:none}
+.d-line-dash{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.d-t{font-size:12px;fill:currentColor;font-weight:600}
+.d-ts{font-size:10.5px;fill:currentColor;opacity:0.85}
+.d-tl{font-size:13px;fill:currentColor;font-weight:700}
+.d-th{font-size:12px;fill:var(--diagram-hi);font-weight:700}
+.d-mono{font-family:var(--font-mono);font-size:10.5px;fill:currentColor}
+svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.d-num{fill:var(--diagram-hi)}
+.d-numt{font-size:10px;fill:#fff;font-weight:800}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.6rem 0 1.4rem;background:var(--surface);border:1px solid var(--line)}
+.tbl th,.tbl td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.tbl-wrap{overflow-x:auto;margin:0.6rem 0 1.4rem}
+.tbl-wrap .tbl{margin:0}
+.datatable{border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;background:var(--surface);border:1px solid var(--line);margin:0.4rem 0 1rem}
+.datatable th,.datatable td{padding:0.3rem 0.7rem;border:1px solid var(--line);white-space:nowrap}
+.datatable th{background:var(--surface-2);font-weight:600}
+.datatable caption{caption-side:top;text-align:left;font-family:var(--font-display);font-size:0.82rem;font-weight:700;padding-bottom:0.3rem}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:0.6rem 0 1.2rem}
+.two-col>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0.8rem 1rem}
+.two-col h4{margin-top:0}
+.two-col ul{margin-bottom:0}
+
+/* glossary */
+.glossary{width:100%;border-collapse:collapse;font-size:0.92rem;background:var(--surface);border:1px solid var(--line)}
+.glossary th,.glossary td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.glossary th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.glossary td:first-child{font-family:var(--font-display);font-weight:700;min-width:12ch;width:18%}
+.glossary td:nth-child(2){width:58%;min-width:30ch}
+.glossary td:last-child{font-family:var(--font-display);font-size:0.84rem;min-width:14ch;width:24%}
+.glossary-letter{font-family:var(--font-display);font-weight:800;font-size:0.8rem;letter-spacing:0.1em;color:var(--ink-2);background:var(--ground)}
+.glossary-letter td{border-top:2px solid var(--line)}
+
+/* answers appendix */
+.qa{margin:1.2rem 0 2rem}
+.qa h4{margin-top:0}
+.qa ol{padding-left:1.4rem}
+.qa li{margin-bottom:0.9rem}
+.qa .q{font-weight:600}
+.qa .a{display:block;margin-top:0.25rem;padding:0.5rem 0.9rem;background:var(--review);border-left:3px solid var(--review-line);border-radius:0 8px 8px 0;color:var(--review-ink)}
+.qa .a code{background:rgba(0,0,0,0.08)}
+.backlink{font-family:var(--font-display);font-size:0.82rem}
+
+.appendix{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .toc,.slides-btn{display:none}
+  .page{display:block}
+  main{max-width:none}
+  .session,.appendix{break-before:page}
+  figure,.review,pre,.note,.analogy,.demo{break-inside:avoid}
+  a{color:inherit}
+  dfn.kw{background:#e6f2f3}
+  .review{background:#fff3d1 !important;color:#000}
+}
+
+html,body{height:100%}
+body{margin:0;padding:0;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+.deck{position:relative;height:100%;width:100%}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:2.4vh 5vw 8vh;box-sizing:border-box}
+.slide.active{display:flex}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--font-display);font-size:clamp(12px,1.7vh,17px);color:var(--ink-2);margin-bottom:1.2vh}
+.topbar .crumb{letter-spacing:0.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font-family:var(--font-display);font-weight:700;font-size:clamp(12px,1.7vh,16px);letter-spacing:0.04em;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.3em 0.9em;border-radius:999px;white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.slide h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5.4vh,58px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 2.4vh;text-wrap:balance;max-width:28ch}
+.slide ul{margin:0;padding-left:1.1em;font-size:clamp(17px,3.3vh,34px);line-height:1.35;max-width:38ch}
+.slide li{margin-bottom:1.6vh}
+.slide li b{font-weight:600;color:var(--accent-ink)}
+.slide code{font-family:var(--font-mono);font-size:0.85em;background:var(--code-bg);padding:0.05em 0.3em;border-radius:4px}
+.slide pre{margin:0 0 2vh;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:1.6vh 2vw;font-family:var(--font-mono);font-size:clamp(13px,2.5vh,25px);line-height:1.4;overflow:auto;max-height:52vh}
+.slide .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:0 0 1.5vh}
+.slide figure{margin:0;padding:1.5vh 1.5vw;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.slide figure .scroll{overflow:visible;min-height:0;display:flex;justify-content:center;width:100%}
+.slide figure svg{max-width:100%;display:block;color:var(--ink);font-family:var(--font-display)}
+.slide figcaption{display:none}
+.slide .with-fig ul{font-size:clamp(15px,2.6vh,26px);max-width:none;display:flex;flex-wrap:wrap;gap:0 3vw;list-style:disc}
+.slide .with-fig li{margin-bottom:0.6vh;flex:1 1 40%}
+.slide table{border-collapse:collapse;font-size:clamp(14px,2.6vh,25px);line-height:1.3;background:var(--surface);border:1px solid var(--line);margin-bottom:2vh;max-width:100%}
+.slide th,.slide td{text-align:left;padding:0.9vh 1.4vw;border-top:1px solid var(--line);vertical-align:top}
+.slide th{background:var(--surface-2);font-family:var(--font-display);font-size:0.72em;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.slide .tbl-scroll{overflow:auto;min-height:0;margin-bottom:2vh}
+.slide .takeaway{margin-top:auto;border-left:5px solid var(--accent);background:var(--surface);padding:1.2vh 1.6vw;font-family:var(--font-display);font-weight:600;font-size:clamp(15px,2.7vh,26px);line-height:1.35;border-radius:0 10px 10px 0}
+.slide.title{justify-content:center;padding-bottom:10vh}
+.slide.title .eyebrow{font-family:var(--font-display);font-size:clamp(13px,2vh,18px);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1.5vh}
+.slide.title h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,7.5vh,84px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 2vh;max-width:22ch;text-wrap:balance}
+.slide.title .sub{font-size:clamp(17px,3vh,30px);color:var(--ink-2);max-width:50ch;margin:0 0 3vh}
+.slide.title ol{columns:2;column-gap:4vw;font-family:var(--font-display);font-size:clamp(14px,2.3vh,22px);line-height:1.5;margin:0 0 3vh;padding-left:1.4em;max-width:80ch}
+.slide.title ol a{color:var(--ink);text-decoration:none}
+.slide.title ol a:hover{color:var(--accent-ink);text-decoration:underline}
+.slide.title .links{display:flex;gap:1rem;flex-wrap:wrap}
+.bottombar{position:fixed;left:0;right:0;bottom:0;height:6vh;min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw calc(0px + env(safe-area-inset-bottom,0px));font-family:var(--font-display);font-size:clamp(12px,1.7vh,16px);color:var(--ink-2);background:var(--ground);border-top:1px solid var(--line);box-sizing:border-box}
+.bottombar .nav{display:flex;gap:0.5rem;align-items:center}
+.bottombar button{font:inherit;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0.3em 0.9em;cursor:pointer}
+.bottombar button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.bottombar button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));height:3px;background:var(--accent);width:0;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.progress{transition:none}}
+.hint{font-size:0.9em;opacity:0.8}
+@media (max-width:700px){.slide{padding:2vh 4vw 9vh}.slide.title ol{columns:1}.slide .with-fig li{flex-basis:100%}.hint{display:none}}
+</style>
+<div class="deck">
+<section class="slide title active" id="title" data-title="Session 2"><div class="eyebrow">Session 2 · 75 minutes · slides</div><h1>From a File on Your Laptop to a Page on the Internet</h1><p class="sub">Browsers, the three languages of a web page, addresses, and the request–response conversation</p><ol><li><a href="#s2-1">2.1 Why architecture is a business topic</a></li><li><a href="#s2-2">2.2 Clients, servers, and programs</a></li><li><a href="#s2-3">2.3 A web page is three languages</a></li><li><a href="#s2-4">2.4 The static website on your own computer</a></li><li><a href="#s2-5">2.5 How the internet delivers a page</a></li><li><a href="#s2-6">2.6 Front end, back end, and the limits of static</a></li><li><a href="#s2-7">2.7 Where Python fits</a></li></ol><div class="links"><a class="btn primary" href="../#session-2">Open the book chapter</a> <a class="btn" href="session-2.pptx">Download as PowerPoint</a></div><p class="hint">Arrow keys or space to move, F for full screen. Every slide has a Book button back to the full text.</p></section>
+<section class="slide" id="s2-1" data-title="2.1 Why architecture is a business topic"><div class="topbar"><span class="crumb">Session 2 · 2.1 Why architecture is a business topic</span><a class="btn" href="../#s2-1" title="Open this section in the full text">Book ↗</a></div><h2>Architecture is the set of decisions that are expensive to change</h2><ul><li>What the major parts are, what each does, how they talk</li><li><b>Cost</b>: a few dollars a month or tens of thousands</li><li><b>Risk</b>: what happens when a component fails; how a breach could occur</li><li><b>Speed</b>: how fast features ship without breaking what works</li></ul><div class="takeaway">The person who cannot follow the conversation does not get a vote.</div></section>
+<section class="slide with-fig" id="s2-2" data-title="2.2 Clients, servers, and programs"><div class="topbar"><span class="crumb">Session 2 · 2.2 Clients, servers, and programs · 1/2</span><a class="btn" href="../#s2-2" title="Open this section in the full text">Book ↗</a></div><h2>One computer asks, another answers</h2><div class="fig"><figure id="fig-s2-2-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,157.1vh);height:auto;aspect-ratio:660/210" viewBox="0 0 660 210" role="img" aria-label="A client laptop sends a request to a server; the server sends back a response.">
+  <defs>
+    <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- client -->
+  <rect x="30" y="50" width="180" height="110" rx="10" class="d-box"/>
+  <rect x="55" y="70" width="130" height="60" rx="4" class="d-box-plain"/>
+  <text x="120" y="102" class="d-t" text-anchor="middle">Browser</text>
+  <text x="120" y="150" class="d-tl" text-anchor="middle">Client (your laptop)</text>
+  <!-- server -->
+  <rect x="450" y="40" width="180" height="130" rx="10" class="d-box"/>
+  <rect x="475" y="58" width="130" height="28" rx="4" class="d-hi"/>
+  <text x="540" y="77" class="d-th" text-anchor="middle">Web server program</text>
+  <rect x="475" y="96" width="130" height="28" rx="4" class="d-box-plain"/>
+  <text x="540" y="115" class="d-t" text-anchor="middle">Files: pages, images</text>
+  <text x="540" y="158" class="d-tl" text-anchor="middle">Server (in a data center)</text>
+  <!-- arrows -->
+  <line x1="215" y1="80" x2="445" y2="80" class="d-line-hi" marker-end="url(#arr1)"/>
+  <text x="330" y="70" class="d-t" text-anchor="middle">1. Request: "send me the home page"</text>
+  <line x1="445" y1="130" x2="215" y2="130" class="d-line" marker-end="url(#arr1)"/>
+  <text x="330" y="150" class="d-t" text-anchor="middle">2. Response: the page's contents</text>
+  <text x="330" y="196" class="d-ts" text-anchor="middle">Millions of clients can talk to the same server. The server never starts the conversation.</text>
+</svg>
+</div>
+<figcaption><b>The client–server model.</b> The client always speaks first. The server waits, answers, and forgets about the client until the next request arrives.</figcaption>
+</figure></div><ul><li><b>Client</b> asks; <b>server</b> waits and answers. The client always speaks first</li><li>A server is an ordinary computer in a <b>data center</b>, running 24 hours a day</li></ul></section>
+<section class="slide" id="s2-2-b" data-title="2.2 Clients, servers, and programs"><div class="topbar"><span class="crumb">Session 2 · 2.2 Clients, servers, and programs · 2/2</span><a class="btn" href="../#s2-2" title="Open this section in the full text">Book ↗</a></div><h2>Two things people get wrong about servers</h2><ul><li>A server is an ordinary computer: processor, memory, disk. Usually no screen</li><li>"Server" also names a <b>program</b>: a <b>web server</b> program listens for requests and hands back pages</li><li>The client for a website is a <b>browser</b>: Chrome, Safari, Firefox, Edge</li><li>Analogy: the restaurant. You order from the menu; the kitchen cooks; you never enter the kitchen</li></ul></section>
+<section class="slide" id="s2-3" data-title="2.3 A web page is three languages"><div class="topbar"><span class="crumb">Session 2 · 2.3 A web page is three languages · 1/3</span><a class="btn" href="../#s2-3" title="Open this section in the full text">Book ↗</a></div><h2>A web page is a plain text file</h2><ul><li><b>HTML</b>: what is on the page (headings, paragraphs, images, links), marked with <b>tags</b></li><li><b>CSS</b>: what it looks like (colors, fonts, layout, phone versus desktop)</li><li><b>JavaScript</b>: what it does (react to clicks, validate forms, load more posts)</li><li>JavaScript is unrelated to Java despite the name</li></ul></section>
+<section class="slide" id="s2-3-b" data-title="2.3 A web page is three languages"><div class="topbar"><span class="crumb">Session 2 · 2.3 A web page is three languages · 2/3</span><a class="btn" href="../#s2-3" title="Open this section in the full text">Book ↗</a></div><h2>HTML by example</h2><pre>&lt;h1&gt;Rosenthal&#x27;s Bakery&lt;/h1&gt;
+&lt;p&gt;Fresh bread every morning since 1998.&lt;/p&gt;
+&lt;img src=&quot;storefront.jpg&quot; alt=&quot;Our shop&quot;&gt;
+&lt;a href=&quot;menu.html&quot;&gt;See the menu&lt;/a&gt;</pre><ul><li>Read it aloud and it explains itself: heading, paragraph, image, link</li></ul></section>
+<section class="slide with-fig" id="s2-3-c" data-title="2.3 A web page is three languages"><div class="topbar"><span class="crumb">Session 2 · 2.3 A web page is three languages · 3/3</span><a class="btn" href="../#s2-3" title="Open this section in the full text">Book ↗</a></div><h2>Three files, one page</h2><div class="fig"><figure id="fig-s2-3-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,147.8vh);height:auto;aspect-ratio:680/230" viewBox="0 0 680 230" role="img" aria-label="Three text files, HTML, CSS, and JavaScript, are read by the browser, which renders the finished page on screen.">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- files -->
+  <rect x="20" y="20" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="42" class="d-tl">index.html</text>
+  <text x="34" y="60" class="d-ts">Content and structure</text>
+  <rect x="20" y="90" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="112" class="d-tl">style.css</text>
+  <text x="34" y="130" class="d-ts">Colors, fonts, layout</text>
+  <rect x="20" y="160" width="170" height="52" rx="6" class="d-box-plain"/>
+  <text x="34" y="182" class="d-tl">app.js</text>
+  <text x="34" y="200" class="d-ts">Behaviour and interaction</text>
+  <!-- browser -->
+  <rect x="290" y="40" width="150" height="150" rx="10" class="d-hi"/>
+  <text x="365" y="108" class="d-th" text-anchor="middle">Browser</text>
+  <text x="365" y="126" class="d-ts" text-anchor="middle">reads all three,</text>
+  <text x="365" y="140" class="d-ts" text-anchor="middle">builds the page</text>
+  <!-- screen -->
+  <rect x="520" y="35" width="140" height="160" rx="8" class="d-box"/>
+  <rect x="532" y="47" width="116" height="14" rx="2" fill="currentColor" opacity="0.8"/>
+  <rect x="532" y="68" width="90" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="80" width="110" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="92" width="70" height="6" rx="2" fill="currentColor" opacity="0.4"/>
+  <rect x="532" y="108" width="116" height="50" rx="3" fill="var(--diagram-hi)" opacity="0.55"/>
+  <rect x="532" y="166" width="60" height="16" rx="8" fill="var(--diagram-hi)"/>
+  <text x="590" y="212" class="d-ts" text-anchor="middle">What the user sees</text>
+  <!-- arrows -->
+  <line x1="195" y1="46" x2="285" y2="90" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="195" y1="116" x2="285" y2="116" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="195" y1="186" x2="285" y2="142" class="d-line" marker-end="url(#arr2)"/>
+  <line x1="445" y1="116" x2="515" y2="116" class="d-line-hi" marker-end="url(#arr2)"/>
+  <text x="480" y="106" class="d-ts" text-anchor="middle">renders</text>
+</svg>
+</div>
+<figcaption><b>Three files, one page.</b> The browser combines structure (HTML), appearance (CSS), and behaviour (JavaScript) into the page a person sees. All three are plain text files.</figcaption>
+</figure></div><ul><li>The browser combines all three and <b>renders</b> the result</li></ul></section>
+<section class="slide" id="s2-4" data-title="2.4 The static website on your own computer"><div class="topbar"><span class="crumb">Session 2 · 2.4 The static website on your own computer</span><a class="btn" href="../#s2-4" title="Open this section in the full text">Book ↗</a></div><h2>The zero-infrastructure starting point</h2><ul><li>A <b>static website</b> is fixed files sent to every visitor exactly as stored</li><li>Double-click <code>index.html</code>: the browser reads it straight off your disk. Address starts with <code>file:///</code></li><li>No server, no internet, no company involved</li><li>Limitation: only you can see it. Sharing needs an always-on server with an address</li></ul></section>
+<section class="slide with-fig" id="s2-5" data-title="2.5 How the internet delivers a page"><div class="topbar"><span class="crumb">Session 2 · 2.5 How the internet delivers a page · 1/5</span><a class="btn" href="../#s2-5" title="Open this section in the full text">Book ↗</a></div><h2>Anatomy of a URL</h2><div class="fig"><figure id="fig-s2-5-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,189.5vh);height:auto;aspect-ratio:720/190" viewBox="0 0 720 190" role="img" aria-label="The URL https://www.rosenthalsbakery.com/menu.html?lang=en broken into protocol, domain, path, and query string.">
+  <text x="360" y="60" class="d-mono" text-anchor="middle" style="font-size:19px;font-weight:600">https://www.rosenthalsbakery.com/menu.html?lang=en</text>
+  <!-- protocol -->
+  <line x1="54" y1="72" x2="122" y2="72" class="d-line-hi"/>
+  <line x1="88" y1="72" x2="88" y2="100" class="d-line-hi"/>
+  <text x="88" y="118" class="d-th" text-anchor="middle">Protocol</text>
+  <text x="88" y="134" class="d-ts" text-anchor="middle">how to talk:</text>
+  <text x="88" y="148" class="d-ts" text-anchor="middle">secure HTTP</text>
+  <!-- domain -->
+  <line x1="126" y1="72" x2="410" y2="72" class="d-line-hi"/>
+  <line x1="268" y1="72" x2="268" y2="100" class="d-line-hi"/>
+  <text x="268" y="118" class="d-th" text-anchor="middle">Domain name</text>
+  <text x="268" y="134" class="d-ts" text-anchor="middle">which server to ask</text>
+  <text x="268" y="148" class="d-ts" text-anchor="middle">(rosenthalsbakery.com is the registered name; www is a subdomain)</text>
+  <!-- path -->
+  <line x1="414" y1="72" x2="540" y2="72" class="d-line-hi"/>
+  <line x1="477" y1="72" x2="477" y2="100" class="d-line-hi"/>
+  <text x="477" y="118" class="d-th" text-anchor="middle">Path</text>
+  <text x="477" y="134" class="d-ts" text-anchor="middle">which page or file</text>
+  <text x="477" y="148" class="d-ts" text-anchor="middle">on that server</text>
+  <!-- query -->
+  <line x1="544" y1="72" x2="666" y2="72" class="d-line-hi"/>
+  <line x1="605" y1="72" x2="605" y2="100" class="d-line-hi"/>
+  <text x="605" y="118" class="d-th" text-anchor="middle">Query string</text>
+  <text x="605" y="134" class="d-ts" text-anchor="middle">extra details, as</text>
+  <text x="605" y="148" class="d-ts" text-anchor="middle">name=value pairs</text>
+</svg>
+</div>
+<figcaption><b>Anatomy of a URL.</b> Protocol, domain, path, and optional query string. The domain picks the server; the path picks the file or page on it.</figcaption>
+</figure></div><ul><li><b>Protocol</b> (how to talk), <b>domain</b> (which server), <b>path</b> (which page), <b>query string</b> (extra details)</li></ul></section>
+<section class="slide" id="s2-5-b" data-title="2.5 How the internet delivers a page"><div class="topbar"><span class="crumb">Session 2 · 2.5 How the internet delivers a page · 2/5</span><a class="btn" href="../#s2-5" title="Open this section in the full text">Book ↗</a></div><h2>Finding the server: DNS</h2><ul><li>Every machine on the internet has a numeric <b>IP address</b>, such as 142.250.72.14</li><li><b>DNS</b> is the distributed phone book: domain name in, IP address out</li><li>A business rents its <b>domain</b> from a <b>registrar</b>; pointing it at a host means editing a DNS record</li><li>"DNS changes take up to 48 hours": thousands of copies of the phone book refresh on a schedule</li></ul></section>
+<section class="slide" id="s2-5-c" data-title="2.5 How the internet delivers a page"><div class="topbar"><span class="crumb">Session 2 · 2.5 How the internet delivers a page · 3/5</span><a class="btn" href="../#s2-5" title="Open this section in the full text">Book ↗</a></div><h2>The conversation: HTTP</h2><pre>GET /menu.html HTTP/1.1
+Host: www.rosenthalsbakery.com
+User-Agent: Chrome/128.0
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+&lt;!DOCTYPE html&gt; ...</pre><ul><li>A <b>request</b> names a method and a path plus <b>headers</b>; a <b>response</b> carries a <b>status code</b> and the content</li><li>200 OK, 301 moved, 404 not found, 500 server error, 503 overloaded</li></ul></section>
+<section class="slide with-fig" id="s2-5-d" data-title="2.5 How the internet delivers a page"><div class="topbar"><span class="crumb">Session 2 · 2.5 How the internet delivers a page · 4/5</span><a class="btn" href="../#s2-5" title="Open this section in the full text">Book ↗</a></div><h2>What happens after you press Enter</h2><div class="fig"><figure id="fig-s2-5-2-slide">
+<div class="scroll">
+<svg style="width:min(88vw,120.0vh);height:auto;aspect-ratio:720/300" class="seq" viewBox="0 0 720 300" role="img" aria-label="Sequence of a page load: browser asks DNS for the IP address, receives it, sends an HTTP GET to the web server, receives HTML, then requests the CSS, JavaScript, and image files and renders the page.">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- actors -->
+  <rect x="30" y="16" width="130" height="34" rx="6" class="d-box"/><text x="95" y="38" class="d-tl" text-anchor="middle">Browser</text>
+  <rect x="295" y="16" width="130" height="34" rx="6" class="d-box"/><text x="360" y="38" class="d-tl" text-anchor="middle">DNS server</text>
+  <rect x="560" y="16" width="130" height="34" rx="6" class="d-hi"/><text x="625" y="38" class="d-th" text-anchor="middle">Web server</text>
+  <line x1="95" y1="50" x2="95" y2="290" class="d-line-dash"/>
+  <line x1="360" y1="50" x2="360" y2="130" class="d-line-dash"/>
+  <line x1="625" y1="50" x2="625" y2="290" class="d-line-dash"/>
+  <!-- 1 dns -->
+  <line x1="100" y1="80" x2="355" y2="80" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="70" r="8" class="d-num"/><text x="112" y="73.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="235" y="74" class="d-ts" text-anchor="middle">IP address of www.rosenthalsbakery.com?</text>
+  <line x1="355" y1="110" x2="100" y2="110" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="343" cy="100" r="8" class="d-num"/><text x="343" y="103.5" class="d-numt" text-anchor="middle">2</text>
+  <text x="228" y="104" class="d-ts" text-anchor="middle">It is 203.0.113.7</text>
+  <!-- 3 http -->
+  <line x1="100" y1="150" x2="620" y2="150" class="d-line-hi" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="140" r="8" class="d-num"/><text x="112" y="143.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="360" y="144" class="d-ts" text-anchor="middle">GET /menu.html  (sent to 203.0.113.7)</text>
+  <line x1="620" y1="180" x2="100" y2="180" class="d-line-hi" marker-end="url(#arr3)"/>
+  <circle cx="608" cy="170" r="8" class="d-num"/><text x="608" y="173.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="360" y="174" class="d-ts" text-anchor="middle">200 OK + the HTML of menu.html</text>
+  <!-- 5 assets -->
+  <line x1="100" y1="215" x2="620" y2="215" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="112" cy="205" r="8" class="d-num"/><text x="112" y="208.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="360" y="209" class="d-ts" text-anchor="middle">GET /style.css, GET /app.js, GET /storefront.jpg …</text>
+  <line x1="620" y1="245" x2="100" y2="245" class="d-line" marker-end="url(#arr3)"/>
+  <circle cx="608" cy="235" r="8" class="d-num"/><text x="608" y="238.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="360" y="239" class="d-ts" text-anchor="middle">200 OK for each file</text>
+  <rect x="30" y="262" width="130" height="26" rx="6" class="d-hi"/>
+  <text x="95" y="279" class="d-th" text-anchor="middle">7. Render the page</text>
+</svg>
+</div>
+<figcaption><b>What happens after you press Enter.</b> A name lookup (DNS) comes first, then one HTTP request for the page, then more requests for everything the page references. Time flows downward.</figcaption>
+</figure></div><ul><li>One page usually means 50 to 150 requests: HTML first, then CSS, JavaScript, images</li></ul></section>
+<section class="slide" id="s2-5-e" data-title="2.5 How the internet delivers a page"><div class="topbar"><span class="crumb">Session 2 · 2.5 How the internet delivers a page · 5/5</span><a class="btn" href="../#s2-5" title="Open this section in the full text">Book ↗</a></div><h2>HTTPS and hosting</h2><ul><li>Plain HTTP is readable by anyone on the same Wi-Fi. <b>HTTPS</b> wraps it in <b>encryption</b>; the padlock</li><li>The server proves its identity with a free <b>certificate</b>. No business reason to skip HTTPS</li><li><b>Hosting</b>: rent space on someone's always-on server. Static hosting is free or nearly so</li><li>Serving static files is the easiest job a computer can do: fast, hard to hack, hard to overload</li></ul></section>
+<section class="slide" id="s2-6" data-title="2.6 Front end, back end, and the limits of static"><div class="topbar"><span class="crumb">Session 2 · 2.6 Front end, back end, and the limits of static · 1/2</span><a class="btn" href="../#s2-6" title="Open this section in the full text">Book ↗</a></div><h2>What a static site cannot do</h2><ul><li><b>Front end</b>: runs on the user's device. <b>Back end</b>: runs on the server, out of sight</li><li>A static site is front end only, so it cannot: remember anything, personalise, keep a secret, or do work (email, charge a card)</li><li>A <b>dynamic website</b> runs a program per request and can do all four</li></ul></section>
+<section class="slide with-fig" id="s2-6-b" data-title="2.6 Front end, back end, and the limits of static"><div class="topbar"><span class="crumb">Session 2 · 2.6 Front end, back end, and the limits of static · 2/2</span><a class="btn" href="../#s2-6" title="Open this section in the full text">Book ↗</a></div><h2>Static versus dynamic</h2><div class="fig"><figure id="fig-s2-6-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,144.0vh);height:auto;aspect-ratio:720/250" viewBox="0 0 720 250" role="img" aria-label="Side by side: a static site's server returns a stored file unchanged; a dynamic site's server runs a program that consults a database and builds a page for this request.">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- static -->
+  <text x="170" y="24" class="d-tl" text-anchor="middle">Static website</text>
+  <rect x="20" y="40" width="300" height="190" rx="10" class="d-zone"/>
+  <rect x="35" y="110" width="80" height="44" rx="6" class="d-box"/>
+  <text x="75" y="136" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="180" y="70" width="125" height="120" rx="8" class="d-box"/>
+  <text x="242" y="90" class="d-t" text-anchor="middle">Server</text>
+  <rect x="195" y="105" width="95" height="66" rx="4" class="d-box-plain"/>
+  <text x="242" y="130" class="d-ts" text-anchor="middle">menu.html</text>
+  <text x="242" y="146" class="d-ts" text-anchor="middle">style.css</text>
+  <text x="242" y="162" class="d-ts" text-anchor="middle">logo.png</text>
+  <line x1="120" y1="122" x2="175" y2="122" class="d-line" marker-end="url(#arr4)"/>
+  <line x1="175" y1="142" x2="120" y2="142" class="d-line" marker-end="url(#arr4)"/>
+  <text x="170" y="215" class="d-ts" text-anchor="middle">Same file for everyone, every time</text>
+  <!-- dynamic -->
+  <text x="545" y="24" class="d-tl" text-anchor="middle">Dynamic website</text>
+  <rect x="380" y="40" width="330" height="190" rx="10" class="d-zone"/>
+  <rect x="395" y="110" width="80" height="44" rx="6" class="d-box"/>
+  <text x="435" y="136" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="520" y="70" width="175" height="120" rx="8" class="d-box"/>
+  <text x="607" y="90" class="d-t" text-anchor="middle">Server</text>
+  <rect x="533" y="104" width="70" height="66" rx="4" class="d-hi"/>
+  <text x="568" y="130" class="d-th" text-anchor="middle">Program</text>
+  <text x="568" y="146" class="d-ts" text-anchor="middle">(back end,</text>
+  <text x="568" y="160" class="d-ts" text-anchor="middle">e.g. Python)</text>
+  <rect x="615" y="104" width="68" height="66" rx="4" class="d-box-plain"/>
+  <text x="649" y="140" class="d-ts" text-anchor="middle">Database</text>
+  <line x1="605" y1="137" x2="612" y2="137" class="d-line"/>
+  <line x1="480" y1="122" x2="515" y2="122" class="d-line" marker-end="url(#arr4)"/>
+  <line x1="515" y1="142" x2="480" y2="142" class="d-line" marker-end="url(#arr4)"/>
+  <text x="545" y="215" class="d-ts" text-anchor="middle">Page built for this visitor, right now</text>
+</svg>
+</div>
+<figcaption><b>Static versus dynamic.</b> On the left, the server only hands out stored files. On the right, a program runs for each request, consults stored data, and composes a page. Everything in Sessions 3 and 4 lives inside that right-hand box.</figcaption>
+</figure></div><ul><li>Most real products mix the two: static marketing pages, dynamic product behind the login</li></ul></section>
+<section class="slide" id="s2-7" data-title="2.7 Where Python fits"><div class="topbar"><span class="crumb">Session 2 · 2.7 Where Python fits</span><a class="btn" href="../#s2-7" title="Open this section in the full text">Book ↗</a></div><h2>Python runs on the server, not in the browser</h2><div class="tbl-scroll"><table><thead><tr><th>Language</th><th>Where it runs</th><th>Job</th></tr></thead><tbody><tr><td>HTML, CSS</td><td>Browser</td><td>Content and appearance</td></tr><tr><td>JavaScript</td><td>Browser (and servers via Node.js)</td><td>Interactivity; also back ends</td></tr><tr><td>Python</td><td>Servers and your own computer</td><td>Back-end logic, data, AI, scripts</td></tr><tr><td>SQL</td><td>Database server</td><td>Questions about stored data</td></tr><tr><td>Swift, Kotlin</td><td>Phones</td><td>Native apps</td></tr></tbody></table></div><div class="takeaway">Your Python skills are directly the skills of writing back ends. "What's your stack?" means "what's your architecture?"</div></section>
+</div>
+<div class="progress" id="progress"></div>
+<div class="bottombar"><span id="counter">1 / 1</span><span class="hint">From a File on Your Laptop to a Page on the Internet</span><span class="nav"><button id="prevbtn" type="button" aria-label="Previous slide">‹ Prev</button><button id="nextbtn" type="button" aria-label="Next slide">Next ›</button><button id="fullbtn" type="button" aria-label="Toggle full screen">Full screen</button></span></div>
+<script>var DECK_TITLE="Session 2 Slides";
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=0, counter=document.getElementById('counter'), bar=document.getElementById('progress');
+  function show(n, push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(push!==false){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){}}
+    document.title=slides[i].getAttribute('data-title')+' · '+DECK_TITLE;
+  }
+  function fromHash(){
+    var h=location.hash.replace('#','');
+    var k=-1; slides.forEach(function(s,idx){if(s.id===h)k=idx;});
+    show(k<0?0:k,false);
+  }
+  window.next=function(){show(i+1);};
+  window.prev=function(){show(i-1);};
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); show(i+1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); show(i-1); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(slides.length-1); break;
+      case 'f': case 'F': toggleFull(); break;
+    }
+  });
+  function toggleFull(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+    }catch(e){}
+  }
+  document.getElementById('fullbtn').addEventListener('click',toggleFull);
+  document.getElementById('prevbtn').addEventListener('click',function(){show(i-1);});
+  document.getElementById('nextbtn').addEventListener('click',function(){show(i+1);});
+  window.addEventListener('hashchange',fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Session 5 Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF4;
+  --ink:#1B2430;
+  --ink-2:#4A5666;
+  --line:#CBD4DF;
+  --accent:#0E7C86;
+  --accent-ink:#0A5A62;
+  --accent-soft:#D6EEF0;
+  --review:#FFF3D1;
+  --review-line:#E2B94E;
+  --review-ink:#5C4300;
+  --note:#EEF2F7;
+  --note-line:#8FA3B8;
+  --code-bg:#EDF1F5;
+  --diagram-hi:#0E7C86;
+  --diagram-hi-soft:#D6EEF0;
+  --font-display:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171E;
+    --surface:#1A212B;
+    --surface-2:#232C38;
+    --ink:#E6EBF1;
+    --ink-2:#A6B2C1;
+    --line:#384454;
+    --accent:#4FC1CB;
+    --accent-ink:#8ADCE3;
+    --accent-soft:#173A3E;
+    --review:#3A2E0E;
+    --review-line:#C9A23E;
+    --review-ink:#F4E3B0;
+    --note:#1F2A36;
+    --note-line:#5B7290;
+    --code-bg:#0F141A;
+    --diagram-hi:#4FC1CB;
+    --diagram-hi-soft:#173A3E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171E;
+  --surface:#1A212B;
+  --surface-2:#232C38;
+  --ink:#E6EBF1;
+  --ink-2:#A6B2C1;
+  --line:#384454;
+  --accent:#4FC1CB;
+  --accent-ink:#8ADCE3;
+  --accent-soft:#173A3E;
+  --review:#3A2E0E;
+  --review-line:#C9A23E;
+  --review-ink:#F4E3B0;
+  --note:#1F2A36;
+  --note-line:#5B7290;
+  --code-bg:#0F141A;
+  --diagram-hi:#4FC1CB;
+  --diagram-hi-soft:#173A3E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 64px;
+}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-0.01em}
+h3{font-size:1.35rem;font-weight:700;margin-top:2.6rem;margin-bottom:0.6rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.6rem 0.9rem}
+h4{font-size:1.05rem;font-weight:700;margin-top:1.6rem;margin-bottom:0.3rem}
+p{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem;margin:0 0 1rem}
+li{margin-bottom:0.35rem}
+li>ul,li>ol{margin-top:0.35rem}
+strong{font-weight:600}
+code,pre,kbd{font-family:var(--font-mono);font-size:0.86em}
+code{background:var(--code-bg);padding:0.08em 0.35em;border-radius:4px}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.9rem 1.1rem;
+  overflow-x:auto;
+  line-height:1.5;
+  margin:0.6rem 0 1.2rem;
+}
+pre code{background:none;padding:0;font-size:0.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+/* layout */
+.page{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0 48px}
+@media (min-width:1100px){
+  .page{grid-template-columns:270px minmax(0,1fr)}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow-y:auto;padding-block:32px 40px}
+  .toc summary{display:none}
+  .toc details>*{display:block}
+}
+.toc{font-family:var(--font-display);font-size:0.86rem;line-height:1.4}
+.toc details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0.6rem 0.9rem;margin-block:20px 8px}
+@media (min-width:1100px){.toc details{border:0;background:transparent;padding:0;margin:0}}
+.toc summary{cursor:pointer;font-weight:700;font-size:0.95rem}
+.toc .toc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin:0.8rem 0 0.5rem}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0}
+.toc a{display:block;padding:0.22rem 0.5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .toc-session>a{font-weight:700;margin-top:0.6rem}
+.toc .toc-sub a{color:var(--ink-2);padding-left:1.1rem;font-size:0.82rem}
+.toc .toc-appendix>a{font-weight:600}
+main{min-width:0;max-width:78ch;padding-block:32px 0}
+main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
+
+/* cover */
+.cover{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.eyebrow{font-family:var(--font-display);font-size:0.74rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:0.7rem}
+.cover .lede{font-size:1.15rem;color:var(--ink-2);max-width:60ch;margin-top:1rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:1.2rem}
+.cover-meta b{color:var(--ink);font-weight:700}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.4rem;margin:1.6rem 0}
+.howto h4{margin-top:0}
+.howto ul{margin-bottom:0}
+
+/* session header */
+.session{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+.session .eyebrow{margin-bottom:0.5rem}
+.session .goal{color:var(--ink-2);font-size:1.05rem;margin-top:0.8rem;max-width:64ch}
+.agenda{width:100%;border-collapse:collapse;font-family:var(--font-display);font-size:0.9rem;margin:1.2rem 0 0.6rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.agenda th,.agenda td{padding:0.5rem 0.8rem;text-align:left;border-top:1px solid var(--line)}
+.agenda th{background:var(--surface-2);border-top:0;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2)}
+.agenda td:last-child,.agenda th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agenda tfoot td{font-weight:700}
+.objectives{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0 0}
+.objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
+.objectives ul{margin:0}
+
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
+/* section time tag */
+.time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
+
+/* keywords */
+dfn.kw{
+  font-style:normal;
+  font-weight:600;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:0 0.25em;
+  border-radius:3px;
+  border-bottom:2px solid var(--accent);
+  scroll-margin-top:24px;
+}
+dfn.kw:target{outline:3px solid var(--review-line);outline-offset:2px}
+
+/* analogy + note callouts */
+.note,.analogy,.demo{
+  border-left:4px solid var(--note-line);
+  background:var(--note);
+  padding:0.8rem 1.1rem;
+  border-radius:0 10px 10px 0;
+  margin:1.2rem 0;
+}
+.note .label,.analogy .label,.demo .label,.review .label{
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:0.3rem;
+}
+.note p:last-child,.analogy p:last-child,.demo p:last-child,.note ul:last-child,.demo ol:last-child,.demo ul:last-child{margin-bottom:0}
+.analogy{border-left-color:var(--accent)}
+.ai{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:0.8rem 1.1rem;border-radius:0 10px 10px 0;margin:1.2rem 0}
+.ai .label{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:0.3rem}
+.ai p:last-child{margin-bottom:0}
+.demo{border-left-style:dashed}
+
+/* review box */
+.review{
+  background:var(--review);
+  border:1px solid var(--review-line);
+  color:var(--review-ink);
+  border-radius:12px;
+  padding:1.1rem 1.4rem 1rem;
+  margin:2.5rem 0 1rem;
+  position:relative;
+  scroll-margin-top:24px;
+}
+.review::before{
+  content:"?";
+  position:absolute;top:-14px;left:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--review-line);color:#1B2430;
+  font-family:var(--font-display);font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.review .label{color:var(--review-ink);margin-top:0.2rem}
+.review h4{margin:0 0 0.5rem;color:var(--review-ink)}
+.review ol{margin-bottom:0.5rem}
+.review li{margin-bottom:0.45rem}
+.review a{color:var(--review-ink);font-weight:600}
+.review .answers-link{font-family:var(--font-display);font-size:0.82rem;margin:0.4rem 0 0}
+.review code{background:rgba(0,0,0,0.08)}
+
+/* figures / diagrams */
+figure{margin:1.4rem 0 1.6rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1rem 0.7rem}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);font-family:var(--font-display)}
+figcaption{font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:0.6rem;line-height:1.45}
+figcaption b{color:var(--ink)}
+.d-box{fill:var(--surface-2);stroke:currentColor;stroke-width:1.2}
+.d-box-plain{fill:var(--surface);stroke:currentColor;stroke-width:1.2}
+.d-hi{fill:var(--diagram-hi-soft);stroke:var(--diagram-hi);stroke-width:1.6}
+.d-zone{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:5 4;opacity:0.7}
+.d-line{stroke:currentColor;stroke-width:1.4;fill:none}
+.d-line-hi{stroke:var(--diagram-hi);stroke-width:1.8;fill:none}
+.d-line-dash{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.d-t{font-size:12px;fill:currentColor;font-weight:600}
+.d-ts{font-size:10.5px;fill:currentColor;opacity:0.85}
+.d-tl{font-size:13px;fill:currentColor;font-weight:700}
+.d-th{font-size:12px;fill:var(--diagram-hi);font-weight:700}
+.d-mono{font-family:var(--font-mono);font-size:10.5px;fill:currentColor}
+svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.d-num{fill:var(--diagram-hi)}
+.d-numt{font-size:10px;fill:#fff;font-weight:800}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.6rem 0 1.4rem;background:var(--surface);border:1px solid var(--line)}
+.tbl th,.tbl td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.tbl-wrap{overflow-x:auto;margin:0.6rem 0 1.4rem}
+.tbl-wrap .tbl{margin:0}
+.datatable{border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;background:var(--surface);border:1px solid var(--line);margin:0.4rem 0 1rem}
+.datatable th,.datatable td{padding:0.3rem 0.7rem;border:1px solid var(--line);white-space:nowrap}
+.datatable th{background:var(--surface-2);font-weight:600}
+.datatable caption{caption-side:top;text-align:left;font-family:var(--font-display);font-size:0.82rem;font-weight:700;padding-bottom:0.3rem}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:0.6rem 0 1.2rem}
+.two-col>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0.8rem 1rem}
+.two-col h4{margin-top:0}
+.two-col ul{margin-bottom:0}
+
+/* glossary */
+.glossary{width:100%;border-collapse:collapse;font-size:0.92rem;background:var(--surface);border:1px solid var(--line)}
+.glossary th,.glossary td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.glossary th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.glossary td:first-child{font-family:var(--font-display);font-weight:700;min-width:12ch;width:18%}
+.glossary td:nth-child(2){width:58%;min-width:30ch}
+.glossary td:last-child{font-family:var(--font-display);font-size:0.84rem;min-width:14ch;width:24%}
+.glossary-letter{font-family:var(--font-display);font-weight:800;font-size:0.8rem;letter-spacing:0.1em;color:var(--ink-2);background:var(--ground)}
+.glossary-letter td{border-top:2px solid var(--line)}
+
+/* answers appendix */
+.qa{margin:1.2rem 0 2rem}
+.qa h4{margin-top:0}
+.qa ol{padding-left:1.4rem}
+.qa li{margin-bottom:0.9rem}
+.qa .q{font-weight:600}
+.qa .a{display:block;margin-top:0.25rem;padding:0.5rem 0.9rem;background:var(--review);border-left:3px solid var(--review-line);border-radius:0 8px 8px 0;color:var(--review-ink)}
+.qa .a code{background:rgba(0,0,0,0.08)}
+.backlink{font-family:var(--font-display);font-size:0.82rem}
+
+.appendix{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .toc,.slides-btn{display:none}
+  .page{display:block}
+  main{max-width:none}
+  .session,.appendix{break-before:page}
+  figure,.review,pre,.note,.analogy,.demo{break-inside:avoid}
+  a{color:inherit}
+  dfn.kw{background:#e6f2f3}
+  .review{background:#fff3d1 !important;color:#000}
+}
+
+html,body{height:100%}
+body{margin:0;padding:0;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+.deck{position:relative;height:100%;width:100%}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:2.4vh 5vw 8vh;box-sizing:border-box}
+.slide.active{display:flex}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--font-display);font-size:clamp(12px,1.7vh,17px);color:var(--ink-2);margin-bottom:1.2vh}
+.topbar .crumb{letter-spacing:0.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font-family:var(--font-display);font-weight:700;font-size:clamp(12px,1.7vh,16px);letter-spacing:0.04em;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.3em 0.9em;border-radius:999px;white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.slide h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5.4vh,58px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 2.4vh;text-wrap:balance;max-width:28ch}
+.slide ul{margin:0;padding-left:1.1em;font-size:clamp(17px,3.3vh,34px);line-height:1.35;max-width:38ch}
+.slide li{margin-bottom:1.6vh}
+.slide li b{font-weight:600;color:var(--accent-ink)}
+.slide code{font-family:var(--font-mono);font-size:0.85em;background:var(--code-bg);padding:0.05em 0.3em;border-radius:4px}
+.slide pre{margin:0 0 2vh;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:1.6vh 2vw;font-family:var(--font-mono);font-size:clamp(13px,2.5vh,25px);line-height:1.4;overflow:auto;max-height:52vh}
+.slide .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:0 0 1.5vh}
+.slide figure{margin:0;padding:1.5vh 1.5vw;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.slide figure .scroll{overflow:visible;min-height:0;display:flex;justify-content:center;width:100%}
+.slide figure svg{max-width:100%;display:block;color:var(--ink);font-family:var(--font-display)}
+.slide figcaption{display:none}
+.slide .with-fig ul{font-size:clamp(15px,2.6vh,26px);max-width:none;display:flex;flex-wrap:wrap;gap:0 3vw;list-style:disc}
+.slide .with-fig li{margin-bottom:0.6vh;flex:1 1 40%}
+.slide table{border-collapse:collapse;font-size:clamp(14px,2.6vh,25px);line-height:1.3;background:var(--surface);border:1px solid var(--line);margin-bottom:2vh;max-width:100%}
+.slide th,.slide td{text-align:left;padding:0.9vh 1.4vw;border-top:1px solid var(--line);vertical-align:top}
+.slide th{background:var(--surface-2);font-family:var(--font-display);font-size:0.72em;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.slide .tbl-scroll{overflow:auto;min-height:0;margin-bottom:2vh}
+.slide .takeaway{margin-top:auto;border-left:5px solid var(--accent);background:var(--surface);padding:1.2vh 1.6vw;font-family:var(--font-display);font-weight:600;font-size:clamp(15px,2.7vh,26px);line-height:1.35;border-radius:0 10px 10px 0}
+.slide.title{justify-content:center;padding-bottom:10vh}
+.slide.title .eyebrow{font-family:var(--font-display);font-size:clamp(13px,2vh,18px);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1.5vh}
+.slide.title h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,7.5vh,84px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 2vh;max-width:22ch;text-wrap:balance}
+.slide.title .sub{font-size:clamp(17px,3vh,30px);color:var(--ink-2);max-width:50ch;margin:0 0 3vh}
+.slide.title ol{columns:2;column-gap:4vw;font-family:var(--font-display);font-size:clamp(14px,2.3vh,22px);line-height:1.5;margin:0 0 3vh;padding-left:1.4em;max-width:80ch}
+.slide.title ol a{color:var(--ink);text-decoration:none}
+.slide.title ol a:hover{color:var(--accent-ink);text-decoration:underline}
+.slide.title .links{display:flex;gap:1rem;flex-wrap:wrap}
+.bottombar{position:fixed;left:0;right:0;bottom:0;height:6vh;min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw calc(0px + env(safe-area-inset-bottom,0px));font-family:var(--font-display);font-size:clamp(12px,1.7vh,16px);color:var(--ink-2);background:var(--ground);border-top:1px solid var(--line);box-sizing:border-box}
+.bottombar .nav{display:flex;gap:0.5rem;align-items:center}
+.bottombar button{font:inherit;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0.3em 0.9em;cursor:pointer}
+.bottombar button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.bottombar button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));height:3px;background:var(--accent);width:0;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.progress{transition:none}}
+.hint{font-size:0.9em;opacity:0.8}
+@media (max-width:700px){.slide{padding:2vh 4vw 9vh}.slide.title ol{columns:1}.slide .with-fig li{flex-basis:100%}.hint{display:none}}
+</style>
+<div class="deck">
+<section class="slide title active" id="title" data-title="Session 5"><div class="eyebrow">Session 5 · 75 minutes · slides</div><h1>Identity, Security, and Software Beyond the Browser</h1><p class="sub">How the server knows who is asking, how to keep it safe, and how phones, desktops, devices, and AI fit in</p><ol><li><a href="#s5-1">5.1 Authentication versus authorization</a></li><li><a href="#s5-2">5.2 Passwords done right</a></li><li><a href="#s5-3">5.3 Staying logged in: cookies, sessions, tokens</a></li><li><a href="#s5-4">5.4 HTTP Basic Authentication and API keys</a></li><li><a href="#s5-5">5.5 OAuth: how &quot;Sign in with Google&quot; works</a></li><li><a href="#s5-6">5.6 Security basics every product owner should know</a></li><li><a href="#s5-7">5.7 Beyond the browser: mobile, desktop, embedded</a></li><li><a href="#s5-8">5.8 Where AI fits</a></li></ol><div class="links"><a class="btn primary" href="../#session-5">Open the book chapter</a> <a class="btn" href="session-5.pptx">Download as PowerPoint</a></div><p class="hint">Arrow keys or space to move, F for full screen. Every slide has a Book button back to the full text.</p></section>
+<section class="slide" id="s5-1" data-title="5.1 Authentication versus authorization"><div class="topbar"><span class="crumb">Session 5 · 5.1 Authentication versus authorization</span><a class="btn" href="../#s5-1" title="Open this section in the full text">Book ↗</a></div><h2>Two questions</h2><ul><li><b>Authentication</b>: "Who are you?" Password, phone code, fingerprint, Google login</li><li><b>Authorization</b>: "What may you do?" May Dana see order 90? Sam's order 88? Issue a refund?</li><li>Office building: the badge check is authentication; which doors open is authorization</li><li>Authorization is organised by <b>roles</b>: customer, staff, manager, administrator</li></ul><div class="takeaway">Every request touching a record must check that THIS user may touch THIS record. Forgetting that has caused huge leaks.</div></section>
+<section class="slide" id="s5-2" data-title="5.2 Passwords done right"><div class="topbar"><span class="crumb">Session 5 · 5.2 Passwords done right</span><a class="btn" href="../#s5-2" title="Open this section in the full text">Book ↗</a></div><h2>Never store the password</h2><ul><li>Store a <b>hash</b>: a one-way scramble that cannot be reversed. Check a login by hashing what was typed</li><li>A stolen database then reveals no passwords. (Salted, with slow algorithms such as bcrypt)</li><li>If a company can email you your old password, it is doing this wrong</li><li><b>Multi-factor authentication</b>: something you know + something you have (or are). Require it for staff</li><li><b>Passkeys</b>: a device-held key unlocked by fingerprint or face; no password at all</li></ul></section>
+<section class="slide with-fig" id="s5-3" data-title="5.3 Staying logged in: cookies, sessions, tokens"><div class="topbar"><span class="crumb">Session 5 · 5.3 Staying logged in: cookies, sessions, tokens · 1/2</span><a class="btn" href="../#s5-3" title="Open this section in the full text">Book ↗</a></div><h2>How a login survives stateless HTTP</h2><div class="fig"><figure id="fig-s5-3-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,120.0vh);height:auto;aspect-ratio:720/300" class="seq" viewBox="0 0 720 300" role="img" aria-label="Login sequence: the browser posts email and password; the server checks the hash, creates a session record, and replies with a Set-Cookie header; the browser stores the cookie and sends it with every later request; the server looks up the session ID to identify the user.">
+  <defs>
+    <marker id="arr14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="30" y="16" width="130" height="34" rx="6" class="d-box"/><text x="95" y="38" class="d-tl" text-anchor="middle">Browser</text>
+  <rect x="380" y="16" width="130" height="34" rx="6" class="d-hi"/><text x="445" y="38" class="d-th" text-anchor="middle">Back end</text>
+  <rect x="570" y="16" width="130" height="34" rx="6" class="d-box"/><text x="635" y="38" class="d-tl" text-anchor="middle">Session store</text>
+  <line x1="95" y1="50" x2="95" y2="290" class="d-line-dash"/>
+  <line x1="445" y1="50" x2="445" y2="290" class="d-line-dash"/>
+  <line x1="635" y1="50" x2="635" y2="290" class="d-line-dash"/>
+  <!-- 1 login -->
+  <line x1="100" y1="80" x2="440" y2="80" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="112" cy="70" r="8" class="d-num"/><text x="112" y="73.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="270" y="74" class="d-ts" text-anchor="middle">POST /login  {email, password}   (over HTTPS)</text>
+  <!-- 2 check -->
+  <rect x="365" y="92" width="160" height="30" rx="4" class="d-box-plain"/>
+  <text x="445" y="106" class="d-ts" text-anchor="middle">2. hash(password) matches</text>
+  <text x="445" y="118" class="d-ts" text-anchor="middle">stored hash? yes</text>
+  <!-- 3 store session -->
+  <line x1="450" y1="140" x2="630" y2="140" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="462" cy="130" r="8" class="d-num"/><text x="462" y="133.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="545" y="134" class="d-ts" text-anchor="middle">save: a8f3…c9 = Dana, 14 days</text>
+  <!-- 4 set cookie -->
+  <line x1="440" y1="170" x2="100" y2="170" class="d-line-hi" marker-end="url(#arr14)"/>
+  <circle cx="428" cy="160" r="8" class="d-num"/><text x="428" y="163.5" class="d-numt" text-anchor="middle">4</text>
+  <text x="270" y="164" class="d-ts" text-anchor="middle">200 OK   Set-Cookie: session=a8f3…c9</text>
+  <rect x="30" y="182" width="130" height="24" rx="4" class="d-box-plain"/>
+  <text x="95" y="198" class="d-ts" text-anchor="middle">browser stores cookie</text>
+  <!-- 5 later request -->
+  <line x1="100" y1="230" x2="440" y2="230" class="d-line-hi" marker-end="url(#arr14)"/>
+  <circle cx="112" cy="220" r="8" class="d-num"/><text x="112" y="223.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="270" y="224" class="d-ts" text-anchor="middle">GET /api/orders   Cookie: session=a8f3…c9</text>
+  <!-- 6 lookup -->
+  <line x1="450" y1="255" x2="630" y2="255" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="462" cy="245" r="8" class="d-num"/><text x="462" y="248.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="545" y="249" class="d-ts" text-anchor="middle">who is a8f3…c9?  → Dana</text>
+  <line x1="440" y1="282" x2="100" y2="282" class="d-line" marker-end="url(#arr14)"/>
+  <circle cx="428" cy="272" r="8" class="d-num"/><text x="428" y="275.5" class="d-numt" text-anchor="middle">7</text>
+  <text x="270" y="276" class="d-ts" text-anchor="middle">200 OK   Dana's orders only</text>
+</svg>
+</div>
+<figcaption><b>How a login survives stateless HTTP.</b> The password is sent exactly once. Afterwards a random session ID in a cookie stands in for it, and any web server can look the ID up in the shared session store.</figcaption>
+</figure></div><ul><li>The password is sent once. A random <b>session ID</b> in a <b>cookie</b> stands in for it afterwards</li><li>Any web server in the pool looks the ID up in the shared session store</li></ul></section>
+<section class="slide" id="s5-3-b" data-title="5.3 Staying logged in: cookies, sessions, tokens"><div class="topbar"><span class="crumb">Session 5 · 5.3 Staying logged in: cookies, sessions, tokens · 2/2</span><a class="btn" href="../#s5-3" title="Open this section in the full text">Book ↗</a></div><h2>Consequences</h2><ul><li>The cookie is as good as the password while it lasts: HTTPS-only, invisible to JavaScript, re-ask for sensitive actions</li><li>This is exactly what lets stateless, load-balanced servers work</li><li>The same mechanism lets advertisers track browsers across sites: hence consent banners</li><li>Apps and APIs often use a signed <b>token</b> (a <b>JSON Web Token</b>) sent in a header instead of a cookie</li></ul></section>
+<section class="slide with-fig" id="s5-4" data-title="5.4 HTTP Basic Authentication and API keys"><div class="topbar"><span class="crumb">Session 5 · 5.4 HTTP Basic Authentication and API keys · 1/2</span><a class="btn" href="../#s5-4" title="Open this section in the full text">Book ↗</a></div><h2>The simplest scheme, built into HTTP</h2><div class="fig"><figure id="fig-s5-4-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,240.0vh);height:auto;aspect-ratio:720/150" viewBox="0 0 720 150" role="img" aria-label="A browser sends a request with a Basic Authorization header containing Base64 of username colon password on every request; the server decodes it and checks the password. An HTTPS wrapper around the whole exchange is the only thing keeping it private.">
+  <defs>
+    <marker id="arr15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="20" width="680" height="110" rx="12" class="d-hi" opacity="0.5"/>
+  <text x="360" y="40" class="d-th" text-anchor="middle">HTTPS tunnel: encrypted between browser and server. Without it, the header below is readable by anyone on the network.</text>
+  <rect x="50" y="62" width="110" height="44" rx="6" class="d-box"/><text x="105" y="89" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="560" y="62" width="110" height="44" rx="6" class="d-box"/><text x="615" y="89" class="d-t" text-anchor="middle">Server</text>
+  <line x1="165" y1="84" x2="555" y2="84" class="d-line" marker-end="url(#arr15)"/>
+  <text x="360" y="76" class="d-mono" text-anchor="middle">Authorization: Basic ZGFuYTpjb3JyZWN0LWhvcnNl</text>
+  <text x="360" y="102" class="d-ts" text-anchor="middle">= Base64("dana:correct-horse"), sent with every single request</text>
+  <text x="360" y="120" class="d-ts" text-anchor="middle">Encoding is reversible by anyone. It is not a secret; HTTPS is what makes it one.</text>
+</svg>
+</div>
+<figcaption><b>Basic Authentication.</b> The credentials ride along on every request in a trivially reversible encoding. The protection comes entirely from HTTPS.</figcaption>
+</figure></div><ul><li><b>Basic Auth</b> sends username:password on every request, encoded in <b>Base64</b>, which anyone can decode</li><li>Only over HTTPS; only for staging sites, internal tools, and some APIs</li></ul></section>
+<section class="slide" id="s5-4-b" data-title="5.4 HTTP Basic Authentication and API keys"><div class="topbar"><span class="crumb">Session 5 · 5.4 HTTP Basic Authentication and API keys · 2/2</span><a class="btn" href="../#s5-4" title="Open this section in the full text">Book ↗</a></div><h2>API keys are passwords for programs</h2><ul><li>A long random secret a provider issues so it knows whom to bill</li><li>Stored in server configuration (<b>environment variables</b>, a <code>.env</code> file); never in front-end code; never in Git</li><li>Bots scan GitHub constantly for leaked keys and can spend thousands within minutes</li></ul><div class="takeaway">The single most important habit when building with Claude Code and the Claude API.</div></section>
+<section class="slide" id="s5-5" data-title="5.5 OAuth: how &quot;Sign in with Google&quot; works"><div class="topbar"><span class="crumb">Session 5 · 5.5 OAuth: how &quot;Sign in with Google&quot; works · 1/3</span><a class="btn" href="../#s5-5" title="Open this section in the full text">Book ↗</a></div><h2>The problem OAuth solves</h2><ul><li>New apps want login without another password; apps want to use your Google Calendar or bank on your behalf</li><li>Typing your Google password into a third-party app would give it everything, forever</li><li><b>OAuth 2.0</b>: the user approves a limited request at the trusted service; the app gets a valet key</li><li>Four roles: <b>resource owner</b> (you), <b>client</b> (the app), <b>authorization server</b> (Google login), <b>resource server</b> (Google's API)</li></ul></section>
+<section class="slide with-fig" id="s5-5-b" data-title="5.5 OAuth: how &quot;Sign in with Google&quot; works"><div class="topbar"><span class="crumb">Session 5 · 5.5 OAuth: how &quot;Sign in with Google&quot; works · 2/3</span><a class="btn" href="../#s5-5" title="Open this section in the full text">Book ↗</a></div><h2>The authorization-code flow</h2><div class="fig"><figure id="fig-s5-5-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,116.3vh);height:auto;aspect-ratio:740/420" class="seq" viewBox="0 0 740 420" role="img" aria-label="OAuth authorization code flow: the user clicks Sign in with Google in the bakery app; the app redirects the browser to Google with its client ID and requested scopes; the user logs in at Google and approves; Google redirects back to the app with a one-time code; the app's back end exchanges the code plus its client secret for an access token; the app uses the token to fetch the user's profile; the app logs the user in.">
+  <defs>
+    <marker id="arr16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="16" width="130" height="40" rx="6" class="d-box"/>
+  <text x="85" y="33" class="d-tl" text-anchor="middle">Dana's browser</text>
+  <text x="85" y="48" class="d-ts" text-anchor="middle">resource owner</text>
+  <rect x="250" y="16" width="130" height="40" rx="6" class="d-hi"/>
+  <text x="315" y="33" class="d-th" text-anchor="middle">Bakery back end</text>
+  <text x="315" y="48" class="d-ts" text-anchor="middle">the "client" app</text>
+  <rect x="480" y="16" width="130" height="40" rx="6" class="d-box"/>
+  <text x="545" y="33" class="d-tl" text-anchor="middle">Google login</text>
+  <text x="545" y="48" class="d-ts" text-anchor="middle">authorization server</text>
+  <rect x="630" y="16" width="100" height="40" rx="6" class="d-box-plain"/>
+  <text x="680" y="33" class="d-tl" text-anchor="middle">Google API</text>
+  <text x="680" y="48" class="d-ts" text-anchor="middle">resource server</text>
+  <line x1="85" y1="56" x2="85" y2="410" class="d-line-dash"/>
+  <line x1="315" y1="56" x2="315" y2="410" class="d-line-dash"/>
+  <line x1="545" y1="56" x2="545" y2="410" class="d-line-dash"/>
+  <line x1="680" y1="56" x2="680" y2="410" class="d-line-dash"/>
+  <!-- 1 -->
+  <line x1="90" y1="86" x2="310" y2="86" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="76" r="8" class="d-num"/><text x="102" y="79.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="200" y="80" class="d-ts" text-anchor="middle">clicks "Sign in with Google"</text>
+  <!-- 2 redirect -->
+  <line x1="310" y1="116" x2="90" y2="116" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="298" cy="106" r="8" class="d-num"/><text x="298" y="109.5" class="d-numt" text-anchor="middle">2</text>
+  <text x="180" y="110" class="d-ts" text-anchor="middle">redirect to Google with client_id + scopes</text>
+  <!-- 3 to google -->
+  <line x1="90" y1="150" x2="540" y2="150" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="140" r="8" class="d-num"/><text x="102" y="143.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="315" y="144" class="d-ts" text-anchor="middle">Dana logs in at accounts.google.com (password + MFA; the bakery never sees them)</text>
+  <!-- 4 consent -->
+  <rect x="440" y="162" width="210" height="30" rx="4" class="d-box-plain"/>
+  <text x="545" y="176" class="d-ts" text-anchor="middle">4. Consent screen: "Rosenthal's Bakery wants</text>
+  <text x="545" y="188" class="d-ts" text-anchor="middle">to see your email and name. Allow?"  Dana: Allow</text>
+  <!-- 5 code back -->
+  <line x1="540" y1="216" x2="90" y2="216" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="528" cy="206" r="8" class="d-num"/><text x="528" y="209.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="300" y="210" class="d-ts" text-anchor="middle">redirect back with ?code=XyZ123 (one-time code, useless alone)</text>
+  <!-- 6 code to backend -->
+  <line x1="90" y1="246" x2="310" y2="246" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="236" r="8" class="d-num"/><text x="102" y="239.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="200" y="240" class="d-ts" text-anchor="middle">browser delivers code=XyZ123</text>
+  <!-- 7 exchange -->
+  <line x1="320" y1="280" x2="540" y2="280" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="332" cy="270" r="8" class="d-num"/><text x="332" y="273.5" class="d-numt" text-anchor="middle">7</text>
+  <text x="440" y="274" class="d-ts" text-anchor="middle">code + client_secret (server to server)</text>
+  <line x1="540" y1="308" x2="320" y2="308" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="528" cy="298" r="8" class="d-num"/><text x="528" y="301.5" class="d-numt" text-anchor="middle">8</text>
+  <text x="425" y="302" class="d-ts" text-anchor="middle">tokens: access (1 h), ID, refresh</text>
+  <!-- 9 use token -->
+  <line x1="320" y1="342" x2="675" y2="342" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="332" cy="332" r="8" class="d-num"/><text x="332" y="335.5" class="d-numt" text-anchor="middle">9</text>
+  <text x="500" y="336" class="d-ts" text-anchor="middle">GET /userinfo   Authorization: Bearer &lt;access token&gt;</text>
+  <line x1="675" y1="366" x2="320" y2="366" class="d-line" marker-end="url(#arr16)"/>
+  <text x="500" y="360" class="d-ts" text-anchor="middle">{"email": "dana@gmail.com", "name": "Dana Levi"}</text>
+  <!-- 10 -->
+  <line x1="310" y1="398" x2="90" y2="398" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="298" cy="388" r="8" class="d-num"/><text x="298" y="391.5" class="d-numt" text-anchor="middle">10</text>
+  <text x="195" y="392" class="d-ts" text-anchor="middle">bakery sets a session cookie</text>
+</svg>
+</div>
+<figcaption><b>The OAuth authorization-code flow.</b> Dana's Google password is typed only at Google. The bakery receives a one-time code in the browser and swaps it for a token in a private server-to-server call, so the token itself never passes through the browser.</figcaption>
+</figure></div></section>
+<section class="slide" id="s5-5-c" data-title="5.5 OAuth: how &quot;Sign in with Google&quot; works"><div class="topbar"><span class="crumb">Session 5 · 5.5 OAuth: how &quot;Sign in with Google&quot; works · 3/3</span><a class="btn" href="../#s5-5" title="Open this section in the full text">Book ↗</a></div><h2>Why the roundabout design</h2><ul><li>The password is typed only at Google; the app never sees it</li><li><b>Scopes</b> limit what the <b>access token</b> can do; the user sees them on the <b>consent screen</b></li><li>The one-time code is swapped for the token server-to-server, using the app's <b>client secret</b></li><li>Tokens expire in about an hour; the user can revoke any app with one click</li><li><b>OpenID Connect</b> adds an ID token for login; <b>single sign-on</b> lets employees use one company identity everywhere</li></ul><div class="takeaway">Offer "Sign in with Google": higher conversion, no password liability. And always read the scopes.</div></section>
+<section class="slide" id="s5-6" data-title="5.6 Security basics every product owner should know"><div class="topbar"><span class="crumb">Session 5 · 5.6 Security basics every product owner should know</span><a class="btn" href="../#s5-6" title="Open this section in the full text">Book ↗</a></div><h2>Six ideas that catch most mistakes</h2><ul><li>Encrypt in transit (HTTPS) and at rest (encrypted disks)</li><li>Never trust the front end: prices, permissions, secrets live on the server</li><li><b>SQL injection</b>: user text pasted into a query. Typing <code>' OR 1=1 --</code> logs in as everyone. Frameworks prevent it with <b>parameterised queries</b></li><li><b>Least privilege</b>: every person, program, and key gets the minimum access</li><li>Secrets out of code and out of Git; rotate anything exposed</li><li>Patch software and test that backups restore</li></ul><div class="takeaway">"Have we reviewed against the OWASP Top Ten?" is a question any engineer or AI assistant can act on.</div></section>
+<section class="slide" id="s5-7" data-title="5.7 Beyond the browser: mobile, desktop, embedded"><div class="topbar"><span class="crumb">Session 5 · 5.7 Beyond the browser: mobile, desktop, embedded · 1/3</span><a class="btn" href="../#s5-7" title="Open this section in the full text">Book ↗</a></div><h2>Where the front end runs</h2><div class="tbl-scroll"><table><thead><tr><th>Kind</th><th>Front end runs</th><th>Built with</th><th>Distributed</th></tr></thead><tbody><tr><td>Web app</td><td>Browser</td><td>HTML, CSS, JavaScript</td><td>A URL; updates instantly</td></tr><tr><td>Native mobile</td><td>Phone, installed</td><td>Swift (iOS), Kotlin (Android)</td><td>App stores; 15 to 30% commission</td></tr><tr><td>Cross-platform</td><td>Phone, installed</td><td>React Native, Flutter</td><td>App stores</td></tr><tr><td>Progressive web app</td><td>Browser, installable</td><td>Web technologies</td><td>A URL, no store</td></tr><tr><td>Desktop</td><td>Laptop, installed</td><td>Native or Electron</td><td>Download, installer</td></tr><tr><td>Embedded</td><td>Inside a device</td><td>C, C++, Rust</td><td>Shipped in the hardware</td></tr></tbody></table></div></section>
+<section class="slide with-fig" id="s5-7-b" data-title="5.7 Beyond the browser: mobile, desktop, embedded"><div class="topbar"><span class="crumb">Session 5 · 5.7 Beyond the browser: mobile, desktop, embedded · 2/3</span><a class="btn" href="../#s5-7" title="Open this section in the full text">Book ↗</a></div><h2>One back end, many clients</h2><div class="fig"><figure id="fig-s5-7-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,133.3vh);height:auto;aspect-ratio:720/270" viewBox="0 0 720 270" role="img" aria-label="Five kinds of client, a browser, an iPhone app, an Android app, a desktop app, and a smart oven, all send requests to the same back-end API, which uses the same database.">
+  <defs>
+    <marker id="arr17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="20" width="160" height="38" rx="6" class="d-box"/><text x="100" y="37" class="d-t" text-anchor="middle">Website</text><text x="100" y="51" class="d-ts" text-anchor="middle">HTML/CSS/JS in a browser</text>
+  <rect x="20" y="68" width="160" height="38" rx="6" class="d-box"/><text x="100" y="85" class="d-t" text-anchor="middle">iPhone app</text><text x="100" y="99" class="d-ts" text-anchor="middle">Swift, from the App Store</text>
+  <rect x="20" y="116" width="160" height="38" rx="6" class="d-box"/><text x="100" y="133" class="d-t" text-anchor="middle">Android app</text><text x="100" y="147" class="d-ts" text-anchor="middle">Kotlin, from Google Play</text>
+  <rect x="20" y="164" width="160" height="38" rx="6" class="d-box"/><text x="100" y="181" class="d-t" text-anchor="middle">Desktop app</text><text x="100" y="195" class="d-ts" text-anchor="middle">Electron, downloaded</text>
+  <rect x="20" y="212" width="160" height="38" rx="6" class="d-box"/><text x="100" y="229" class="d-t" text-anchor="middle">Smart oven</text><text x="100" y="243" class="d-ts" text-anchor="middle">embedded firmware</text>
+  <rect x="330" y="80" width="170" height="110" rx="10" class="d-hi"/>
+  <text x="415" y="120" class="d-th" text-anchor="middle">One back end</text>
+  <text x="415" y="138" class="d-ts" text-anchor="middle">same API, same rules,</text>
+  <text x="415" y="152" class="d-ts" text-anchor="middle">same login (OAuth, tokens)</text>
+  <text x="415" y="172" class="d-ts" text-anchor="middle">JSON over HTTPS</text>
+  <line x1="185" y1="39" x2="325" y2="105" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="87" x2="325" y2="120" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="135" x2="325" y2="135" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="183" x2="325" y2="150" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="231" x2="325" y2="165" class="d-line" marker-end="url(#arr17)"/>
+  <rect x="570" y="100" width="130" height="70" rx="8" class="d-box"/>
+  <text x="635" y="130" class="d-t" text-anchor="middle">One database</text>
+  <text x="635" y="148" class="d-ts" text-anchor="middle">customers, orders</text>
+  <line x1="505" y1="135" x2="565" y2="135" class="d-line" marker-end="url(#arr17)"/>
+  <text x="360" y="255" class="d-ts" text-anchor="middle">Different front ends are different "faces" on the same product. Build the API once; add faces as the business needs them.</text>
+</svg>
+</div>
+<figcaption><b>One back end, many clients.</b> Whether the customer orders from a browser, a phone, a laptop, or the oven's own screen, the request reaches the same API and the same data. The architecture of Sessions 3 and 4 does not change.</figcaption>
+</figure></div><ul><li>Different front ends are different faces on the same product; the API and database do not change</li></ul></section>
+<section class="slide" id="s5-7-c" data-title="5.7 Beyond the browser: mobile, desktop, embedded"><div class="topbar"><span class="crumb">Session 5 · 5.7 Beyond the browser: mobile, desktop, embedded · 3/3</span><a class="btn" href="../#s5-7" title="Open this section in the full text">Book ↗</a></div><h2>What this explains</h2><ul><li>"We need an app" is a new front end if the API exists, and secretly a back-end project if it does not</li><li>Companies start with the web: no store review, no commission, one codebase, instant updates</li><li>The API outlives several generations of front ends</li><li>Embedded devices are the exception: a 2026 thermostat must work in 2036; a mistake is a recall, not a redeploy</li></ul></section>
+<section class="slide with-fig" id="s5-8" data-title="5.8 Where AI fits"><div class="topbar"><span class="crumb">Session 5 · 5.8 Where AI fits · 1/2</span><a class="btn" href="../#s5-8" title="Open this section in the full text">Book ↗</a></div><h2>An AI model is a third-party API called from your back end</h2><div class="fig"><figure id="fig-s5-8-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,180.0vh);height:auto;aspect-ratio:720/200" viewBox="0 0 720 200" role="img" aria-label="The user's browser sends a question to the bakery back end; the back end adds context from its database, calls the Claude API with its secret API key, receives the model's answer, and returns it to the browser. The API key never leaves the server.">
+  <defs>
+    <marker id="arr18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="70" width="120" height="60" rx="6" class="d-box"/>
+  <text x="80" y="96" class="d-t" text-anchor="middle">Browser or app</text>
+  <text x="80" y="114" class="d-ts" text-anchor="middle">"Is the rye gluten-free?"</text>
+  <rect x="230" y="40" width="200" height="120" rx="10" class="d-hi"/>
+  <text x="330" y="66" class="d-th" text-anchor="middle">Bakery back end</text>
+  <text x="330" y="86" class="d-ts" text-anchor="middle">1. check who is asking</text>
+  <text x="330" y="102" class="d-ts" text-anchor="middle">2. fetch product data from the DB</text>
+  <text x="330" y="118" class="d-ts" text-anchor="middle">3. build the prompt</text>
+  <text x="330" y="134" class="d-ts" text-anchor="middle">4. call Claude with the API key</text>
+  <text x="330" y="150" class="d-ts" text-anchor="middle">5. log usage, return the answer</text>
+  <rect x="540" y="60" width="160" height="80" rx="8" class="d-box"/>
+  <text x="620" y="90" class="d-t" text-anchor="middle">Claude API</text>
+  <text x="620" y="108" class="d-ts" text-anchor="middle">Anthropic's servers</text>
+  <text x="620" y="124" class="d-ts" text-anchor="middle">billed per token</text>
+  <line x1="145" y1="90" x2="225" y2="90" class="d-line" marker-end="url(#arr18)"/>
+  <line x1="225" y1="112" x2="145" y2="112" class="d-line" marker-end="url(#arr18)"/>
+  <line x1="435" y1="90" x2="535" y2="90" class="d-line-hi" marker-end="url(#arr18)"/>
+  <text x="485" y="82" class="d-ts" text-anchor="middle">prompt + key</text>
+  <line x1="535" y1="112" x2="435" y2="112" class="d-line-hi" marker-end="url(#arr18)"/>
+  <text x="485" y="126" class="d-ts" text-anchor="middle">answer</text>
+  <text x="360" y="188" class="d-ts" text-anchor="middle">The API key and the model call live on the server. The browser only ever talks to your own back end.</text>
+</svg>
+</div>
+<figcaption><b>AI in the architecture.</b> The model is one more service the back end calls, after applying its own rules and adding its own data. Nothing about the tiers, hosting, or security changes.</figcaption>
+</figure></div><ul><li>The key and the model call stay on the server; the browser talks only to your back end</li></ul></section>
+<section class="slide" id="s5-8-b" data-title="5.8 Where AI fits"><div class="topbar"><span class="crumb">Session 5 · 5.8 Where AI fits · 2/2</span><a class="btn" href="../#s5-8" title="Open this section in the full text">Book ↗</a></div><h2>Three practical consequences</h2><ul><li>The API key stays on the server: a call from the browser exposes it to every visitor</li><li>Your data is the differentiator: add this customer's history and your catalogue to the <b>prompt</b> (<b>RAG</b>)</li><li>AI calls cost money per <b>token</b>, take seconds, and can fail: cache, monitor, and give them a fallback</li></ul><div class="takeaway">Claude itself is served through exactly this architecture. Now you know what is on the other end of the request.</div></section>
+</div>
+<div class="progress" id="progress"></div>
+<div class="bottombar"><span id="counter">1 / 1</span><span class="hint">Identity, Security, and Software Beyond the Browser</span><span class="nav"><button id="prevbtn" type="button" aria-label="Previous slide">‹ Prev</button><button id="nextbtn" type="button" aria-label="Next slide">Next ›</button><button id="fullbtn" type="button" aria-label="Toggle full screen">Full screen</button></span></div>
+<script>var DECK_TITLE="Session 5 Slides";
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=0, counter=document.getElementById('counter'), bar=document.getElementById('progress');
+  function show(n, push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(push!==false){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){}}
+    document.title=slides[i].getAttribute('data-title')+' · '+DECK_TITLE;
+  }
+  function fromHash(){
+    var h=location.hash.replace('#','');
+    var k=-1; slides.forEach(function(s,idx){if(s.id===h)k=idx;});
+    show(k<0?0:k,false);
+  }
+  window.next=function(){show(i+1);};
+  window.prev=function(){show(i-1);};
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); show(i+1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); show(i-1); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(slides.length-1); break;
+      case 'f': case 'F': toggleFull(); break;
+    }
+  });
+  function toggleFull(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+    }catch(e){}
+  }
+  document.getElementById('fullbtn').addEventListener('click',toggleFull);
+  document.getElementById('prevbtn').addEventListener('click',function(){show(i-1);});
+  document.getElementById('nextbtn').addEventListener('click',function(){show(i+1);});
+  window.addEventListener('hashchange',fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

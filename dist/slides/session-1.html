@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Session 1 Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF4;
+  --ink:#1B2430;
+  --ink-2:#4A5666;
+  --line:#CBD4DF;
+  --accent:#0E7C86;
+  --accent-ink:#0A5A62;
+  --accent-soft:#D6EEF0;
+  --review:#FFF3D1;
+  --review-line:#E2B94E;
+  --review-ink:#5C4300;
+  --note:#EEF2F7;
+  --note-line:#8FA3B8;
+  --code-bg:#EDF1F5;
+  --diagram-hi:#0E7C86;
+  --diagram-hi-soft:#D6EEF0;
+  --font-display:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171E;
+    --surface:#1A212B;
+    --surface-2:#232C38;
+    --ink:#E6EBF1;
+    --ink-2:#A6B2C1;
+    --line:#384454;
+    --accent:#4FC1CB;
+    --accent-ink:#8ADCE3;
+    --accent-soft:#173A3E;
+    --review:#3A2E0E;
+    --review-line:#C9A23E;
+    --review-ink:#F4E3B0;
+    --note:#1F2A36;
+    --note-line:#5B7290;
+    --code-bg:#0F141A;
+    --diagram-hi:#4FC1CB;
+    --diagram-hi-soft:#173A3E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171E;
+  --surface:#1A212B;
+  --surface-2:#232C38;
+  --ink:#E6EBF1;
+  --ink-2:#A6B2C1;
+  --line:#384454;
+  --accent:#4FC1CB;
+  --accent-ink:#8ADCE3;
+  --accent-soft:#173A3E;
+  --review:#3A2E0E;
+  --review-line:#C9A23E;
+  --review-ink:#F4E3B0;
+  --note:#1F2A36;
+  --note-line:#5B7290;
+  --code-bg:#0F141A;
+  --diagram-hi:#4FC1CB;
+  --diagram-hi-soft:#173A3E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0 64px;
+}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-0.01em}
+h3{font-size:1.35rem;font-weight:700;margin-top:2.6rem;margin-bottom:0.6rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.6rem 0.9rem}
+h4{font-size:1.05rem;font-weight:700;margin-top:1.6rem;margin-bottom:0.3rem}
+p{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem;margin:0 0 1rem}
+li{margin-bottom:0.35rem}
+li>ul,li>ol{margin-top:0.35rem}
+strong{font-weight:600}
+code,pre,kbd{font-family:var(--font-mono);font-size:0.86em}
+code{background:var(--code-bg);padding:0.08em 0.35em;border-radius:4px}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.9rem 1.1rem;
+  overflow-x:auto;
+  line-height:1.5;
+  margin:0.6rem 0 1.2rem;
+}
+pre code{background:none;padding:0;font-size:0.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+/* layout */
+.page{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0 48px}
+@media (min-width:1100px){
+  .page{grid-template-columns:270px minmax(0,1fr)}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow-y:auto;padding-block:32px 40px}
+  .toc summary{display:none}
+  .toc details>*{display:block}
+}
+.toc{font-family:var(--font-display);font-size:0.86rem;line-height:1.4}
+.toc details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0.6rem 0.9rem;margin-block:20px 8px}
+@media (min-width:1100px){.toc details{border:0;background:transparent;padding:0;margin:0}}
+.toc summary{cursor:pointer;font-weight:700;font-size:0.95rem}
+.toc .toc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin:0.8rem 0 0.5rem}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0}
+.toc a{display:block;padding:0.22rem 0.5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .toc-session>a{font-weight:700;margin-top:0.6rem}
+.toc .toc-sub a{color:var(--ink-2);padding-left:1.1rem;font-size:0.82rem}
+.toc .toc-appendix>a{font-weight:600}
+main{min-width:0;max-width:78ch;padding-block:32px 0}
+main>p,main>ul,main>ol,section>p,section>ul,section>ol{max-width:70ch}
+
+/* cover */
+.cover{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.eyebrow{font-family:var(--font-display);font-size:0.74rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:0.7rem}
+.cover .lede{font-size:1.15rem;color:var(--ink-2);max-width:60ch;margin-top:1rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:0.5rem 1.6rem;font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:1.2rem}
+.cover-meta b{color:var(--ink);font-weight:700}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.4rem;margin:1.6rem 0}
+.howto h4{margin-top:0}
+.howto ul{margin-bottom:0}
+
+/* session header */
+.session{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+.session .eyebrow{margin-bottom:0.5rem}
+.session .goal{color:var(--ink-2);font-size:1.05rem;margin-top:0.8rem;max-width:64ch}
+.agenda{width:100%;border-collapse:collapse;font-family:var(--font-display);font-size:0.9rem;margin:1.2rem 0 0.6rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.agenda th,.agenda td{padding:0.5rem 0.8rem;text-align:left;border-top:1px solid var(--line)}
+.agenda th{background:var(--surface-2);border-top:0;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2)}
+.agenda td:last-child,.agenda th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agenda tfoot td{font-weight:700}
+.objectives{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0 0}
+.objectives h4{margin:0 0 0.4rem;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2)}
+.objectives ul{margin:0}
+
+/* slides buttons */
+.slides-btn{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.slides-btn:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.slides-btn.alt{border-color:var(--line);color:var(--ink-2)}
+.slides-btn.alt:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--surface)}
+.eyebrow .slides-btn{margin-left:0.6rem;letter-spacing:0.06em}
+
+/* section time tag */
+.time{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);padding:0.15rem 0.55rem;border-radius:999px;white-space:nowrap}
+
+/* keywords */
+dfn.kw{
+  font-style:normal;
+  font-weight:600;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:0 0.25em;
+  border-radius:3px;
+  border-bottom:2px solid var(--accent);
+  scroll-margin-top:24px;
+}
+dfn.kw:target{outline:3px solid var(--review-line);outline-offset:2px}
+
+/* analogy + note callouts */
+.note,.analogy,.demo{
+  border-left:4px solid var(--note-line);
+  background:var(--note);
+  padding:0.8rem 1.1rem;
+  border-radius:0 10px 10px 0;
+  margin:1.2rem 0;
+}
+.note .label,.analogy .label,.demo .label,.review .label{
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:0.3rem;
+}
+.note p:last-child,.analogy p:last-child,.demo p:last-child,.note ul:last-child,.demo ol:last-child,.demo ul:last-child{margin-bottom:0}
+.analogy{border-left-color:var(--accent)}
+.ai{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:0.8rem 1.1rem;border-radius:0 10px 10px 0;margin:1.2rem 0}
+.ai .label{font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:0.3rem}
+.ai p:last-child{margin-bottom:0}
+.demo{border-left-style:dashed}
+
+/* review box */
+.review{
+  background:var(--review);
+  border:1px solid var(--review-line);
+  color:var(--review-ink);
+  border-radius:12px;
+  padding:1.1rem 1.4rem 1rem;
+  margin:2.5rem 0 1rem;
+  position:relative;
+  scroll-margin-top:24px;
+}
+.review::before{
+  content:"?";
+  position:absolute;top:-14px;left:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--review-line);color:#1B2430;
+  font-family:var(--font-display);font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.review .label{color:var(--review-ink);margin-top:0.2rem}
+.review h4{margin:0 0 0.5rem;color:var(--review-ink)}
+.review ol{margin-bottom:0.5rem}
+.review li{margin-bottom:0.45rem}
+.review a{color:var(--review-ink);font-weight:600}
+.review .answers-link{font-family:var(--font-display);font-size:0.82rem;margin:0.4rem 0 0}
+.review code{background:rgba(0,0,0,0.08)}
+
+/* figures / diagrams */
+figure{margin:1.4rem 0 1.6rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1rem 0.7rem}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);font-family:var(--font-display)}
+figcaption{font-family:var(--font-display);font-size:0.86rem;color:var(--ink-2);margin-top:0.6rem;line-height:1.45}
+figcaption b{color:var(--ink)}
+.d-box{fill:var(--surface-2);stroke:currentColor;stroke-width:1.2}
+.d-box-plain{fill:var(--surface);stroke:currentColor;stroke-width:1.2}
+.d-hi{fill:var(--diagram-hi-soft);stroke:var(--diagram-hi);stroke-width:1.6}
+.d-zone{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:5 4;opacity:0.7}
+.d-line{stroke:currentColor;stroke-width:1.4;fill:none}
+.d-line-hi{stroke:var(--diagram-hi);stroke-width:1.8;fill:none}
+.d-line-dash{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.d-t{font-size:12px;fill:currentColor;font-weight:600}
+.d-ts{font-size:10.5px;fill:currentColor;opacity:0.85}
+.d-tl{font-size:13px;fill:currentColor;font-weight:700}
+.d-th{font-size:12px;fill:var(--diagram-hi);font-weight:700}
+.d-mono{font-family:var(--font-mono);font-size:10.5px;fill:currentColor}
+svg.seq .d-ts,svg.seq .d-mono{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.d-num{fill:var(--diagram-hi)}
+.d-numt{font-size:10px;fill:#fff;font-weight:800}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.6rem 0 1.4rem;background:var(--surface);border:1px solid var(--line)}
+.tbl th,.tbl td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.tbl-wrap{overflow-x:auto;margin:0.6rem 0 1.4rem}
+.tbl-wrap .tbl{margin:0}
+.datatable{border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;background:var(--surface);border:1px solid var(--line);margin:0.4rem 0 1rem}
+.datatable th,.datatable td{padding:0.3rem 0.7rem;border:1px solid var(--line);white-space:nowrap}
+.datatable th{background:var(--surface-2);font-weight:600}
+.datatable caption{caption-side:top;text-align:left;font-family:var(--font-display);font-size:0.82rem;font-weight:700;padding-bottom:0.3rem}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:0.6rem 0 1.2rem}
+.two-col>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0.8rem 1rem}
+.two-col h4{margin-top:0}
+.two-col ul{margin-bottom:0}
+
+/* glossary */
+.glossary{width:100%;border-collapse:collapse;font-size:0.92rem;background:var(--surface);border:1px solid var(--line)}
+.glossary th,.glossary td{padding:0.5rem 0.75rem;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.glossary th{background:var(--surface-2);font-family:var(--font-display);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.glossary td:first-child{font-family:var(--font-display);font-weight:700;min-width:12ch;width:18%}
+.glossary td:nth-child(2){width:58%;min-width:30ch}
+.glossary td:last-child{font-family:var(--font-display);font-size:0.84rem;min-width:14ch;width:24%}
+.glossary-letter{font-family:var(--font-display);font-weight:800;font-size:0.8rem;letter-spacing:0.1em;color:var(--ink-2);background:var(--ground)}
+.glossary-letter td{border-top:2px solid var(--line)}
+
+/* answers appendix */
+.qa{margin:1.2rem 0 2rem}
+.qa h4{margin-top:0}
+.qa ol{padding-left:1.4rem}
+.qa li{margin-bottom:0.9rem}
+.qa .q{font-weight:600}
+.qa .a{display:block;margin-top:0.25rem;padding:0.5rem 0.9rem;background:var(--review);border-left:3px solid var(--review-line);border-radius:0 8px 8px 0;color:var(--review-ink)}
+.qa .a code{background:rgba(0,0,0,0.08)}
+.backlink{font-family:var(--font-display);font-size:0.82rem}
+
+.appendix{margin-top:4rem;padding-top:2rem;border-top:3px solid var(--ink)}
+
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .toc,.slides-btn{display:none}
+  .page{display:block}
+  main{max-width:none}
+  .session,.appendix{break-before:page}
+  figure,.review,pre,.note,.analogy,.demo{break-inside:avoid}
+  a{color:inherit}
+  dfn.kw{background:#e6f2f3}
+  .review{background:#fff3d1 !important;color:#000}
+}
+
+html,body{height:100%}
+body{margin:0;padding:0;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+.deck{position:relative;height:100%;width:100%}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:2.4vh 5vw 8vh;box-sizing:border-box}
+.slide.active{display:flex}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--font-display);font-size:clamp(12px,1.7vh,17px);color:var(--ink-2);margin-bottom:1.2vh}
+.topbar .crumb{letter-spacing:0.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font-family:var(--font-display);font-weight:700;font-size:clamp(12px,1.7vh,16px);letter-spacing:0.04em;text-decoration:none;color:var(--accent-ink);border:1.5px solid var(--accent);background:var(--surface);padding:0.3em 0.9em;border-radius:999px;white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink)}
+.slide h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,5.4vh,58px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 2.4vh;text-wrap:balance;max-width:28ch}
+.slide ul{margin:0;padding-left:1.1em;font-size:clamp(17px,3.3vh,34px);line-height:1.35;max-width:38ch}
+.slide li{margin-bottom:1.6vh}
+.slide li b{font-weight:600;color:var(--accent-ink)}
+.slide code{font-family:var(--font-mono);font-size:0.85em;background:var(--code-bg);padding:0.05em 0.3em;border-radius:4px}
+.slide pre{margin:0 0 2vh;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:1.6vh 2vw;font-family:var(--font-mono);font-size:clamp(13px,2.5vh,25px);line-height:1.4;overflow:auto;max-height:52vh}
+.slide .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:0 0 1.5vh}
+.slide figure{margin:0;padding:1.5vh 1.5vw;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}
+.slide figure .scroll{overflow:visible;min-height:0;display:flex;justify-content:center;width:100%}
+.slide figure svg{max-width:100%;display:block;color:var(--ink);font-family:var(--font-display)}
+.slide figcaption{display:none}
+.slide .with-fig ul{font-size:clamp(15px,2.6vh,26px);max-width:none;display:flex;flex-wrap:wrap;gap:0 3vw;list-style:disc}
+.slide .with-fig li{margin-bottom:0.6vh;flex:1 1 40%}
+.slide table{border-collapse:collapse;font-size:clamp(14px,2.6vh,25px);line-height:1.3;background:var(--surface);border:1px solid var(--line);margin-bottom:2vh;max-width:100%}
+.slide th,.slide td{text-align:left;padding:0.9vh 1.4vw;border-top:1px solid var(--line);vertical-align:top}
+.slide th{background:var(--surface-2);font-family:var(--font-display);font-size:0.72em;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);border-top:0}
+.slide .tbl-scroll{overflow:auto;min-height:0;margin-bottom:2vh}
+.slide .takeaway{margin-top:auto;border-left:5px solid var(--accent);background:var(--surface);padding:1.2vh 1.6vw;font-family:var(--font-display);font-weight:600;font-size:clamp(15px,2.7vh,26px);line-height:1.35;border-radius:0 10px 10px 0}
+.slide.title{justify-content:center;padding-bottom:10vh}
+.slide.title .eyebrow{font-family:var(--font-display);font-size:clamp(13px,2vh,18px);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1.5vh}
+.slide.title h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,7.5vh,84px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 2vh;max-width:22ch;text-wrap:balance}
+.slide.title .sub{font-size:clamp(17px,3vh,30px);color:var(--ink-2);max-width:50ch;margin:0 0 3vh}
+.slide.title ol{columns:2;column-gap:4vw;font-family:var(--font-display);font-size:clamp(14px,2.3vh,22px);line-height:1.5;margin:0 0 3vh;padding-left:1.4em;max-width:80ch}
+.slide.title ol a{color:var(--ink);text-decoration:none}
+.slide.title ol a:hover{color:var(--accent-ink);text-decoration:underline}
+.slide.title .links{display:flex;gap:1rem;flex-wrap:wrap}
+.bottombar{position:fixed;left:0;right:0;bottom:0;height:6vh;min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw calc(0px + env(safe-area-inset-bottom,0px));font-family:var(--font-display);font-size:clamp(12px,1.7vh,16px);color:var(--ink-2);background:var(--ground);border-top:1px solid var(--line);box-sizing:border-box}
+.bottombar .nav{display:flex;gap:0.5rem;align-items:center}
+.bottombar button{font:inherit;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0.3em 0.9em;cursor:pointer}
+.bottombar button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.bottombar button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:fixed;left:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));height:3px;background:var(--accent);width:0;transition:width .2s}
+@media (prefers-reduced-motion: reduce){.progress{transition:none}}
+.hint{font-size:0.9em;opacity:0.8}
+@media (max-width:700px){.slide{padding:2vh 4vw 9vh}.slide.title ol{columns:1}.slide .with-fig li{flex-basis:100%}.hint{display:none}}
+</style>
+<div class="deck">
+<section class="slide title active" id="title" data-title="Session 1"><div class="eyebrow">Session 1 · 75 minutes · slides</div><h1>Choosing a Programming Language</h1><p class="sub">What software is written in, and how the choice is made</p><ol><li><a href="#s1-1">1.1 What a programming language is</a></li><li><a href="#s1-2">1.2 Fit for purpose</a></li><li><a href="#s1-3">1.3 Popularity, maturity, and community</a></li><li><a href="#s1-4">1.4 The ecosystem: packages and libraries</a></li><li><a href="#s1-5">1.5 Speed and memory</a></li><li><a href="#s1-6">1.6 Platforms and portability</a></li><li><a href="#s1-7">1.7 Making the decision in the age of AI</a></li></ol><div class="links"><a class="btn primary" href="../#session-1">Open the book chapter</a> <a class="btn" href="session-1.pptx">Download as PowerPoint</a></div><p class="hint">Arrow keys or space to move, F for full screen. Every slide has a Book button back to the full text.</p></section>
+<section class="slide" id="s1-1" data-title="1.1 What a programming language is"><div class="topbar"><span class="crumb">Session 1 · 1.1 What a programming language is · 1/3</span><a class="btn" href="../#s1-1" title="Open this section in the full text">Book ↗</a></div><h2>From human ideas to machine instructions</h2><ul><li>Processors understand only <b>machine code</b>: numbers</li><li>A <b>programming language</b> is a human-readable notation with strict grammar (<b>syntax</b>)</li><li>What the programmer writes is <b>source code</b></li><li>Something must translate source code into machine code</li></ul></section>
+<section class="slide" id="s1-1-b" data-title="1.1 What a programming language is"><div class="topbar"><span class="crumb">Session 1 · 1.1 What a programming language is · 2/3</span><a class="btn" href="../#s1-1" title="Open this section in the full text">Book ↗</a></div><h2>Two ways to translate</h2><ul><li><b>Compiler</b>: translate the whole program ahead of time into an <b>executable</b>. Fast; tied to one platform. C, C++, Rust, Go, Swift</li><li><b>Interpreter</b>: carry out the source code on the spot. Portable; slower. Python, JavaScript, Ruby</li><li>Analogy: a published translation versus a live interpreter in the room</li></ul></section>
+<section class="slide" id="s1-1-c" data-title="1.1 What a programming language is"><div class="topbar"><span class="crumb">Session 1 · 1.1 What a programming language is · 3/3</span><a class="btn" href="../#s1-1" title="Open this section in the full text">Book ↗</a></div><h2>Language, library, framework</h2><ul><li><b>Language</b>: the notation itself (Python)</li><li><b>Library</b>: ready-made code for one job (send email, draw a chart)</li><li><b>Framework</b>: the skeleton of a whole kind of application (Flask, React)</li><li>Hundreds of languages exist because each makes one kind of work easier at the cost of another</li></ul><div class="takeaway">In the age of AI: syntax is the part AI has fully absorbed. The trade-offs below have not gone away.</div></section>
+<section class="slide" id="s1-2" data-title="1.2 Fit for purpose"><div class="topbar"><span class="crumb">Session 1 · 1.2 Fit for purpose · 1/3</span><a class="btn" href="../#s1-2" title="Open this section in the full text">Book ↗</a></div><h2>Was the language built for the job?</h2><ul><li><b>General-purpose</b> languages can write almost anything: Python, JavaScript, Java, C#, C++, Go, Rust</li><li><b>Domain-specific</b> languages do one thing superbly: SQL (database questions), HTML (structure), CSS (style)</li><li>Nobody writes a website in SQL: it cannot draw a button, react to a click, or send an email</li></ul></section>
+<section class="slide with-fig" id="s1-2-b" data-title="1.2 Fit for purpose"><div class="topbar"><span class="crumb">Session 1 · 1.2 Fit for purpose · 2/3</span><a class="btn" href="../#s1-2" title="Open this section in the full text">Book ↗</a></div><h2>Where each language lives</h2><div class="fig"><figure id="fig-s1-2-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,120.0vh);height:auto;aspect-ratio:720/300" viewBox="0 0 720 300" role="img" aria-label="A map of where each language runs: HTML, CSS, JavaScript, and TypeScript in the browser; Python, JavaScript, Java, C#, Go, Ruby, and PHP on the server; SQL in the database; Swift, Kotlin, and cross-platform frameworks on phones; C, C++, and Rust inside devices; Python and R for data analysis.">
+  <defs>
+    <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- browser -->
+  <rect x="20" y="20" width="200" height="88" rx="8" class="d-box"/>
+  <text x="120" y="42" class="d-tl" text-anchor="middle">Browser</text>
+  <text x="120" y="62" class="d-ts" text-anchor="middle">HTML · CSS (structure, style)</text>
+  <text x="120" y="78" class="d-ts" text-anchor="middle">JavaScript · TypeScript (logic)</text>
+  <text x="120" y="96" class="d-ts" text-anchor="middle" opacity="0.7">only JavaScript can run here</text>
+  <!-- phone -->
+  <rect x="20" y="126" width="200" height="72" rx="8" class="d-box"/>
+  <text x="120" y="148" class="d-tl" text-anchor="middle">Phone</text>
+  <text x="120" y="168" class="d-ts" text-anchor="middle">Swift (iPhone) · Kotlin (Android)</text>
+  <text x="120" y="184" class="d-ts" text-anchor="middle">Dart/Flutter, React Native (both)</text>
+  <!-- device -->
+  <rect x="20" y="216" width="200" height="64" rx="8" class="d-box"/>
+  <text x="120" y="238" class="d-tl" text-anchor="middle">Device (embedded)</text>
+  <text x="120" y="258" class="d-ts" text-anchor="middle">C · C++ · Rust</text>
+  <text x="120" y="272" class="d-ts" text-anchor="middle" opacity="0.7">tiny processors, no room for waste</text>
+  <!-- server -->
+  <rect x="300" y="60" width="200" height="120" rx="8" class="d-hi"/>
+  <text x="400" y="84" class="d-th" text-anchor="middle">Server (back end)</text>
+  <text x="400" y="106" class="d-ts" text-anchor="middle">Python · JavaScript/Node · TypeScript</text>
+  <text x="400" y="122" class="d-ts" text-anchor="middle">Java · C# · Go · Ruby · PHP</text>
+  <text x="400" y="138" class="d-ts" text-anchor="middle">Rust (when speed is critical)</text>
+  <text x="400" y="162" class="d-ts" text-anchor="middle" opacity="0.7">the widest choice; any of these works</text>
+  <!-- database -->
+  <rect x="560" y="60" width="140" height="60" rx="8" class="d-box"/>
+  <text x="630" y="84" class="d-tl" text-anchor="middle">Database</text>
+  <text x="630" y="104" class="d-ts" text-anchor="middle">SQL, and only SQL</text>
+  <!-- data -->
+  <rect x="560" y="140" width="140" height="60" rx="8" class="d-box-plain"/>
+  <text x="630" y="164" class="d-tl" text-anchor="middle">Data &amp; AI work</text>
+  <text x="630" y="184" class="d-ts" text-anchor="middle">Python · R · SQL</text>
+  <!-- arrows -->
+  <line x1="225" y1="64" x2="295" y2="100" class="d-line" marker-end="url(#arr0)"/>
+  <line x1="225" y1="162" x2="295" y2="130" class="d-line" marker-end="url(#arr0)"/>
+  <line x1="225" y1="248" x2="295" y2="160" class="d-line" marker-end="url(#arr0)"/>
+  <line x1="505" y1="100" x2="555" y2="92" class="d-line" marker-end="url(#arr0)"/>
+  <text x="260" y="292" class="d-ts" text-anchor="middle">Where the code runs decides which languages are even possible.</text>
+</svg>
+</div>
+<figcaption><b>Where each language lives.</b> Some places admit only one language (the browser, the database). The server admits almost any, which is why the back-end choice is the one most worth thinking about.</figcaption>
+</figure></div><ul><li>Browser: only JavaScript. Database: only SQL</li><li>The server admits almost anything: that is the real choice</li></ul></section>
+<section class="slide" id="s1-2-c" data-title="1.2 Fit for purpose"><div class="topbar"><span class="crumb">Session 1 · 1.2 Fit for purpose · 3/3</span><a class="btn" href="../#s1-2" title="Open this section in the full text">Book ↗</a></div><h2>A product is never one language</h2><ul><li>Typical web product: HTML + CSS + JavaScript in the browser, Python (or JS) on the server, SQL in the database</li><li>Add Swift and Kotlin for native phone apps</li><li>"Choosing a language" really means choosing the back-end language and the mobile strategy</li></ul><div class="takeaway">In the age of AI: fit for purpose is unchanged. Using several languages in one product is cheaper than it was.</div></section>
+<section class="slide" id="s1-3" data-title="1.3 Popularity, maturity, and community"><div class="topbar"><span class="crumb">Session 1 · 1.3 Popularity, maturity, and community · 1/2</span><a class="btn" href="../#s1-3" title="Open this section in the full text">Book ↗</a></div><h2>A language is a community, not just a notation</h2><ul><li><b>Hiring</b>: millions of developers versus a few thousand</li><li><b>Answers</b>: every problem in a popular language has been solved publicly</li><li><b>Longevity</b>: COBOL from the 1970s still runs banks; who maintains it now?</li><li><b>Security</b>: many eyes find and fix flaws quickly</li><li><b>Tooling</b>: editors, testing, hosting support the popular languages first</li></ul></section>
+<section class="slide" id="s1-3-b" data-title="1.3 Popularity, maturity, and community"><div class="topbar"><span class="crumb">Session 1 · 1.3 Popularity, maturity, and community · 2/2</span><a class="btn" href="../#s1-3" title="Open this section in the full text">Book ↗</a></div><h2>The mainstream, and the caution about the new</h2><ul><li>Mainstream today: Python, JavaScript/TypeScript, Java, C#, C/C++, Go, SQL; Rust, Swift, Kotlin in their niches</li><li>A brand-new language may be better designed and still be the wrong choice: few libraries, breaking changes, unproven survival</li><li>Most successful languages needed ten years to become safe bets</li></ul><div class="takeaway">In the age of AI: popularity matters MORE. AI learns from public code, so mainstream, stable languages get the best help.</div></section>
+<section class="slide" id="s1-4" data-title="1.4 The ecosystem: packages and libraries"><div class="topbar"><span class="crumb">Session 1 · 1.4 The ecosystem: packages and libraries · 1/2</span><a class="btn" href="../#s1-4" title="Open this section in the full text">Book ↗</a></div><h2>Nobody writes it from scratch</h2><ul><li>Email, spreadsheets, payments, images, charts: someone already wrote it and published it free</li><li>The <b>ecosystem</b> = the libraries plus the tools to find and install them</li><li><b>Package manager</b>: pip (Python), npm (JavaScript). "We added a <b>dependency</b>"</li><li>Almost all of it is <b>open source</b>, which is also a <b>supply chain</b> to watch</li></ul></section>
+<section class="slide" id="s1-4-b" data-title="1.4 The ecosystem: packages and libraries"><div class="topbar"><span class="crumb">Session 1 · 1.4 The ecosystem: packages and libraries · 2/2</span><a class="btn" href="../#s1-4" title="Open this section in the full text">Book ↗</a></div><h2>The ecosystem steers the choice</h2><div class="tbl-scroll"><table><thead><tr><th>If the product is mostly about…</th><th>The ecosystem pulls toward</th></tr></thead><tbody><tr><td>AI, machine learning, data</td><td>Python</td></tr><tr><td>Rich interactive web front end</td><td>JavaScript / TypeScript</td></tr><tr><td>Conventional web back end</td><td>Python, JavaScript, Ruby, Java, C#, Go</td></tr><tr><td>Enterprise integration</td><td>Java, C#</td></tr><tr><td>Games</td><td>C# (Unity), C++ (Unreal)</td></tr><tr><td>Native phone app</td><td>Swift / Kotlin</td></tr></tbody></table></div><div class="takeaway">In the age of AI: ecosystems matter as much as ever. Watch for hallucinated packages that do not exist.</div></section>
+<section class="slide" id="s1-5" data-title="1.5 Speed and memory"><div class="topbar"><span class="crumb">Session 1 · 1.5 Speed and memory · 1/2</span><a class="btn" href="../#s1-5" title="Open this section in the full text">Book ↗</a></div><h2>The fastest language is usually the wrong question</h2><ul><li>Compiled languages can be 10 to 100 times faster than Python at raw computation</li><li>But most business apps <b>wait</b> (database, network, disk); they do not compute</li><li>Developer time costs far more than machine time</li><li>Python's AI libraries are C inside: "Python is slow" and "Python runs AI" are both true</li></ul></section>
+<section class="slide" id="s1-5-b" data-title="1.5 Speed and memory"><div class="topbar"><span class="crumb">Session 1 · 1.5 Speed and memory · 2/2</span><a class="btn" href="../#s1-5" title="Open this section in the full text">Book ↗</a></div><h2>When performance genuinely decides</h2><div class="tbl-scroll"><table><thead><tr><th>Situation</th><th>Why</th><th>Typical choice</th></tr></thead><tbody><tr><td>Embedded devices, wearables</td><td>Kilobytes of memory, a battery</td><td>C, C++, Rust</td></tr><tr><td>Games, video</td><td>16 ms per frame</td><td>C++, C#, Rust</td></tr><tr><td>Trading, real-time control</td><td>Microseconds are money or safety</td><td>C++, Rust</td></tr><tr><td>Very large services</td><td>10× efficiency = thousands of servers</td><td>Go, Rust, Java</td></tr><tr><td>Mobile apps</td><td>Battery and memory limits</td><td>Swift, Kotlin</td></tr></tbody></table></div><div class="takeaway">Build in the productive language, measure, then rewrite only the proven hot spot. In the age of AI that last step is cheap.</div></section>
+<section class="slide" id="s1-6" data-title="1.6 Platforms and portability"><div class="topbar"><span class="crumb">Session 1 · 1.6 Platforms and portability · 1/4</span><a class="btn" href="../#s1-6" title="Open this section in the full text">Book ↗</a></div><h2>A platform is processor + operating system</h2><ul><li>Processor families: <b>x86</b> (Intel, AMD) and <b>ARM</b> (phones, Apple silicon, new servers)</li><li>Operating systems: Windows, macOS, Linux, iOS, Android</li><li>Machine code for one platform is gibberish to another</li><li>Every extra platform is another version to build, test, and support</li></ul></section>
+<section class="slide with-fig" id="s1-6-b" data-title="1.6 Platforms and portability"><div class="topbar"><span class="crumb">Session 1 · 1.6 Platforms and portability · 2/4</span><a class="btn" href="../#s1-6" title="Open this section in the full text">Book ↗</a></div><h2>Three ways to reach three platforms</h2><div class="fig"><figure id="fig-s1-6-1-slide">
+<div class="scroll">
+<svg style="width:min(88vw,148.0vh);height:auto;aspect-ratio:740/330" viewBox="0 0 740 330" role="img" aria-label="Three strategies for reaching Windows, macOS, and Linux: C++ source is compiled separately into three different executables; Java source is compiled once into bytecode that a virtual machine on each platform runs; Python source is not compiled at all and is run by an interpreter installed on each platform.">
+  <defs>
+    <marker id="arr1p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- column headers -->
+  <text x="90" y="24" class="d-ts" text-anchor="middle" opacity="0.7">source code</text>
+  <text x="350" y="24" class="d-ts" text-anchor="middle" opacity="0.7">what ships</text>
+  <text x="630" y="24" class="d-ts" text-anchor="middle" opacity="0.7">each platform</text>
+  <!-- row 1: C++ -->
+  <text x="20" y="52" class="d-tl">1. Compile per platform (C, C++, Rust, Go, Swift)</text>
+  <rect x="30" y="62" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="82" class="d-mono" text-anchor="middle">app.cpp</text>
+  <rect x="270" y="58" width="160" height="14" rx="3" class="d-box"/><text x="350" y="68" class="d-ts" text-anchor="middle" style="font-size:9px">app.exe (Windows, x86)</text>
+  <rect x="270" y="76" width="160" height="14" rx="3" class="d-box"/><text x="350" y="86" class="d-ts" text-anchor="middle" style="font-size:9px">app (macOS, ARM)</text>
+  <rect x="270" y="94" width="160" height="14" rx="3" class="d-box"/><text x="350" y="104" class="d-ts" text-anchor="middle" style="font-size:9px">app (Linux, x86)</text>
+  <line x1="155" y1="70" x2="265" y2="65" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="155" y1="78" x2="265" y2="83" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="155" y1="86" x2="265" y2="101" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="205" y="60" class="d-ts" text-anchor="middle" style="font-size:9.5px">3 compiles</text>
+  <rect x="560" y="58" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="68" class="d-ts" text-anchor="middle" style="font-size:9px">Windows PC</text>
+  <rect x="560" y="76" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="86" class="d-ts" text-anchor="middle" style="font-size:9px">Mac</text>
+  <rect x="560" y="94" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="104" class="d-ts" text-anchor="middle" style="font-size:9px">Linux server</text>
+  <line x1="435" y1="65" x2="555" y2="65" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="83" x2="555" y2="83" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="101" x2="555" y2="101" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="380" y="126" class="d-ts" text-anchor="middle">Fastest programs; one build (and one round of testing) per platform</text>
+  <!-- row 2: Java -->
+  <text x="20" y="158" class="d-tl">2. Compile once to a virtual machine (Java, Kotlin, C#)</text>
+  <rect x="30" y="168" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="188" class="d-mono" text-anchor="middle">App.java</text>
+  <rect x="270" y="168" width="160" height="30" rx="5" class="d-hi"/><text x="350" y="188" class="d-th" text-anchor="middle">App.class (bytecode)</text>
+  <line x1="155" y1="183" x2="265" y2="183" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="210" y="176" class="d-ts" text-anchor="middle" style="font-size:9.5px">1 compile</text>
+  <rect x="560" y="164" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="174" class="d-ts" text-anchor="middle" style="font-size:9px">Windows + JVM</text>
+  <rect x="560" y="182" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="192" class="d-ts" text-anchor="middle" style="font-size:9px">Mac + JVM</text>
+  <rect x="560" y="200" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="210" class="d-ts" text-anchor="middle" style="font-size:9px">Linux + JVM</text>
+  <line x1="435" y1="178" x2="555" y2="171" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="184" x2="555" y2="189" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="190" x2="555" y2="207" class="d-line" marker-end="url(#arr1p)"/>
+  <text x="380" y="232" class="d-ts" text-anchor="middle">"Write once, run anywhere": the same file runs wherever the virtual machine is installed</text>
+  <!-- row 3: Python -->
+  <text x="20" y="264" class="d-tl">3. Interpret the source directly (Python, JavaScript, Ruby)</text>
+  <rect x="30" y="274" width="120" height="30" rx="5" class="d-box-plain"/><text x="90" y="294" class="d-mono" text-anchor="middle">app.py</text>
+  <rect x="270" y="274" width="160" height="30" rx="5" class="d-box"/><text x="350" y="294" class="d-t" text-anchor="middle">app.py, unchanged</text>
+  <line x1="155" y1="289" x2="265" y2="289" class="d-line-dash"/>
+  <text x="210" y="282" class="d-ts" text-anchor="middle" style="font-size:9.5px">no compile</text>
+  <rect x="560" y="270" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="280" class="d-ts" text-anchor="middle" style="font-size:9px">Windows + Python</text>
+  <rect x="560" y="288" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="298" class="d-ts" text-anchor="middle" style="font-size:9px">Mac + Python</text>
+  <rect x="560" y="306" width="140" height="14" rx="3" class="d-box-plain"/><text x="630" y="316" class="d-ts" text-anchor="middle" style="font-size:9px">Linux + Python</text>
+  <line x1="435" y1="284" x2="555" y2="277" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="290" x2="555" y2="295" class="d-line" marker-end="url(#arr1p)"/>
+  <line x1="435" y1="296" x2="555" y2="313" class="d-line" marker-end="url(#arr1p)"/>
+</svg>
+</div>
+<figcaption><b>Three ways to reach three platforms.</b> Compiled languages produce a separate program per platform. Java-style languages compile once to an intermediate form that a virtual machine runs anywhere. Interpreted languages ship the source itself. Each step down trades speed for portability.</figcaption>
+</figure></div></section>
+<section class="slide" id="s1-6-c" data-title="1.6 Platforms and portability"><div class="topbar"><span class="crumb">Session 1 · 1.6 Platforms and portability · 3/4</span><a class="btn" href="../#s1-6" title="Open this section in the full text">Book ↗</a></div><h2>Recompile, virtual machine, or interpret</h2><ul><li><b>Recompile per platform</b> (C, C++, Rust): fastest; one build per platform. Apple's 2020 move to ARM forced every Mac app to be rebuilt</li><li><b>Compile once to bytecode</b> (Java, Kotlin, C#): "write once, run anywhere" on a <b>virtual machine</b></li><li><b>Interpret the source</b> (Python, JavaScript): ship the file itself. JavaScript's interpreter is in every browser, so the web is the most portable platform ever</li></ul></section>
+<section class="slide" id="s1-6-d" data-title="1.6 Platforms and portability"><div class="topbar"><span class="crumb">Session 1 · 1.6 Platforms and portability · 4/4</span><a class="btn" href="../#s1-6" title="Open this section in the full text">Book ↗</a></div><h2>Phones are the special case</h2><ul><li>Apple prefers Swift; Google prefers Kotlin. Both compiled for the phone</li><li>The best app on both platforms means writing it twice</li><li><b>Cross-platform frameworks</b> (React Native, Flutter) produce both from one codebase, with some loss of polish</li><li>Electron does the same for desktop (Slack, VS Code, Discord)</li></ul><div class="takeaway">In the age of AI: porting code between platforms is cheaper. Testing on every real device is not.</div></section>
+<section class="slide" id="s1-7" data-title="1.7 Making the decision in the age of AI"><div class="topbar"><span class="crumb">Session 1 · 1.7 Making the decision in the age of AI · 1/2</span><a class="btn" href="../#s1-7" title="Open this section in the full text">Book ↗</a></div><h2>How each factor shifts</h2><div class="tbl-scroll"><table><thead><tr><th>Factor</th><th>Before AI</th><th>With AI assistance</th></tr></thead><tbody><tr><td>Fit for purpose</td><td>Decisive</td><td>Unchanged</td></tr><tr><td>Popularity and maturity</td><td>High</td><td>Higher: AI quality tracks public code</td></tr><tr><td>Ecosystem</td><td>High</td><td>Unchanged to higher; verify packages</td></tr><tr><td>Speed and memory</td><td>Decisive in a few domains</td><td>Same domains; elsewhere lower</td></tr><tr><td>Platforms</td><td>High (duplicated work)</td><td>Lower for writing; same for testing</td></tr><tr><td>Your own familiarity</td><td>Often decisive</td><td>Lower, but you still review the code</td></tr></tbody></table></div></section>
+<section class="slide" id="s1-7-b" data-title="1.7 Making the decision in the age of AI"><div class="topbar"><span class="crumb">Session 1 · 1.7 Making the decision in the age of AI · 2/2</span><a class="btn" href="../#s1-7" title="Open this section in the full text">Book ↗</a></div><h2>Three conclusions</h2><ul><li><b>Choose mainstream.</b> Python, JavaScript/TypeScript, SQL; Java or C# when the enterprise requires; Swift and Kotlin for native mobile</li><li><b>Optimise for readability.</b> When AI writes the code, the human's job is reading it</li><li><b>The language is rarely the risk.</b> Products fail on requirements, data models, and security, not Python versus Go</li></ul><div class="takeaway">This module uses HTML, CSS, JavaScript in the browser; Python on the server; SQL in the database.</div></section>
+</div>
+<div class="progress" id="progress"></div>
+<div class="bottombar"><span id="counter">1 / 1</span><span class="hint">Choosing a Programming Language</span><span class="nav"><button id="prevbtn" type="button" aria-label="Previous slide">‹ Prev</button><button id="nextbtn" type="button" aria-label="Next slide">Next ›</button><button id="fullbtn" type="button" aria-label="Toggle full screen">Full screen</button></span></div>
+<script>var DECK_TITLE="Session 1 Slides";
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=0, counter=document.getElementById('counter'), bar=document.getElementById('progress');
+  function show(n, push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    if(push!==false){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){}}
+    document.title=slides[i].getAttribute('data-title')+' · '+DECK_TITLE;
+  }
+  function fromHash(){
+    var h=location.hash.replace('#','');
+    var k=-1; slides.forEach(function(s,idx){if(s.id===h)k=idx;});
+    show(k<0?0:k,false);
+  }
+  window.next=function(){show(i+1);};
+  window.prev=function(){show(i-1);};
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); show(i+1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); show(i-1); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(slides.length-1); break;
+      case 'f': case 'F': toggleFull(); break;
+    }
+  });
+  function toggleFull(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+    }catch(e){}
+  }
+  document.getElementById('fullbtn').addEventListener('click',toggleFull);
+  document.getElementById('prevbtn').addEventListener('click',function(){show(i-1);});
+  document.getElementById('nextbtn').addEventListener('click',function(){show(i+1);});
+  window.addEventListener('hashchange',fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>
