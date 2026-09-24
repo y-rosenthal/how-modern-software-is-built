@@ -1,0 +1,171 @@
+<section class="session" id="session-3">
+  <div class="eyebrow">Session 3 · 75 minutes</div>
+  <h2>Hosting, Scaling, and the Cloud</h2>
+  <p class="goal">So far everything has run on one laptop. This session moves the bakery onto the internet and then grows it, one step at a time, from a single rented server to the distributed architecture used by companies serving millions of people. Each step is motivated by a specific problem the previous step could not solve, and each step has a price tag.</p>
+
+  <div class="objectives">
+    <h4>By the end of this session students can</h4>
+    <ul>
+      <li>Explain what deployment means and name the standard environments code moves through.</li>
+      <li>Describe the single-server setup and its main weakness.</li>
+      <li>Explain why the database is moved to its own machine.</li>
+      <li>Describe horizontal scaling, load balancing, and why servers must be stateless.</li>
+      <li>Say what a cache, a CDN, and object storage each do.</li>
+      <li>Distinguish IaaS, PaaS, SaaS, and serverless, and know when each is a sensible choice.</li>
+    </ul>
+  </div>
+
+  <table class="agenda">
+    <thead><tr><th>Section</th><th>Minutes</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#s3-1">3.1 From localhost to production</a></td><td>10</td></tr>
+      <tr><td><a href="#s3-2">3.2 Step 1: everything on one server</a></td><td>10</td></tr>
+      <tr><td><a href="#s3-3">3.3 Step 2: give the database its own machine</a></td><td>10</td></tr>
+      <tr><td><a href="#s3-4">3.4 Step 3: many web servers behind a load balancer</a></td><td>15</td></tr>
+      <tr><td><a href="#s3-5">3.5 Step 4: caches, CDNs, and storage</a></td><td>10</td></tr>
+      <tr><td><a href="#s3-6">3.6 The cloud menu: IaaS, PaaS, SaaS, serverless</a></td><td>10</td></tr>
+      <tr><td><a href="#s3-7">3.7 Shipping code safely</a></td><td>5</td></tr>
+    </tbody>
+    <tfoot><tr><td>Review questions and buffer</td><td>5</td></tr></tfoot>
+  </table>
+</section>
+
+<section id="s3-1-wrap">
+<h3 id="s3-1">3.1 From localhost to production <span class="time">10 min</span></h3>
+<p>The bakery's back end works beautifully at <code>http://localhost:5000</code>. Moving it to a place where customers can reach it is called <dfn class="kw" id="kw-deployment" data-def="The act of putting a version of your software onto servers where real users can reach it. 'We deployed on Tuesday' means Tuesday's version went live.">deployment</dfn>. "Deploy" is one of the most frequently used verbs in a software team, and it means exactly this: take the code that works here and make it run there.</p>
+<p>Serious teams do not deploy straight from a laptop to customers. Code passes through <dfn class="kw" id="kw-environment" data-def="A complete, separate copy of the application and its supporting services used for one purpose. Development (the programmer's own machine), staging (a private replica of production for testing), and production (the live system real users use) are the standard three.">environments</dfn>, each a full copy of the application with its own database:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Environment</th><th>Who uses it</th><th>Purpose</th><th>Data</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Development</strong> ("dev", "local")</td><td>Each programmer, on their own computer</td><td>Write and try code freely; break things</td><td>Fake or sample data</td></tr>
+    <tr><td><strong>Staging</strong> ("test", "QA")</td><td>The team, testers, sometimes the client</td><td>A private replica of production to check a release before customers see it</td><td>Realistic but not real (or anonymised)</td></tr>
+    <tr><td><strong>Production</strong> ("prod", "live")</td><td>Real customers</td><td>The actual business</td><td>Real; protected and backed up</td></tr>
+  </tbody>
+</table>
+</div>
+<p>"It works on my machine" is the oldest joke in software precisely because development and production differ: different operating system, different database size, different traffic, different secrets. Staging exists to catch those differences before a customer does. When a founder asks "can we just push it live?" the honest engineering answer is "only if you would be comfortable finding the bugs at the same moment your customers do."</p>
+<p>Two measures describe how well a production system is doing. <dfn class="kw" id="kw-uptime" data-def="The fraction of time a service is working and reachable, usually quoted as a percentage. 99.9% uptime ('three nines') allows about 9 hours of downtime a year; 99.99% allows about 53 minutes.">Uptime</dfn> is the percentage of time it is reachable; each extra "nine" is dramatically more expensive to achieve. <dfn class="kw" id="kw-latency" data-def="The delay between a request being sent and the response arriving, usually measured in milliseconds. Users notice anything over about 100 ms; a page taking more than 3 seconds loses a large fraction of visitors.">Latency</dfn> is how long each request takes to answer. Much of the architecture in this session exists to push uptime up and latency down.</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Uptime</th><th>Downtime allowed per year</th><th>Typical of</th></tr></thead>
+  <tbody>
+    <tr><td>99%</td><td>About 3.7 days</td><td>A hobby site on one cheap server</td></tr>
+    <tr><td>99.9% ("three nines")</td><td>About 8.8 hours</td><td>A small business product with sensible hosting</td></tr>
+    <tr><td>99.99% ("four nines")</td><td>About 53 minutes</td><td>Payment, banking, large SaaS. Requires redundancy at every layer</td></tr>
+    <tr><td>99.999% ("five nines")</td><td>About 5 minutes</td><td>Telecom, critical infrastructure. Very expensive</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section id="s3-2-wrap">
+<h3 id="s3-2">3.2 Step 1: everything on one server <span class="time">10 min</span></h3>
+<p>The simplest deployment is to rent one computer in a data center and install everything on it. Cloud companies rent these by the hour or month as <dfn class="kw" id="kw-vps" data-def="Virtual Private Server: a rented slice of a physical server in a data center that behaves like your own dedicated computer, with its own operating system, IP address, and disk. The cheapest way to run a back end on the internet; typically 5 to 50 dollars a month.">virtual private servers</dfn> (VPS) from providers such as DigitalOcean, Linode, Hetzner, or Amazon's EC2, for as little as 5 dollars a month. "Virtual" because one powerful physical machine is carved into several independent virtual ones, each of which feels to its renter like a whole computer.</p>
+<p>On that one machine you install:</p>
+<ul>
+  <li>An <dfn class="kw" id="kw-operating-system" data-def="The base software that manages a computer's hardware and runs programs: Linux on almost all servers, Windows and macOS on desktops, iOS and Android on phones.">operating system</dfn>, almost always Linux on servers. Linux is free, stable, and what nearly all server software is built for. Windows and macOS run desktops; iOS and Android run phones; Linux runs the internet.</li>
+  <li>The web server program (Nginx is the usual choice), which accepts connections on ports 80 and 443, handles HTTPS, serves the static files itself, and forwards dynamic requests to the back end.</li>
+  <li>Your back-end program (the Python/Flask app), listening on an internal port such as 5000.</li>
+  <li>The database (PostgreSQL), listening on its own internal port, 5432 by convention.</li>
+</ul>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 250" role="img" aria-label="Browsers on the internet connect through DNS to one rented server that runs the web server program, the back-end application, and the database together.">
+  <defs>
+    <marker id="arr8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- users -->
+  <rect x="20" y="60" width="110" height="36" rx="6" class="d-box"/><text x="75" y="83" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="106" width="110" height="36" rx="6" class="d-box"/><text x="75" y="129" class="d-t" text-anchor="middle">Browser</text>
+  <rect x="20" y="152" width="110" height="36" rx="6" class="d-box"/><text x="75" y="175" class="d-t" text-anchor="middle">Phone app</text>
+  <text x="75" y="215" class="d-ts" text-anchor="middle">Customers, anywhere</text>
+  <!-- internet -->
+  <text x="205" y="118" class="d-ts" text-anchor="middle">the internet</text>
+  <line x1="135" y1="124" x2="275" y2="124" class="d-line-hi" marker-end="url(#arr8)"/>
+  <text x="205" y="142" class="d-ts" text-anchor="middle">HTTPS, port 443</text>
+  <!-- server -->
+  <rect x="280" y="20" width="420" height="210" rx="12" class="d-zone"/>
+  <text x="490" y="42" class="d-tl" text-anchor="middle">One rented server (VPS), Linux, IP 203.0.113.7</text>
+  <rect x="300" y="70" width="110" height="110" rx="6" class="d-hi"/>
+  <text x="355" y="115" class="d-th" text-anchor="middle">Web server</text>
+  <text x="355" y="132" class="d-ts" text-anchor="middle">Nginx</text>
+  <text x="355" y="148" class="d-ts" text-anchor="middle">HTTPS, static files</text>
+  <rect x="440" y="70" width="110" height="110" rx="6" class="d-box"/>
+  <text x="495" y="115" class="d-t" text-anchor="middle">Back end</text>
+  <text x="495" y="132" class="d-ts" text-anchor="middle">Python app</text>
+  <text x="495" y="148" class="d-ts" text-anchor="middle">port 5000</text>
+  <rect x="580" y="70" width="105" height="110" rx="6" class="d-box"/>
+  <text x="632" y="115" class="d-t" text-anchor="middle">Database</text>
+  <text x="632" y="132" class="d-ts" text-anchor="middle">PostgreSQL</text>
+  <text x="632" y="148" class="d-ts" text-anchor="middle">port 5432</text>
+  <line x1="415" y1="125" x2="435" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <line x1="555" y1="125" x2="575" y2="125" class="d-line" marker-end="url(#arr8)"/>
+  <text x="490" y="210" class="d-ts" text-anchor="middle">All three programs share one processor, one memory, one disk, one power supply</text>
+</svg>
+</div>
+<figcaption><b>Step 1: the single-server deployment.</b> Simple, cheap, and enough for thousands of daily visitors. Every component shares the same hardware, so every component shares the same fate.</figcaption>
+</figure>
+<p>Do not underestimate this setup. A modest 20-dollar server can comfortably handle tens of thousands of visits a day, which covers most small businesses and every early-stage prototype. Its weaknesses only appear with growth:</p>
+<ul>
+  <li><strong>Single point of failure.</strong> If the machine's disk dies, or the data center loses power, or you make a mistake while updating it, the website and the database disappear together. A <dfn class="kw" id="kw-spof" data-def="Any single component whose failure takes the whole system down. Removing single points of failure by adding duplicates is the main way to increase uptime.">single point of failure</dfn> is the enemy of uptime.</li>
+  <li><strong>Resource contention.</strong> The database and the back end compete for the same memory and processor. A heavy report query can make the website slow for every visitor.</li>
+  <li><strong>Hard ceiling.</strong> When traffic outgrows the machine, the only option is a bigger machine, and machines do not get infinitely big.</li>
+  <li><strong>Security blast radius.</strong> If an attacker breaks into the web server, they are already sitting on the same machine as all the customer data.</li>
+</ul>
+<p>Each of the following steps removes one of these weaknesses, and each adds cost and complexity. Good architecture means taking the next step when the problem is real, not before.</p>
+</section>
+
+<section id="s3-3-wrap">
+<h3 id="s3-3">3.3 Step 2: give the database its own machine <span class="time">10 min</span></h3>
+<p>The first thing to move off the shared server is the database. It goes onto a second machine, a dedicated <dfn class="kw" id="kw-database-server" data-def="A machine (or managed cloud service) whose only job is to run the database, separate from the servers that run the application. Allows the two to be sized, secured, and scaled independently.">database server</dfn>, and the back end connects to it over the network instead of talking to it on the same box.</p>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 260" role="img" aria-label="Two servers: a public web server running Nginx and the Python back end, and a database server reachable only over a private network. Customers reach the web server; only the web server reaches the database.">
+  <defs>
+    <marker id="arr9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="95" width="110" height="36" rx="6" class="d-box"/><text x="75" y="118" class="d-t" text-anchor="middle">Customers</text>
+  <line x1="135" y1="113" x2="195" y2="113" class="d-line-hi" marker-end="url(#arr9)"/>
+  <text x="165" y="104" class="d-ts" text-anchor="middle">HTTPS</text>
+  <!-- web server -->
+  <rect x="200" y="30" width="220" height="170" rx="12" class="d-zone"/>
+  <text x="310" y="52" class="d-tl" text-anchor="middle">Web server (public IP)</text>
+  <rect x="220" y="75" width="80" height="100" rx="6" class="d-hi"/>
+  <text x="260" y="120" class="d-th" text-anchor="middle">Nginx</text>
+  <text x="260" y="138" class="d-ts" text-anchor="middle">HTTPS, static</text>
+  <rect x="320" y="75" width="80" height="100" rx="6" class="d-box"/>
+  <text x="360" y="120" class="d-t" text-anchor="middle">Back end</text>
+  <text x="360" y="138" class="d-ts" text-anchor="middle">Python</text>
+  <line x1="305" y1="125" x2="315" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <!-- db server -->
+  <rect x="500" y="30" width="200" height="170" rx="12" class="d-zone"/>
+  <text x="600" y="52" class="d-tl" text-anchor="middle">Database server (private IP)</text>
+  <rect x="540" y="75" width="120" height="100" rx="6" class="d-box"/>
+  <text x="600" y="115" class="d-t" text-anchor="middle">PostgreSQL</text>
+  <text x="600" y="133" class="d-ts" text-anchor="middle">more memory,</text>
+  <text x="600" y="147" class="d-ts" text-anchor="middle">fast disks, backups</text>
+  <line x1="405" y1="125" x2="535" y2="125" class="d-line" marker-end="url(#arr9)"/>
+  <text x="470" y="116" class="d-ts" text-anchor="middle">SQL over the</text>
+  <text x="470" y="145" class="d-ts" text-anchor="middle">private network</text>
+  <!-- blocked -->
+  <line x1="75" y1="150" x2="75" y2="230" class="d-line-dash"/>
+  <line x1="75" y1="230" x2="580" y2="230" class="d-line-dash"/>
+  <line x1="580" y1="230" x2="580" y2="212" class="d-line-dash"/>
+  <circle cx="330" cy="230" r="11" fill="var(--surface)" stroke="currentColor" stroke-width="1.4"/>
+  <line x1="324" y1="224" x2="336" y2="236" stroke="currentColor" stroke-width="2"/>
+  <line x1="336" y1="224" x2="324" y2="236" stroke="currentColor" stroke-width="2"/>
+  <text x="330" y="253" class="d-ts" text-anchor="middle">No path from the internet to the database. Only the web server may connect.</text>
+</svg>
+</div>
+<figcaption><b>Step 2: the database moves to its own machine on a private network.</b> The public internet can reach the web server but not the database. Each machine can now be sized for its own job.</figcaption>
+</figure>
+<p>Why this is worth the second bill:</p>
+<ul>
+  <li><strong>Right-sized hardware.</strong> Databases want lots of memory and fast disks; web servers want processor cores and network bandwidth. Separated, each can be bought for what it actually needs.</li>
+  <li><strong>Security.</strong> The database server gets a <dfn class="kw" id="kw-private-network" data-def="A network inside a data center or cloud account that is not reachable from the public internet. Databases and internal services are placed on it so that only your own servers can connect to them.">private network</dfn> address only. There is no route from the internet to it. A <dfn class="kw" id="kw-firewall" data-def="A rule set on a network or server that decides which connections are allowed in or out, for example 'accept web traffic on port 443 from anywhere; accept database connections on port 5432 only from the web server'.">firewall</dfn> allows connections on port 5432 only from the web server. An attacker who compromises the web server still has another wall to get through, and no one can stumble across the customer records from outside.</li>
+  <li><strong>Independent failure and maintenance.</strong> The web server can be rebuilt, upgraded, or replaced without touching a byte of data. Backups of the database run without slowing the website.</li>
+  <li><strong>It unlocks the next step.</strong> With the data in one shared place, you can now run more than one copy of the web server, which is what Step 3 does.</li>
+</ul>
+<p>In practice, almost nobody installs PostgreSQL on a rented machine themselves any more. Cloud providers offer a <dfn class="kw" id="kw-managed-database" data-def="A database run for you by a cloud provider (Amazon RDS, Google Cloud SQL, Supabase, Neon, PlanetScale): they handle installation, backups, security patches, and failover; you get a connection address and a monthly bill.">managed database</dfn>, such as Amazon RDS, Google Cloud SQL, Supabase, or Neon: you click "create PostgreSQL," and they run the machine, take nightly backups, install security patches, and can switch to a standby copy automatically if the primary fails. You get a connection address and a bill, starting around 15 to 50 dollars a month. For nearly every business this is the correct choice; running your own database is expertise you do not want to have to hire.</p>
+</section>

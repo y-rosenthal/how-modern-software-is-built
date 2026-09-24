@@ -1,0 +1,287 @@
+<section class="session" id="session-2">
+  <div class="eyebrow">Session 2 · 75 minutes</div>
+  <h2>Dynamic Websites, APIs, and Databases</h2>
+  <p class="goal">Session 1 ended with a program running on the server. This session opens that box. We see what a back end actually looks like, how the front end talks to it through an API, why almost every product needs a database, and what SQL is, illustrated with a bakery that finally takes orders.</p>
+
+  <div class="objectives">
+    <h4>By the end of this session students can</h4>
+    <ul>
+      <li>Read a ten-line Python web server and say what each route does.</li>
+      <li>Explain what an API is, what JSON looks like, and what GET and POST mean.</li>
+      <li>Describe the relational model: tables, rows, columns, primary and foreign keys.</li>
+      <li>Read simple SQL statements and say in plain English what they do.</li>
+      <li>Draw the three-tier architecture and trace an order through it.</li>
+    </ul>
+  </div>
+
+  <table class="agenda">
+    <thead><tr><th>Section</th><th>Minutes</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#s2-1">2.1 Inside the back end: a Python web server</a></td><td>12</td></tr>
+      <tr><td><a href="#s2-2">2.2 APIs and JSON: how programs talk to programs</a></td><td>15</td></tr>
+      <tr><td><a href="#s2-3">2.3 Why every product needs a database</a></td><td>10</td></tr>
+      <tr><td><a href="#s2-4">2.4 SQL by example</a></td><td>15</td></tr>
+      <tr><td><a href="#s2-5">2.5 Beyond tables: NoSQL and ORMs</a></td><td>8</td></tr>
+      <tr><td><a href="#s2-6">2.6 Putting it together: the three-tier architecture</a></td><td>10</td></tr>
+    </tbody>
+    <tfoot><tr><td>Review questions and buffer</td><td>5</td></tr></tfoot>
+  </table>
+</section>
+
+<section id="s2-1-wrap">
+<h3 id="s2-1">2.1 Inside the back end: a Python web server <span class="time">12 min</span></h3>
+<p>Here is a complete dynamic web server written in Python, using a popular library called Flask. It is short enough to read in full.</p>
+<pre><code>from flask import Flask
+from datetime import datetime
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "&lt;h1&gt;Rosenthal's Bakery&lt;/h1&gt;&lt;p&gt;Fresh bread every morning.&lt;/p&gt;"
+
+@app.route("/hours")
+def hours():
+    now = datetime.now()
+    if 7 &lt;= now.hour &lt; 18:
+        return "&lt;p&gt;We are &lt;b&gt;open&lt;/b&gt; right now!&lt;/p&gt;"
+    return "&lt;p&gt;We are closed. Back at 7 a.m.&lt;/p&gt;"
+
+app.run(port=5000)</code></pre>
+<p>Walk through it slowly with the class:</p>
+<ul>
+  <li><code>app = Flask(__name__)</code> creates the web server program. Flask is a <dfn class="kw" id="kw-framework" data-def="A pre-built collection of code that handles the routine parts of a kind of program (for a web framework: receiving requests, matching paths to functions, sending responses) so that developers write only the parts specific to their product. Flask, Django, FastAPI, Express, Rails, and Next.js are web frameworks.">framework</dfn>: a bundle of pre-written code that handles the routine parts of being a web server, so the developer only writes the parts unique to the bakery. Flask, Django, and FastAPI are Python frameworks; Express and Next.js are JavaScript ones; Rails is Ruby; Spring is Java. When Claude Code builds you a web app, it will pick one of these.</li>
+  <li>Each <code>@app.route("...")</code> line is a <dfn class="kw" id="kw-route" data-def="A rule in a back-end program that says which function should run when a request arrives for a particular path, such as /hours or /orders/42. Routing is the act of matching incoming paths to code.">route</dfn>: it connects a path (the part of the URL after the domain) to a Python function. When a request for <code>/hours</code> arrives, the <code>hours()</code> function runs and whatever it returns is sent back as the response.</li>
+  <li>The <code>hours()</code> function is where "dynamic" happens. It checks the current time and returns different HTML depending on the answer. Two visitors a minute apart at 5:59 p.m. and 6:00 p.m. see different pages. No static file could do that.</li>
+  <li><code>app.run(port=5000)</code> starts listening. A <dfn class="kw" id="kw-port" data-def="A numbered 'door' on a computer that a server program listens on, so that one machine can run several services. Web traffic uses port 80 (HTTP) and 443 (HTTPS); developers often run test servers on ports like 3000, 5000, or 8000.">port</dfn> is a numbered door on a computer. One machine can run many server programs, each behind a different door. Websites use port 443 (HTTPS) and 80 (HTTP) by convention, so you never type them; developers testing on their own machine use doors like 5000 or 3000, which is why you will see addresses like <code>http://localhost:5000</code>.</li>
+</ul>
+<p><dfn class="kw" id="kw-localhost" data-def="The name a computer uses for itself. Opening http://localhost:5000 in a browser connects to a server program running on your own machine, which is how developers test before deploying.">localhost</dfn> means "this computer." When you run the program above and open <code>http://localhost:5000/hours</code>, your browser is the client, your own laptop is the server, and the request never leaves the machine. Every developer works this way before putting anything on the internet. Session 3 covers the jump from localhost to the world.</p>
+<div class="demo"><span class="label">Live demo (4 minutes)</span>
+<ol>
+  <li>Ask Claude Code to create the Flask app above and run it.</li>
+  <li>Open <code>http://localhost:5000</code> and <code>http://localhost:5000/hours</code> in a browser.</li>
+  <li>Change the closing hour in the code, save, refresh. Point out that the HTML did not exist as a file anywhere; the program composed it on demand.</li>
+  <li>Try <code>http://localhost:5000/nothing</code> to get a live 404.</li>
+</ol>
+</div>
+<p>In practice, back ends do not build HTML by gluing strings together. They use <dfn class="kw" id="kw-template" data-def="An HTML file with placeholders (such as {{ customer_name }}) that the back end fills in with real data before sending the page. Templates keep page design separate from program logic.">templates</dfn>: HTML files with blanks in them, such as <code>Welcome back, {{ customer_name }}</code>, which the program fills in for each request. Designers can edit the template without touching the Python, and the Python can change without touching the design. The idea to carry away is the same either way: the server runs code, and the code produces the page.</p>
+</section>
+
+<section id="s2-2-wrap">
+<h3 id="s2-2">2.2 APIs and JSON: how programs talk to programs <span class="time">15 min</span></h3>
+<p>The Flask example returned HTML for a human to read. But increasingly the thing making the request is not a human's browser rendering a page. It is another program: JavaScript in the page asking for "just the data," a mobile app, a partner's system, or an AI assistant. For those callers, the server returns raw data instead of a designed page. The set of requests a server understands, and the shape of the answers it gives, is its <dfn class="kw" id="kw-api" data-def="Application Programming Interface. The defined set of requests a program accepts and the responses it gives, so that other programs can use it without knowing how it works inside. A web API is reached over HTTP and usually speaks JSON.">API</dfn> (Application Programming Interface).</p>
+<div class="analogy"><span class="label">Analogy</span><p>Back to the restaurant. The <em>menu</em> is the API. It lists exactly what you may order and what you will get. You do not need to see the kitchen, and the kitchen can be reorganised without changing the menu. A menu written in a standard format lets anyone order, including delivery apps that were never imagined when the restaurant opened.</p></div>
+<p>A web API is reached over HTTP just like a page, but its <dfn class="kw" id="kw-endpoint" data-def="One specific address in an API, such as GET /api/products or POST /api/orders, that performs one operation. An API is a collection of endpoints.">endpoints</dfn> (individual addresses) return data rather than HTML. Here is the bakery adding one:</p>
+<pre><code>@app.route("/api/products")
+def list_products():
+    return {
+        "products": [
+            {"id": 1, "name": "Sourdough loaf", "price": 7.50, "in_stock": True},
+            {"id": 2, "name": "Rye bread",      "price": 6.00, "in_stock": False},
+            {"id": 3, "name": "Challah",        "price": 8.00, "in_stock": True}
+        ]
+    }</code></pre>
+<p>A request to <code>/api/products</code> gets back this:</p>
+<pre><code>{
+  "products": [
+    {"id": 1, "name": "Sourdough loaf", "price": 7.5, "in_stock": true},
+    {"id": 2, "name": "Rye bread", "price": 6.0, "in_stock": false},
+    {"id": 3, "name": "Challah", "price": 8.0, "in_stock": true}
+  ]
+}</code></pre>
+<p>This format is <dfn class="kw" id="kw-json" data-def="JavaScript Object Notation. The standard text format for exchanging data between programs over the web: values in curly braces with 'name': value pairs and square brackets for lists. Human-readable and understood by every programming language.">JSON</dfn> (JavaScript Object Notation, pronounced "Jason"). Curly braces hold a set of named values; square brackets hold a list; text is in quotes; numbers and true/false stand alone. Python students will recognise it: a JSON object is almost exactly a Python dictionary, and a JSON array is a Python list. Every programming language can read and write JSON, which is why it became the common tongue of the web.</p>
+
+<h4 id="s2-2-methods">Verbs: GET, POST, and friends</h4>
+<p>HTTP requests carry a <dfn class="kw" id="kw-http-method" data-def="The verb at the start of an HTTP request that says what kind of action is wanted. GET reads, POST creates or submits, PUT/PATCH updates, DELETE removes.">method</dfn>, a verb stating the kind of action. Static sites only ever needed GET ("give me this"). APIs use the full set:</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Method</th><th>Meaning</th><th>Bakery example</th><th>Business action</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET</code></td><td>Read; fetch something</td><td><code>GET /api/products</code></td><td>Show the catalogue</td></tr>
+    <tr><td><code>POST</code></td><td>Create; submit new data</td><td><code>POST /api/orders</code> with the order in the body</td><td>Place an order</td></tr>
+    <tr><td><code>PUT</code> / <code>PATCH</code></td><td>Update something existing</td><td><code>PATCH /api/orders/88</code> with <code>{"status": "ready"}</code></td><td>Mark an order ready</td></tr>
+    <tr><td><code>DELETE</code></td><td>Remove</td><td><code>DELETE /api/orders/88</code></td><td>Cancel an order</td></tr>
+  </tbody>
+</table>
+</div>
+<p>An API organised this way, where every URL names a <em>thing</em> (a product, an order) and the method says what to do to it, is called <dfn class="kw" id="kw-rest" data-def="A widely used style for designing web APIs in which each URL names a resource (a product, an order) and the HTTP method (GET, POST, PUT, DELETE) says what to do with it. 'A REST API' is the most common kind of API a business will build or consume.">REST</dfn> (or "RESTful"). Almost every API you will encounter, from Stripe to Shopify to the Claude API, is roughly REST. The letters stand for something (Representational State Transfer) that nobody needs to remember; the idea is <em>nouns in the URL, verbs in the method</em>.</p>
+<p>The four verbs map to the four things any system does with data, remembered by the acronym <dfn class="kw" id="kw-crud" data-def="Create, Read, Update, Delete: the four basic operations any application performs on stored data. Most business software is, at heart, CRUD screens over a database.">CRUD</dfn>: Create, Read, Update, Delete. A surprising fraction of all business software is CRUD screens over a database: customers, invoices, tickets, inventory. Recognising a product as "mostly CRUD" is a useful signal that it is well understood and inexpensive to build.</p>
+
+<h4 id="s2-2-who">Who calls APIs?</h4>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 260" role="img" aria-label="A back-end API in the middle is called by JavaScript in a web page, by a mobile app, and by a partner company's system; the back end in turn calls third-party APIs such as Stripe and the Claude API.">
+  <defs>
+    <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <!-- callers -->
+  <rect x="20" y="30" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="50" class="d-t" text-anchor="middle">Web page</text>
+  <text x="95" y="66" class="d-ts" text-anchor="middle">JavaScript in the browser</text>
+  <rect x="20" y="107" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="127" class="d-t" text-anchor="middle">Mobile app</text>
+  <text x="95" y="143" class="d-ts" text-anchor="middle">iPhone or Android</text>
+  <rect x="20" y="184" width="150" height="46" rx="6" class="d-box"/>
+  <text x="95" y="204" class="d-t" text-anchor="middle">Partner system</text>
+  <text x="95" y="220" class="d-ts" text-anchor="middle">e.g. a delivery marketplace</text>
+  <!-- api -->
+  <rect x="280" y="60" width="170" height="140" rx="10" class="d-hi"/>
+  <text x="365" y="90" class="d-th" text-anchor="middle">Your back end</text>
+  <text x="365" y="110" class="d-ts" text-anchor="middle">GET  /api/products</text>
+  <text x="365" y="126" class="d-ts" text-anchor="middle">POST /api/orders</text>
+  <text x="365" y="142" class="d-ts" text-anchor="middle">GET  /api/orders/88</text>
+  <text x="365" y="172" class="d-ts" text-anchor="middle">Answers in JSON</text>
+  <!-- arrows in -->
+  <line x1="175" y1="53" x2="275" y2="95" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="175" y1="130" x2="275" y2="130" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="175" y1="207" x2="275" y2="165" class="d-line" marker-end="url(#arr5)"/>
+  <!-- third parties -->
+  <rect x="560" y="45" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="63" class="d-t" text-anchor="middle">Stripe API</text>
+  <text x="630" y="78" class="d-ts" text-anchor="middle">charge a card</text>
+  <rect x="560" y="109" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="127" class="d-t" text-anchor="middle">Claude API</text>
+  <text x="630" y="142" class="d-ts" text-anchor="middle">generate, summarise</text>
+  <rect x="560" y="173" width="140" height="42" rx="6" class="d-box-plain"/>
+  <text x="630" y="191" class="d-t" text-anchor="middle">Email API</text>
+  <text x="630" y="206" class="d-ts" text-anchor="middle">send confirmation</text>
+  <line x1="455" y1="100" x2="555" y2="66" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="455" y1="130" x2="555" y2="130" class="d-line" marker-end="url(#arr5)"/>
+  <line x1="455" y1="160" x2="555" y2="194" class="d-line" marker-end="url(#arr5)"/>
+  <text x="95" y="252" class="d-ts" text-anchor="middle">Your clients call you…</text>
+  <text x="630" y="240" class="d-ts" text-anchor="middle">…and you call other companies' APIs</text>
+</svg>
+</div>
+<figcaption><b>APIs in both directions.</b> Your back end offers an API to your own front ends and to partners, and it consumes other companies' APIs for payments, AI, email, maps, and more. Being on both sides is normal.</figcaption>
+</figure>
+<p>The right-hand side of this picture is where much of modern product-building happens. A <dfn class="kw" id="kw-third-party-api" data-def="An API offered by another company that your product calls to get a capability without building it: payments (Stripe), maps (Google), text messages (Twilio), AI (Claude API). Usually paid per use.">third-party API</dfn> lets you rent a capability instead of building it: charge a card with Stripe, send a text message with Twilio, look up an address with Google Maps, or generate text with the Claude API. Each is usually billed per use, which turns what used to be an engineering project into a line item. Much of "using AI to build products" is, architecturally, calling the right third-party APIs from your back end.</p>
+<div class="note"><span class="label">Instructor note</span><p>Students will meet the phrase "API key" constantly. It is a long secret string a third party gives you that identifies your account when your back end calls their API, so they know whom to bill. It lives on your server, never in front-end code. We return to this in Session 4, but planting it here pays off.</p></div>
+</section>
+
+<section id="s2-3-wrap">
+<h3 id="s2-3">2.3 Why every product needs a database <span class="time">10 min</span></h3>
+<p>The <code>/api/products</code> example had its data typed directly into the program. That breaks the moment a real business touches it: the baker cannot edit Python to change a price, and an order placed by a customer has nowhere to be saved. The server needs somewhere to <em>store</em> data that survives restarts, can be changed by the program, and can be searched. That somewhere is a <dfn class="kw" id="kw-database" data-def="A program dedicated to storing, organising, and retrieving data reliably, so that many users and programs can read and write it at the same time without losing or corrupting anything. Almost every dynamic application has one.">database</dfn>.</p>
+<p>Why not just save to a file, the way you might save a spreadsheet? Because a database solves problems a file cannot:</p>
+<ul>
+  <li><strong>Many writers at once.</strong> Two customers buying the last challah at the same instant must not both succeed. A database handles this; a file being edited by two programs simultaneously gets corrupted.</li>
+  <li><strong>Speed at scale.</strong> Finding one order among ten million by scanning a file takes minutes. A database with an <em>index</em> (like the index in a textbook) does it in milliseconds.</li>
+  <li><strong>Reliability.</strong> If the power fails halfway through saving an order, a database guarantees the order is either fully saved or not saved at all, never half. This property is called a <dfn class="kw" id="kw-transaction" data-def="A group of database changes that either all succeed or all fail together, so the data is never left half-updated. Moving money between two accounts is the classic example.">transaction</dfn>. Moving money between two bank accounts is the classic case: the debit and the credit must both happen or neither.</li>
+  <li><strong>Questions.</strong> "Which customers ordered rye more than three times last quarter?" is one line in a database language and a small programming project against a pile of files.</li>
+</ul>
+<p>The database is a separate program, a <dfn class="kw" id="kw-dbms" data-def="Database Management System: the actual software product that implements a database, such as PostgreSQL, MySQL, SQLite, SQL Server, Oracle, or MongoDB.">database management system</dfn> (DBMS). Your Python back end does not store data itself; it sends instructions to the DBMS and gets results back, much as the browser sends requests to the web server. In Session 3 we will see that the DBMS often runs on its own machine.</p>
+
+<h4 id="s2-3-relational">The relational model: tables</h4>
+<p>The dominant way to organise business data for the last fifty years is the <dfn class="kw" id="kw-relational" data-def="The way of organising data into tables of rows and columns, where each table describes one kind of thing (customers, orders) and tables are linked to each other by shared identifying values (keys). Managed by relational databases and queried with SQL.">relational model</dfn>. Data lives in <dfn class="kw" id="kw-table" data-def="In a relational database, a grid holding all records of one kind of thing. Each row is one record (one customer) and each column is one attribute (name, email).">tables</dfn>: each table holds one kind of thing, each <strong>row</strong> is one instance of that thing, and each <strong>column</strong> is one fact about it. The bakery needs at least these:</p>
+
+<div class="two-col">
+<div>
+<table class="datatable">
+<caption>customers</caption>
+<thead><tr><th>customer_id</th><th>name</th><th>email</th><th>city</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Dana Levi</td><td>dana@example.com</td><td>Boston</td></tr>
+<tr><td>2</td><td>Sam Ortiz</td><td>sam@example.com</td><td>Cambridge</td></tr>
+<tr><td>3</td><td>Priya Nair</td><td>priya@example.com</td><td>Boston</td></tr>
+</tbody>
+</table>
+</div>
+<div>
+<table class="datatable">
+<caption>products</caption>
+<thead><tr><th>product_id</th><th>name</th><th>price</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Sourdough loaf</td><td>7.50</td></tr>
+<tr><td>2</td><td>Rye bread</td><td>6.00</td></tr>
+<tr><td>3</td><td>Challah</td><td>8.00</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<table class="datatable">
+<caption>orders</caption>
+<thead><tr><th>order_id</th><th>customer_id</th><th>product_id</th><th>quantity</th><th>ordered_at</th><th>status</th></tr></thead>
+<tbody>
+<tr><td>87</td><td>1</td><td>3</td><td>2</td><td>2026-09-21 08:14</td><td>ready</td></tr>
+<tr><td>88</td><td>2</td><td>1</td><td>1</td><td>2026-09-21 08:20</td><td>baking</td></tr>
+<tr><td>89</td><td>1</td><td>2</td><td>1</td><td>2026-09-22 07:55</td><td>placed</td></tr>
+</tbody>
+</table>
+<p>Two ideas make this work:</p>
+<ul>
+  <li>Every row has a <dfn class="kw" id="kw-primary-key" data-def="A column whose value uniquely identifies each row in a table, such as customer_id. No two rows share one, and it never changes, so it can be used to refer to that row from anywhere.">primary key</dfn>, a column whose value is unique for that row and never changes: <code>customer_id</code>, <code>product_id</code>, <code>order_id</code>. Names are not good keys because two customers can share one and people change theirs.</li>
+  <li>Instead of copying Dana's name and email into every order she places, the order stores only her <code>customer_id</code>. A column that holds the primary key of a row in <em>another</em> table is a <dfn class="kw" id="kw-foreign-key" data-def="A column in one table that holds the primary key of a row in another table, linking the two. The customer_id in an orders table is a foreign key pointing to the customers table.">foreign key</dfn>. The orders table has two: <code>customer_id</code> and <code>product_id</code>. This is what "relational" refers to: tables related through keys.</li>
+</ul>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 200" role="img" aria-label="Three tables: customers, orders, and products. The orders table's customer_id column points to the customers table's primary key, and its product_id column points to the products table's primary key.">
+  <defs>
+    <marker id="arr6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--diagram-hi)"/></marker>
+  </defs>
+  <!-- customers -->
+  <rect x="20" y="30" width="180" height="130" rx="6" class="d-box-plain"/>
+  <rect x="20" y="30" width="180" height="26" rx="6" class="d-box"/>
+  <text x="110" y="48" class="d-tl" text-anchor="middle">customers</text>
+  <text x="34" y="78" class="d-mono" style="font-weight:700">customer_id  (PK)</text>
+  <text x="34" y="98" class="d-mono">name</text>
+  <text x="34" y="118" class="d-mono">email</text>
+  <text x="34" y="138" class="d-mono">city</text>
+  <!-- orders -->
+  <rect x="270" y="20" width="180" height="170" rx="6" class="d-box-plain"/>
+  <rect x="270" y="20" width="180" height="26" rx="6" class="d-hi"/>
+  <text x="360" y="38" class="d-th" text-anchor="middle">orders</text>
+  <text x="284" y="68" class="d-mono" style="font-weight:700">order_id  (PK)</text>
+  <text x="284" y="88" class="d-mono" style="font-weight:700">customer_id  (FK)</text>
+  <text x="284" y="108" class="d-mono" style="font-weight:700">product_id  (FK)</text>
+  <text x="284" y="128" class="d-mono">quantity</text>
+  <text x="284" y="148" class="d-mono">ordered_at</text>
+  <text x="284" y="168" class="d-mono">status</text>
+  <!-- products -->
+  <rect x="520" y="30" width="180" height="110" rx="6" class="d-box-plain"/>
+  <rect x="520" y="30" width="180" height="26" rx="6" class="d-box"/>
+  <text x="610" y="48" class="d-tl" text-anchor="middle">products</text>
+  <text x="534" y="78" class="d-mono" style="font-weight:700">product_id  (PK)</text>
+  <text x="534" y="98" class="d-mono">name</text>
+  <text x="534" y="118" class="d-mono">price</text>
+  <!-- arrows -->
+  <line x1="270" y1="84" x2="205" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
+  <text x="238" y="66" class="d-ts" text-anchor="middle">refers to</text>
+  <line x1="450" y1="104" x2="515" y2="74" class="d-line-hi" marker-end="url(#arr6)"/>
+  <text x="484" y="66" class="d-ts" text-anchor="middle">refers to</text>
+  <text x="360" y="196" class="d-ts" text-anchor="middle">PK = primary key   FK = foreign key.  One customer can have many orders; each order has exactly one customer.</text>
+</svg>
+</div>
+<figcaption><b>A schema for the bakery.</b> Orders do not copy customer or product details; they point at them by key. Change Dana's email once and every order she ever placed reflects it.</figcaption>
+</figure>
+<p>The overall design of the tables, their columns, and the keys that link them is the <dfn class="kw" id="kw-schema" data-def="The blueprint of a database: which tables exist, what columns each has, what type of data each column holds, and how tables link to one another through keys.">schema</dfn>. Designing a schema is really designing the business: what things exist, what we record about them, and how they relate. Business students are often better at this than engineers, because it is a question about the domain rather than about code.</p>
+</section>
+
+<section id="s2-4-wrap">
+<h3 id="s2-4">2.4 SQL by example <span class="time">15 min</span></h3>
+<p>Relational databases are all controlled with one language, <dfn class="kw" id="kw-sql" data-def="Structured Query Language, the standard language for asking questions of and making changes to a relational database. Statements read almost like English: SELECT, FROM, WHERE, INSERT, UPDATE, DELETE, JOIN.">SQL</dfn> (Structured Query Language, said "sequel" or "S-Q-L"). It was designed in the 1970s to be readable by business analysts, and it largely is. You are not expected to write SQL in this course; you are expected to recognise it, read simple statements, and know what it can do. Claude Code will write the SQL, but you will be reviewing what it writes and asking for the right things.</p>
+<p>A request to a database is a <dfn class="kw" id="kw-query" data-def="A question or instruction sent to a database, written in SQL. 'Running a query' means asking the database for data or telling it to change data.">query</dfn>. Six examples cover most of what a business ever needs.</p>
+
+<h4>Reading: SELECT</h4>
+<pre><code>SELECT name, email FROM customers WHERE city = 'Boston';</code></pre>
+<p>"Give me the name and email of every customer whose city is Boston." <code>SELECT</code> picks the columns, <code>FROM</code> picks the table, <code>WHERE</code> filters the rows. Result: Dana Levi and Priya Nair. Replace the column list with <code>*</code> to get every column.</p>
+
+<h4>Counting and summing: aggregate functions</h4>
+<pre><code>SELECT status, COUNT(*) AS how_many
+FROM orders
+GROUP BY status;</code></pre>
+<p>"For each order status, how many orders are there?" Result: one row per status (placed 1, baking 1, ready 1). <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, and <code>MAX</code> work the same way. Every management dashboard in the world is a stack of queries like this.</p>
+
+<h4>Combining tables: JOIN</h4>
+<pre><code>SELECT customers.name, products.name, orders.quantity
+FROM orders
+JOIN customers ON orders.customer_id = customers.customer_id
+JOIN products  ON orders.product_id  = products.product_id
+WHERE orders.status = 'placed';</code></pre>
+<p>This is the query that makes the relational model pay off. The orders table has only ID numbers; a <dfn class="kw" id="kw-join" data-def="The SQL operation that combines rows from two tables by matching a foreign key in one to the primary key in the other, for example attaching each order to the customer who placed it.">JOIN</dfn> stitches each order to the matching customer row and product row using the keys, so the result reads like a human wants it to: "Dana Levi, Rye bread, 1." Whenever you see a report that combines information from several places, there is a JOIN behind it.</p>
+
+<h4>Writing: INSERT, UPDATE, DELETE</h4>
+<pre><code>INSERT INTO orders (customer_id, product_id, quantity, status)
+VALUES (3, 1, 2, 'placed');
+
+UPDATE orders SET status = 'ready' WHERE order_id = 88;
+
+DELETE FROM orders WHERE order_id = 89;</code></pre>

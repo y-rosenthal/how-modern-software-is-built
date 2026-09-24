@@ -1,0 +1,239 @@
+<section id="s4-5-wrap">
+<h3 id="s4-5">4.5 OAuth: how "Sign in with Google" works <span class="time">15 min</span></h3>
+<p>Two problems appear the moment products start working together. First, a new app wants to let users sign up without inventing yet another password, so it offers "Sign in with Google" or "Continue with Apple." Second, an app wants to <em>use</em> another service on the user's behalf: a scheduling tool that reads your Google Calendar, an accounting app that pulls transactions from your bank, a Claude integration that reads your Notion pages. The naive solution to both, asking the user to type their Google password into the new app, is catastrophic: the app would then hold a password that opens everything, forever, and the user could revoke it only by changing the password everywhere.</p>
+<p><dfn class="kw" id="kw-oauth" data-def="OAuth 2.0: the standard protocol that lets a user grant one application limited access to their account at another service (or prove their identity to it) without ever sharing their password. The user is sent to the trusted service to approve specific permissions, and the application receives a scoped, revocable access token instead of the password. Behind every 'Sign in with Google' button.">OAuth 2.0</dfn> solves both problems with one idea: the user never gives the app their password. Instead, the user is sent to the service they already trust (Google), approves a specific, limited request there, and the trusted service hands the app a special-purpose key.</p>
+<div class="analogy"><span class="label">Analogy</span><p>A valet key. You would not hand a valet the master key to your car, house, and safe. A valet key starts the engine, opens the driver's door, and does nothing else; you can have it cancelled without changing any other lock. OAuth issues valet keys for online accounts. The key is called an <em>access token</em>; the "engine only" restriction is called a <em>scope</em>.</p></div>
+
+<h4 id="s4-5-roles">The four parties</h4>
+<p>OAuth conversations always involve four roles. Learning their names makes every OAuth diagram readable.</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Role</th><th>Who it is</th><th>In "Sign in with Google" for the bakery app</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Resource owner</strong></td><td>The user, who owns the data or identity</td><td>Dana</td></tr>
+    <tr><td><strong>Client</strong></td><td>The application that wants access (a different sense of "client" than in Session 1)</td><td>The bakery's web app</td></tr>
+    <tr><td><strong>Authorization server</strong></td><td>The trusted service that authenticates the user and issues tokens</td><td>Google's login and consent system</td></tr>
+    <tr><td><strong>Resource server</strong></td><td>The service holding the data the token unlocks</td><td>Google's profile or Calendar API</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="s4-5-flow">The authorization-code flow, step by step</h4>
+<figure>
+<div class="scroll">
+<svg class="seq" viewBox="0 0 740 420" role="img" aria-label="OAuth authorization code flow: the user clicks Sign in with Google in the bakery app; the app redirects the browser to Google with its client ID and requested scopes; the user logs in at Google and approves; Google redirects back to the app with a one-time code; the app's back end exchanges the code plus its client secret for an access token; the app uses the token to fetch the user's profile; the app logs the user in.">
+  <defs>
+    <marker id="arr16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="16" width="130" height="40" rx="6" class="d-box"/>
+  <text x="85" y="33" class="d-tl" text-anchor="middle">Dana's browser</text>
+  <text x="85" y="48" class="d-ts" text-anchor="middle">resource owner</text>
+  <rect x="250" y="16" width="130" height="40" rx="6" class="d-hi"/>
+  <text x="315" y="33" class="d-th" text-anchor="middle">Bakery back end</text>
+  <text x="315" y="48" class="d-ts" text-anchor="middle">the "client" app</text>
+  <rect x="480" y="16" width="130" height="40" rx="6" class="d-box"/>
+  <text x="545" y="33" class="d-tl" text-anchor="middle">Google login</text>
+  <text x="545" y="48" class="d-ts" text-anchor="middle">authorization server</text>
+  <rect x="630" y="16" width="100" height="40" rx="6" class="d-box-plain"/>
+  <text x="680" y="33" class="d-tl" text-anchor="middle">Google API</text>
+  <text x="680" y="48" class="d-ts" text-anchor="middle">resource server</text>
+  <line x1="85" y1="56" x2="85" y2="410" class="d-line-dash"/>
+  <line x1="315" y1="56" x2="315" y2="410" class="d-line-dash"/>
+  <line x1="545" y1="56" x2="545" y2="410" class="d-line-dash"/>
+  <line x1="680" y1="56" x2="680" y2="410" class="d-line-dash"/>
+  <!-- 1 -->
+  <line x1="90" y1="86" x2="310" y2="86" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="76" r="8" class="d-num"/><text x="102" y="79.5" class="d-numt" text-anchor="middle">1</text>
+  <text x="200" y="80" class="d-ts" text-anchor="middle">clicks "Sign in with Google"</text>
+  <!-- 2 redirect -->
+  <line x1="310" y1="116" x2="90" y2="116" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="298" cy="106" r="8" class="d-num"/><text x="298" y="109.5" class="d-numt" text-anchor="middle">2</text>
+  <text x="190" y="110" class="d-ts" text-anchor="middle">redirect to Google: client_id + scopes (email, profile)</text>
+  <!-- 3 to google -->
+  <line x1="90" y1="150" x2="540" y2="150" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="140" r="8" class="d-num"/><text x="102" y="143.5" class="d-numt" text-anchor="middle">3</text>
+  <text x="315" y="144" class="d-ts" text-anchor="middle">Dana logs in at accounts.google.com (password + MFA; the bakery never sees them)</text>
+  <!-- 4 consent -->
+  <rect x="440" y="162" width="210" height="30" rx="4" class="d-box-plain"/>
+  <text x="545" y="176" class="d-ts" text-anchor="middle">4. Consent screen: "Rosenthal's Bakery wants</text>
+  <text x="545" y="188" class="d-ts" text-anchor="middle">to see your email and name. Allow?"  Dana: Allow</text>
+  <!-- 5 code back -->
+  <line x1="540" y1="216" x2="90" y2="216" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="528" cy="206" r="8" class="d-num"/><text x="528" y="209.5" class="d-numt" text-anchor="middle">5</text>
+  <text x="300" y="210" class="d-ts" text-anchor="middle">redirect back with ?code=XyZ123 (one-time code, useless alone)</text>
+  <!-- 6 code to backend -->
+  <line x1="90" y1="246" x2="310" y2="246" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="102" cy="236" r="8" class="d-num"/><text x="102" y="239.5" class="d-numt" text-anchor="middle">6</text>
+  <text x="200" y="240" class="d-ts" text-anchor="middle">browser delivers code=XyZ123</text>
+  <!-- 7 exchange -->
+  <line x1="320" y1="280" x2="540" y2="280" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="332" cy="270" r="8" class="d-num"/><text x="332" y="273.5" class="d-numt" text-anchor="middle">7</text>
+  <text x="430" y="274" class="d-ts" text-anchor="middle">server-to-server: code + client_secret</text>
+  <line x1="540" y1="308" x2="320" y2="308" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="528" cy="298" r="8" class="d-num"/><text x="528" y="301.5" class="d-numt" text-anchor="middle">8</text>
+  <text x="430" y="302" class="d-ts" text-anchor="middle">tokens: access (1 hour), ID, refresh</text>
+  <!-- 9 use token -->
+  <line x1="320" y1="342" x2="675" y2="342" class="d-line" marker-end="url(#arr16)"/>
+  <circle cx="332" cy="332" r="8" class="d-num"/><text x="332" y="335.5" class="d-numt" text-anchor="middle">9</text>
+  <text x="500" y="336" class="d-ts" text-anchor="middle">GET /userinfo   Authorization: Bearer &lt;access token&gt;</text>
+  <line x1="675" y1="366" x2="320" y2="366" class="d-line" marker-end="url(#arr16)"/>
+  <text x="500" y="360" class="d-ts" text-anchor="middle">{"email": "dana@gmail.com", "name": "Dana Levi"}</text>
+  <!-- 10 -->
+  <line x1="310" y1="398" x2="90" y2="398" class="d-line-hi" marker-end="url(#arr16)"/>
+  <circle cx="298" cy="388" r="8" class="d-num"/><text x="298" y="391.5" class="d-numt" text-anchor="middle">10</text>
+  <text x="200" y="392" class="d-ts" text-anchor="middle">bakery sets its own session cookie</text>
+</svg>
+</div>
+<figcaption><b>The OAuth authorization-code flow.</b> Dana's Google password is typed only at Google. The bakery receives a one-time code in the browser and swaps it for a token in a private server-to-server call, so the token itself never passes through the browser.</figcaption>
+</figure>
+<p>Walk the class through it slowly; it is the most intricate diagram in the module and worth the time.</p>
+<ol>
+  <li><strong>Steps 1–3.</strong> The bakery's app does not show a password box. It sends Dana's browser to Google, telling Google which app is asking (a public <em>client ID</em> the bakery registered with Google beforehand) and what it wants (the <dfn class="kw" id="kw-scope" data-def="In OAuth, a named permission the application asks for, such as 'read email address' or 'read calendar events'. The user sees the scopes on the consent screen and the issued token can do nothing beyond them.">scopes</dfn>: here just email and name).</li>
+  <li><strong>Step 4.</strong> Dana logs in <em>at Google</em>, with Google's password box and Google's MFA. The bakery sees none of it. Google shows a consent screen listing exactly the scopes requested. Dana can refuse.</li>
+  <li><strong>Steps 5–6.</strong> Google sends the browser back to a pre-registered address at the bakery with a one-time <em>authorization code</em>. The code is deliberately useless on its own: it expires in a minute and can be redeemed only by the party holding the matching secret.</li>
+  <li><strong>Steps 7–8.</strong> The bakery's back end, in a direct server-to-server call the browser never sees, presents the code together with its <em>client secret</em> (a password that only the bakery's server and Google know). Google returns the <dfn class="kw" id="kw-access-token" data-def="The short-lived credential an OAuth authorization server issues to an application, which the application attaches to API requests to act within the granted scopes. Typically valid for about an hour; renewed using a longer-lived refresh token.">access token</dfn>, valid for about an hour, plus a longer-lived <em>refresh token</em> for obtaining new ones, plus an ID token describing who Dana is.</li>
+  <li><strong>Steps 9–10.</strong> The bakery uses the access token to ask Google for Dana's email and name, matches or creates her account, and issues its own ordinary session cookie. From here on, Session 4.3 applies.</li>
+</ol>
+<p>Why the roundabout design? Because of what it protects against. Dana's password is never disclosed to the bakery. The token can do only what the scopes allow, so even a badly behaved app cannot read her email if it asked only for her name. Dana can see every app she has authorised in her Google account settings and revoke any of them with one click, instantly, without changing her password. And the access token expires quickly, so a stolen one has a short life. Compare each of those properties with the "type your Google password into our app" alternative and the value of the standard becomes obvious.</p>
+
+<h4 id="s4-5-oidc">Login versus access: OpenID Connect</h4>
+<p>Strictly, OAuth is about <em>authorization</em>: granting an app access to resources. Using it for <em>login</em> (proving who the user is) was such a common desire that a thin standard was added on top: <dfn class="kw" id="kw-oidc" data-def="OpenID Connect: a layer on top of OAuth 2.0 that standardises using it for login. The authorization server returns an ID token stating who the user is, which is what 'Sign in with Google/Apple/Microsoft' actually uses.">OpenID Connect</dfn> (OIDC). It defines the ID token in step 8 and what it must contain. Every "Sign in with Google / Apple / Microsoft / GitHub" button is OIDC over OAuth. When a vendor says they support <dfn class="kw" id="kw-sso" data-def="Single Sign-On: logging in once with a central identity provider (Google Workspace, Microsoft Entra, Okta) and being recognised by many applications without separate passwords. Built on OpenID Connect or the older SAML standard; a standard requirement for selling software to companies.">single sign-on</dfn> (SSO), they mean a company's employees can log into the vendor's product with the company's central identity provider (Google Workspace, Microsoft Entra, Okta) using OIDC or its older enterprise cousin, SAML. For a business selling software to other businesses, supporting SSO is often a condition of the sale.</p>
+<div class="note"><span class="label">Business translation</span>
+<ul>
+  <li>Offering "Sign in with Google" raises sign-up conversion and removes your password-storage liability. Most new products should offer it alongside email and password.</li>
+  <li>When another app asks to "connect" to your Google, Slack, or bank account, read the scopes on the consent screen. That list is the entire extent of what it can do.</li>
+  <li>Your own product can be the resource server: letting partners "connect to your app" via OAuth is how platforms such as Shopify and Slack built their ecosystems.</li>
+</ul>
+</div>
+</section>
+
+<section id="s4-6-wrap">
+<h3 id="s4-6">4.6 Security basics every product owner should know <span class="time">7 min</span></h3>
+<p>You do not need to be a security engineer, but a handful of ideas will let you ask the right questions and recognise the most common mistakes, several of which have already appeared in this module.</p>
+<ul>
+  <li><strong>Encrypt in transit and at rest.</strong> HTTPS everywhere (in transit); encrypted disks and database volumes (at rest). Every cloud provider offers the latter as a checkbox. Turn it on.</li>
+  <li><strong>Never trust the front end.</strong> Anything in the browser or the app can be read and altered by the user. Prices, discounts, permissions, and secrets belong on the server. This was the lesson of the three-tier diagram in Session 2.</li>
+  <li><strong>Watch for injection.</strong> The most famous web vulnerability, <dfn class="kw" id="kw-sql-injection" data-def="An attack in which text a user types (in a form or URL) is pasted into a SQL query and ends up being run as part of the query, letting the attacker read or destroy data. Prevented by parameterised queries, which every modern framework and ORM uses by default.">SQL injection</dfn>, happens when text a user types is pasted straight into a SQL query. If a login form builds <code>SELECT * FROM users WHERE name = '</code> + whatever was typed + <code>'</code>, then typing <code>' OR 1=1 --</code> makes the query true for every user. The fix (parameterised queries, where user input is passed to the database separately from the SQL) is automatic in every modern framework and ORM, which is one reason to use them. A cousin, cross-site scripting (XSS), does the same trick with HTML and JavaScript. The general rule: user input is data, never code.</li>
+  <li><strong>Least privilege.</strong> Every person, program, and API key gets the minimum access it needs. The web server's database account should not be able to drop tables. An intern should not be an administrator. A leaked key that can only read is a nuisance; one that can do everything is a disaster.</li>
+  <li><strong>Keep secrets out of code.</strong> Passwords, API keys, and client secrets go in environment configuration, never in source files and never in Git. Rotate any secret that has ever been exposed.</li>
+  <li><strong>Keep software updated and take backups.</strong> Most breaches exploit known holes in unpatched software. Managed services (PaaS, managed databases) patch for you, which is a security argument for them, not only a convenience one. And test that backups actually restore; an untested backup is a hope, not a plan.</li>
+</ul>
+<p>The industry maintains a list of the ten most common web application risks, published by an organisation called OWASP. You do not need to memorise it, but "have we reviewed against the OWASP Top Ten?" is a question that any engineer or AI coding assistant can act on, and asking it marks you as someone who knows what matters.</p>
+</section>
+
+<section id="s4-7-wrap">
+<h3 id="s4-7">4.7 Beyond the browser: mobile, desktop, embedded <span class="time">10 min</span></h3>
+<p>Everything so far has assumed the client is a browser. Most software you use is not a website, and yet almost all of it is built from the same parts. The distinction that matters is <em>where the front end runs</em>; the back end and the database are the same story.</p>
+<div class="tbl-wrap">
+<table class="tbl">
+  <thead><tr><th>Kind of software</th><th>Where the front end runs</th><th>Built with</th><th>Distributed how</th><th>Trade-offs</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Website / web app</strong></td><td>Browser</td><td>HTML, CSS, JavaScript (often with a framework such as React)</td><td>Just a URL; nothing to install; updates instantly</td><td>Limited access to device hardware; needs a connection</td></tr>
+    <tr><td><strong><dfn class="kw" id="kw-native-app" data-def="A mobile or desktop application written in the platform's own language and tools (Swift for iPhone, Kotlin for Android) and installed on the device. Fastest and most capable on that platform, but a separate codebase per platform.">Native mobile app</dfn></strong></td><td>Phone or tablet, installed</td><td>Swift (iOS), Kotlin (Android)</td><td>Apple App Store, Google Play; store review; 15–30% commission on in-app purchases</td><td>Best performance, full hardware access, offline use; two separate codebases to maintain</td></tr>
+    <tr><td><strong><dfn class="kw" id="kw-cross-platform" data-def="A way of building mobile (and sometimes desktop) apps from one codebase that runs on both iPhone and Android, using frameworks such as React Native or Flutter. Saves building the same app twice at some cost in performance or platform polish.">Cross-platform app</dfn></strong></td><td>Phone, installed</td><td>React Native, Flutter</td><td>App stores, same as native</td><td>One codebase for both platforms; slightly less polish and performance than native</td></tr>
+    <tr><td><strong><dfn class="kw" id="kw-pwa" data-def="Progressive Web App: a website built so that it can be installed to the home screen, work offline, and send notifications, blurring the line between website and app. Distributed by URL, not through an app store.">Progressive web app</dfn> (PWA)</strong></td><td>Browser, but installable to home screen</td><td>Web technologies</td><td>URL; no store</td><td>No store commission or review; some features unavailable, especially on iPhone</td></tr>
+    <tr><td><strong><dfn class="kw" id="kw-desktop-app" data-def="A program installed on a laptop or desktop computer (Windows, macOS, Linux). Built natively or with web technologies wrapped in a desktop shell such as Electron (Slack, VS Code, Discord).">Desktop application</dfn></strong></td><td>Laptop or PC, installed</td><td>Native (C#, Swift, C++) or Electron (web technologies in a desktop wrapper: Slack, VS Code, Discord, Spotify)</td><td>Download and installer, Mac App Store, Microsoft Store; must ship its own updates</td><td>Full power of the machine, works offline; installation friction, per-OS testing</td></tr>
+    <tr><td><strong><dfn class="kw" id="kw-embedded" data-def="Software built into a physical device to control it: a thermostat, a car's dashboard, a payment terminal, a smart speaker. Runs on small, constrained processors, is hard to update, and increasingly reports to and takes commands from cloud servers (the Internet of Things).">Embedded software</dfn></strong></td><td>Inside a device: thermostat, car, payment terminal, medical device</td><td>C, C++, Rust; tiny processors, little memory</td><td>Shipped inside the hardware; updated over the air, if at all</td><td>Hard to change after sale; reliability and security are paramount; the Internet of Things (IoT) connects them to the cloud</td></tr>
+    <tr><td><strong>Command-line tool</strong></td><td>A terminal on a computer</td><td>Python, Go, Rust, JavaScript</td><td>Package managers (pip, npm, Homebrew)</td><td>Text only; favoured by developers; Claude Code itself is one</td></tr>
+  </tbody>
+</table>
+</div>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 270" role="img" aria-label="Five kinds of client, a browser, an iPhone app, an Android app, a desktop app, and a smart oven, all send requests to the same back-end API, which uses the same database.">
+  <defs>
+    <marker id="arr17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="20" width="160" height="38" rx="6" class="d-box"/><text x="100" y="37" class="d-t" text-anchor="middle">Website</text><text x="100" y="51" class="d-ts" text-anchor="middle">HTML/CSS/JS in a browser</text>
+  <rect x="20" y="68" width="160" height="38" rx="6" class="d-box"/><text x="100" y="85" class="d-t" text-anchor="middle">iPhone app</text><text x="100" y="99" class="d-ts" text-anchor="middle">Swift, from the App Store</text>
+  <rect x="20" y="116" width="160" height="38" rx="6" class="d-box"/><text x="100" y="133" class="d-t" text-anchor="middle">Android app</text><text x="100" y="147" class="d-ts" text-anchor="middle">Kotlin, from Google Play</text>
+  <rect x="20" y="164" width="160" height="38" rx="6" class="d-box"/><text x="100" y="181" class="d-t" text-anchor="middle">Desktop app</text><text x="100" y="195" class="d-ts" text-anchor="middle">Electron, downloaded</text>
+  <rect x="20" y="212" width="160" height="38" rx="6" class="d-box"/><text x="100" y="229" class="d-t" text-anchor="middle">Smart oven</text><text x="100" y="243" class="d-ts" text-anchor="middle">embedded firmware</text>
+  <rect x="330" y="80" width="170" height="110" rx="10" class="d-hi"/>
+  <text x="415" y="120" class="d-th" text-anchor="middle">One back end</text>
+  <text x="415" y="138" class="d-ts" text-anchor="middle">same API, same rules,</text>
+  <text x="415" y="152" class="d-ts" text-anchor="middle">same login (OAuth, tokens)</text>
+  <text x="415" y="172" class="d-ts" text-anchor="middle">JSON over HTTPS</text>
+  <line x1="185" y1="39" x2="325" y2="105" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="87" x2="325" y2="120" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="135" x2="325" y2="135" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="183" x2="325" y2="150" class="d-line" marker-end="url(#arr17)"/>
+  <line x1="185" y1="231" x2="325" y2="165" class="d-line" marker-end="url(#arr17)"/>
+  <rect x="570" y="100" width="130" height="70" rx="8" class="d-box"/>
+  <text x="635" y="130" class="d-t" text-anchor="middle">One database</text>
+  <text x="635" y="148" class="d-ts" text-anchor="middle">customers, orders</text>
+  <line x1="505" y1="135" x2="565" y2="135" class="d-line" marker-end="url(#arr17)"/>
+  <text x="360" y="255" class="d-ts" text-anchor="middle">Different front ends are different "faces" on the same product. Build the API once; add faces as the business needs them.</text>
+</svg>
+</div>
+<figcaption><b>One back end, many clients.</b> Whether the customer orders from a browser, a phone, a laptop, or the oven's own screen, the request reaches the same API and the same data. The architecture of Sessions 2 and 3 does not change.</figcaption>
+</figure>
+<p>This picture explains several things business people encounter:</p>
+<ul>
+  <li><strong>Why "we need an app" is a smaller decision than it sounds.</strong> If the back end and API already exist, a mobile app is a new front end, not a new system. If they do not exist, the app project is secretly also a back-end project.</li>
+  <li><strong>Why companies start with the web.</strong> A web app has no store review, no commission, instant updates, and one codebase. Native apps are added when the product needs the camera, notifications, offline use, or a home-screen presence.</li>
+  <li><strong>Why the API is the product's most durable asset.</strong> Front ends are rewritten every few years as fashions and devices change; a well-designed API and its database outlive several generations of them.</li>
+  <li><strong>Why embedded devices are the exception.</strong> A thermostat sold in 2026 must still work in 2036, may never be updated, and can physically harm someone if it fails. The engineering culture is correspondingly conservative, and the cost of a mistake is a recall rather than a redeploy.</li>
+</ul>
+</section>
+
+<section id="s4-8-wrap">
+<h3 id="s4-8">4.8 Where AI fits <span class="time">5 min</span></h3>
+<p>Since this course is about building products with AI, the last question is where a model such as Claude sits in everything above. The answer is reassuringly familiar: <strong>an AI model is a third-party API called from your back end.</strong> It is the Claude API box that has been sitting at the edge of the diagrams since Session 2.</p>
+<figure>
+<div class="scroll">
+<svg viewBox="0 0 720 200" role="img" aria-label="The user's browser sends a question to the bakery back end; the back end adds context from its database, calls the Claude API with its secret API key, receives the model's answer, and returns it to the browser. The API key never leaves the server.">
+  <defs>
+    <marker id="arr18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <rect x="20" y="70" width="120" height="60" rx="6" class="d-box"/>
+  <text x="80" y="96" class="d-t" text-anchor="middle">Browser or app</text>
+  <text x="80" y="114" class="d-ts" text-anchor="middle">"Is the rye gluten-free?"</text>
+  <rect x="230" y="40" width="200" height="120" rx="10" class="d-hi"/>
+  <text x="330" y="66" class="d-th" text-anchor="middle">Bakery back end</text>
+  <text x="330" y="86" class="d-ts" text-anchor="middle">1. check who is asking</text>
+  <text x="330" y="102" class="d-ts" text-anchor="middle">2. fetch product data from the DB</text>
+  <text x="330" y="118" class="d-ts" text-anchor="middle">3. build the prompt</text>
+  <text x="330" y="134" class="d-ts" text-anchor="middle">4. call Claude with the API key</text>
+  <text x="330" y="150" class="d-ts" text-anchor="middle">5. log usage, return the answer</text>
+  <rect x="540" y="60" width="160" height="80" rx="8" class="d-box"/>
+  <text x="620" y="90" class="d-t" text-anchor="middle">Claude API</text>
+  <text x="620" y="108" class="d-ts" text-anchor="middle">Anthropic's servers</text>
+  <text x="620" y="124" class="d-ts" text-anchor="middle">billed per token</text>
+  <line x1="145" y1="90" x2="225" y2="90" class="d-line" marker-end="url(#arr18)"/>
+  <line x1="225" y1="112" x2="145" y2="112" class="d-line" marker-end="url(#arr18)"/>
+  <line x1="435" y1="90" x2="535" y2="90" class="d-line-hi" marker-end="url(#arr18)"/>
+  <text x="485" y="82" class="d-ts" text-anchor="middle">prompt + key</text>
+  <line x1="535" y1="112" x2="435" y2="112" class="d-line-hi" marker-end="url(#arr18)"/>
+  <text x="485" y="126" class="d-ts" text-anchor="middle">answer</text>
+  <text x="360" y="188" class="d-ts" text-anchor="middle">The API key and the model call live on the server. The browser only ever talks to your own back end.</text>
+</svg>
+</div>
+<figcaption><b>AI in the architecture.</b> The model is one more service the back end calls, after applying its own rules and adding its own data. Nothing about the tiers, hosting, or security changes.</figcaption>
+</figure>
+<p>Three practical consequences:</p>
+<ul>
+  <li><strong>The key stays on the server.</strong> A model call from the browser would expose your API key to every visitor, who could run up your bill. All the reasoning of Section 4.4 applies.</li>
+  <li><strong>Your data is the differentiator.</strong> The model is the same one your competitors can rent. What makes an AI feature yours is the context your back end adds from your database (this customer's history, your product catalogue, your policies) before calling the model. That pattern, fetching relevant data and putting it in the prompt, is what people mean by <dfn class="kw" id="kw-rag" data-def="Retrieval-Augmented Generation: having the back end look up relevant information (from a database, documents, or search) and include it in the prompt, so the AI model answers using your data rather than only what it learned in training.">retrieval-augmented generation</dfn> (RAG).</li>
+  <li><strong>AI calls have cost, latency, and failure modes.</strong> A model call takes seconds and costs money per word, so it is treated like any slow, paid third-party API: cached where possible, monitored, and given a fallback. When Claude Code builds an AI feature for you, these are the questions to ask it.</li>
+</ul>
+<p>Step back and look at the whole module. A model such as Claude, the tool you are learning to build with, is itself served through exactly the architecture described here: a front end (the Claude app, or Claude Code in your terminal), load-balanced back ends behind an API, databases, caches, OAuth login, and an API key for programs. The next time you use it, you will know what is on the other end of the request.</p>
+</section>
+
+<div class="review" id="review-4">
+  <span class="label">Review questions</span>
+  <h4>Session 4: Identity, security, and software beyond the browser</h4>
+  <ol>
+    <li>Define authentication and authorization, and give an example where a system gets the first right and the second wrong.<span class="answer">Authentication verifies who a user is (password, code, fingerprint, Google login). Authorization decides what that identified user may do. Example of getting only the first right: a site that checks you are logged in but lets you view any order by changing the number in the URL, so any customer can read any other customer's order.</span></li>
+    <li>Why should a database store a hash of each password rather than the password itself? What does it mean if a company can email you your old password?<span class="answer">A hash is a one-way scramble that cannot be reversed to recover the password, so if the database is stolen the attackers cannot read users' passwords (which people reuse elsewhere). Login works by hashing what the user types and comparing. If a company can send you your old password, it is storing passwords in readable form, which is a serious security failure.</span></li>
+    <li>HTTP is stateless, yet you stay logged in. Explain the role of the cookie and the session store.<span class="answer">On login the server creates a session record ("ID a8f3… = Dana, expires in 14 days") in a shared session store and tells the browser to save the ID in a cookie. The browser automatically sends the cookie with every later request; the server looks up the ID and knows who is asking. Any web server in the pool can do this lookup, which is what allows servers to be stateless.</span></li>
+    <li>What does HTTP Basic Authentication send, in what form, and why is it acceptable only over HTTPS?<span class="answer">It sends the username and password on every request in an Authorization header, encoded in Base64 (for example Base64 of "dana:correct-horse"). Base64 is encoding, not encryption, and is instantly reversible, so over plain HTTP the password would be readable by anyone on the network. HTTPS encrypts the whole exchange, which is the only thing keeping the credentials private.</span></li>
+    <li>Name the four roles in OAuth and identify each one when a scheduling app asks to read your Google Calendar.<span class="answer">Resource owner: you, the user who owns the calendar. Client: the scheduling app requesting access. Authorization server: Google's login and consent system, which authenticates you and issues the token. Resource server: the Google Calendar API that holds the data the token unlocks.</span></li>
+    <li>In the OAuth flow, why does Google send a one-time code back through the browser instead of the access token itself? And why does the user never type their Google password into the bakery's app?<span class="answer">The code is useless on its own: it expires quickly and can only be exchanged for a token by presenting the client secret, which lives on the bakery's server. Exchanging it in a server-to-server call means the token never passes through the browser where it could be intercepted or leaked. The user types their password only at Google so the bakery never possesses it; the bakery receives a scoped, expiring, revocable token instead, which limits damage if the app is careless or compromised.</span></li>
+    <li>What is a scope in OAuth, and where does the user see it?<span class="answer">A scope is a named, limited permission the application requests, such as "read your email address" or "read calendar events." The user sees the requested scopes on the consent screen at the authorization server (Google) before approving, and the issued token can do nothing beyond them.</span></li>
+    <li>What is SQL injection, and why does using a modern framework or ORM largely prevent it?<span class="answer">SQL injection occurs when text a user types is pasted directly into a SQL statement so that it runs as part of the query; typing <code>' OR 1=1 --</code> into a login form could make the query match every user. Modern frameworks and ORMs use parameterised queries, which send user input to the database separately from the SQL text so it is always treated as data, never as code.</span></li>
+    <li>Your company has a web app with a working API. The CEO wants "an iPhone app and an Android app." In architectural terms, how big is that project, and what alternative might you propose first?<span class="answer">Because the back end and API already exist, the apps are new front ends rather than a new system: the mobile apps call the same API and use the same data and login. It is still real work (two native codebases or one cross-platform codebase, app store review, updates). A cheaper first step is a progressive web app, which is installable to the home screen from the existing web app with no store involvement, unless the product needs native-only features such as rich offline use or certain hardware access.</span></li>
+    <li>Where in a product's architecture does a call to an AI model such as Claude belong, and why must it not be made from the browser?<span class="answer">In the back end (application tier), as a call to a third-party API, after the back end has checked who is asking and gathered relevant data from the database to include in the prompt. It must not be made from the browser because the API key would then be visible to every visitor, who could use it to run up the company's bill, and because the business rules and private data added to the prompt must stay on the server.</span></li>
+  </ol>
+  <p class="answers-link">Answers are in <a href="#answers-4">Appendix B, Session 4</a>.</p>
+</div>
