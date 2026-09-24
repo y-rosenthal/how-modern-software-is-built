@@ -9,7 +9,7 @@
     ordered_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status       TEXT DEFAULT 'placed'
 );</code></pre>
-<p>This defines the table itself: each column, its data type (whole number, timestamp, text), which column is the primary key, which columns are foreign keys (<code>REFERENCES</code>), and which are required (<code>NOT NULL</code>). The database will now refuse to save an order with no quantity, or one pointing at a customer who does not exist. Those constraints are business rules enforced by the storage layer, which is far more reliable than hoping every program remembers to check.</p>
+<p>This defines the table itself: each column, its <dfn class="kw" id="kw-data-type" data-def="The kind of value a column (or variable) may hold: whole number, decimal, text, date and time, true/false. The database rejects values of the wrong kind, so a price cannot be stored as a word.">data type</dfn> (whole number, timestamp, text), which column is the primary key, which columns are foreign keys (<code>REFERENCES</code>), and which are required (<code>NOT NULL</code>). The database will now refuse to save an order with no quantity, or one pointing at a customer who does not exist. Those <dfn class="kw" id="kw-constraint" data-def="A rule the database enforces on the data it stores: a column must not be empty, a value must be unique, a foreign key must point at a row that exists. Business rules guaranteed by the database itself rather than by every program remembering to check.">constraints</dfn> are business rules enforced by the storage layer, which is far more reliable than hoping every program remembers to check.</p>
 
 <div class="note"><span class="label">What students should take away</span>
 <ul>
@@ -25,12 +25,12 @@
 <table class="tbl">
   <thead><tr><th>Product</th><th>Type</th><th>Typical use</th><th>Cost model</th></tr></thead>
   <tbody>
-    <tr><td>SQLite</td><td>Relational, single file</td><td>Prototypes, phone apps, small tools. Built into Python. Claude Code will often start you here.</td><td>Free, no server to run</td></tr>
-    <tr><td>PostgreSQL ("Postgres")</td><td>Relational server</td><td>The default choice for new web products of any size</td><td>Free software; hosted versions charged by size and usage</td></tr>
+    <tr><td><dfn class="kw" id="kw-sqlite" data-def="A relational database that lives in a single file with no server program to run. Built into Python and every phone; ideal for prototypes and small tools, and the usual starting point when Claude Code creates a database.">SQLite</dfn></td><td>Relational, single file</td><td>Prototypes, phone apps, small tools. Built into Python. Claude Code will often start you here.</td><td>Free, no server to run</td></tr>
+    <tr><td><dfn class="kw" id="kw-postgresql" data-def="A free, open-source relational database server, usually the default recommendation for new web products. Often shortened to Postgres.">PostgreSQL</dfn> ("Postgres")</td><td>Relational server</td><td>The default choice for new web products of any size</td><td>Free software; hosted versions charged by size and usage</td></tr>
     <tr><td>MySQL / MariaDB</td><td>Relational server</td><td>Very common in older web products, WordPress, many hosting packages</td><td>Free software; hosted versions charged</td></tr>
-    <tr><td>Microsoft SQL Server, Oracle</td><td>Relational server</td><td>Large enterprises, finance, legacy systems</td><td>Commercial licences, often expensive</td></tr>
+    <tr><td>Microsoft SQL Server, Oracle</td><td>Relational server</td><td>Large enterprises, finance, <dfn class="kw" id="kw-legacy-system" data-def="An old software system that a business still depends on but that is built with outdated technology, is hard to change, and few people fully understand. Replacing or integrating legacy systems is a major cost in established companies.">legacy systems</dfn></td><td>Commercial licences, often expensive</td></tr>
     <tr><td>MongoDB</td><td>Document (NoSQL)</td><td>Flexible or rapidly changing data shapes</td><td>Free software; hosted service (Atlas) charged</td></tr>
-    <tr><td>Redis</td><td>Key-value, in memory</td><td>Caching, sessions, counters (Session 4)</td><td>Free software; hosted charged</td></tr>
+    <tr><td><dfn class="kw" id="kw-redis" data-def="A very fast in-memory key-value store used as a cache, a session store, and for counters and queues. Appears in almost every scaled web architecture alongside the main database.">Redis</dfn></td><td><dfn class="kw" id="kw-key-value-store" data-def="The simplest kind of database: it stores a value under a key and returns the value when asked for the key, like a dictionary. Extremely fast; used for caches, sessions, and settings. Redis is the common example.">Key-value store</dfn>, <dfn class="kw" id="kw-in-memory" data-def="Kept in the computer's working memory (RAM) rather than on disk. Thousands of times faster to read, but lost if the machine restarts unless separately saved, so used for caches and temporary data.">in memory</dfn></td><td>Caching, sessions, counters (Session 4)</td><td>Free software; hosted charged</td></tr>
   </tbody>
 </table>
 </div>
@@ -40,7 +40,7 @@
 <section id="s3-5-wrap">
 <h3 id="s3-5">3.5 Beyond tables: NoSQL and ORMs <span class="time">8 min</span></h3>
 <h4>NoSQL databases</h4>
-<p>Not all data fits neatly into fixed columns. A product catalogue where every product has different attributes (shoes have sizes, laptops have memory) fights the relational model. <dfn class="kw" id="kw-nosql" data-def="A family of databases that do not use the table-and-SQL model. Document databases (MongoDB) store JSON-like records with flexible shapes; key-value stores (Redis) hold simple lookups very fast. Chosen for flexibility or speed at very large scale.">NoSQL</dfn> databases relax the rules. The most common kind, a <em>document database</em> such as MongoDB, stores each record as a JSON-like document with whatever fields it needs:</p>
+<p>Not all data fits neatly into fixed columns. A product catalogue where every product has different attributes (shoes have sizes, laptops have memory) fights the relational model. <dfn class="kw" id="kw-nosql" data-def="A family of databases that do not use the table-and-SQL model. Document databases (MongoDB) store JSON-like records with flexible shapes; key-value stores (Redis) hold simple lookups very fast. Chosen for flexibility or speed at very large scale.">NoSQL</dfn> databases relax the rules. The most common kind, a <dfn class="kw" id="kw-document-database" data-def="A NoSQL database that stores each record as a self-describing JSON-like document with whatever fields it needs, instead of a row in a fixed table. MongoDB is the best-known example.">document database</dfn> such as MongoDB, stores each record as a JSON-like document with whatever fields it needs:</p>
 <pre><code>{
   "product_id": 3,
   "name": "Challah",

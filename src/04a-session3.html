@@ -30,7 +30,7 @@
 
 <section id="s3-1-wrap">
 <h3 id="s3-1">3.1 Inside the back end: a Python web server <span class="time">12 min</span></h3>
-<p>Here is a complete dynamic web server written in Python, using a popular library called Flask. It is short enough to read in full.</p>
+<p>Here is a complete dynamic web server written in Python, using a popular framework called <dfn class="kw" id="kw-flask" data-def="A small, widely used Python web framework, favoured for learning and for small services. Used for the examples in this module. Django and FastAPI are its larger and newer Python cousins.">Flask</dfn>. It is short enough to read in full.</p>
 <pre><code>from flask import Flask
 from datetime import datetime
 
@@ -50,7 +50,7 @@ def hours():
 app.run(port=5000)</code></pre>
 <p>Walk through it slowly with the class:</p>
 <ul>
-  <li><code>app = Flask(__name__)</code> creates the web server program. Flask is a <dfn class="kw" id="kw-framework" data-def="A pre-built collection of code that handles the routine parts of a kind of program (for a web framework: receiving requests, matching paths to functions, sending responses) so that developers write only the parts specific to their product. Flask, Django, FastAPI, Express, Rails, and Next.js are web frameworks.">framework</dfn>: a bundle of pre-written code that handles the routine parts of being a web server, so the developer only writes the parts unique to the bakery. Flask, Django, and FastAPI are Python frameworks; Express and Next.js are JavaScript ones; Rails is Ruby; Spring is Java. When Claude Code builds you a web app, it will pick one of these.</li>
+  <li><code>app = Flask(__name__)</code> creates the web server program. Flask is a <strong>framework</strong> (Session 1): a bundle of pre-written code that handles the routine parts of being a web server, so the developer only writes the parts unique to the bakery. Flask, Django, and FastAPI are Python frameworks; Express and Next.js are JavaScript ones; Rails is Ruby; Spring is Java. When Claude Code builds you a web app, it will pick one of these.</li>
   <li>Each <code>@app.route("...")</code> line is a <dfn class="kw" id="kw-route" data-def="A rule in a back-end program that says which function should run when a request arrives for a particular path, such as /hours or /orders/42. Routing is the act of matching incoming paths to code.">route</dfn>: it connects a path (the part of the URL after the domain) to a Python function. When a request for <code>/hours</code> arrives, the <code>hours()</code> function runs and whatever it returns is sent back as the response.</li>
   <li>The <code>hours()</code> function is where "dynamic" happens. It checks the current time and returns different HTML depending on the answer. Two visitors a minute apart at 5:59 p.m. and 6:00 p.m. see different pages. No static file could do that.</li>
   <li><code>app.run(port=5000)</code> starts listening. A <dfn class="kw" id="kw-port" data-def="A numbered 'door' on a computer that a server program listens on, so that one machine can run several services. Web traffic uses port 80 (HTTP) and 443 (HTTPS); developers often run test servers on ports like 3000, 5000, or 8000.">port</dfn> is a numbered door on a computer. One machine can run many server programs, each behind a different door. Websites use port 443 (HTTPS) and 80 (HTTP) by convention, so you never type them; developers testing on their own machine use doors like 5000 or 3000, which is why you will see addresses like <code>http://localhost:5000</code>.</li>
@@ -64,7 +64,7 @@ app.run(port=5000)</code></pre>
   <li>Try <code>http://localhost:5000/nothing</code> to get a live 404.</li>
 </ol>
 </div>
-<p>In practice, back ends do not build HTML by gluing strings together. They use <dfn class="kw" id="kw-template" data-def="An HTML file with placeholders (such as {{ customer_name }}) that the back end fills in with real data before sending the page. Templates keep page design separate from program logic.">templates</dfn>: HTML files with blanks in them, such as <code>Welcome back, {{ customer_name }}</code>, which the program fills in for each request. Designers can edit the template without touching the Python, and the Python can change without touching the design. The idea to carry away is the same either way: the server runs code, and the code produces the page.</p>
+<p>In practice, back ends do not build HTML by gluing <dfn class="kw" id="kw-string" data-def="In programming, a piece of text: a name, an email address, a sentence, a long random code. Called a string because it is a string of characters.">strings</dfn> together. They use <dfn class="kw" id="kw-template" data-def="An HTML file with placeholders (such as {{ customer_name }}) that the back end fills in with real data before sending the page. Templates keep page design separate from program logic.">templates</dfn>: HTML files with blanks in them, such as <code>Welcome back, {{ customer_name }}</code>, which the program fills in for each request. Designers can edit the template without touching the Python, and the Python can change without touching the design. The idea to carry away is the same either way: the server runs code, and the code produces the page.</p>
 </section>
 
 <section id="s3-2-wrap">
@@ -164,7 +164,7 @@ def list_products():
 <p>Why not just save to a file, the way you might save a spreadsheet? Because a database solves problems a file cannot:</p>
 <ul>
   <li><strong>Many writers at once.</strong> Two customers buying the last challah at the same instant must not both succeed. A database handles this; a file being edited by two programs simultaneously gets corrupted.</li>
-  <li><strong>Speed at scale.</strong> Finding one order among ten million by scanning a file takes minutes. A database with an <em>index</em> (like the index in a textbook) does it in milliseconds.</li>
+  <li><strong>Speed at scale.</strong> Finding one order among ten million by scanning a file takes minutes. A database with an <dfn class="kw" id="kw-index" data-def="A lookup structure a database keeps alongside a table, like the index at the back of a textbook, so that rows matching a value (an email address, an order number) can be found without scanning every row. Makes searches fast; costs a little on every write.">index</dfn> (like the index in a textbook) does it in milliseconds.</li>
   <li><strong>Reliability.</strong> If the power fails halfway through saving an order, a database guarantees the order is either fully saved or not saved at all, never half. This property is called a <dfn class="kw" id="kw-transaction" data-def="A group of database changes that either all succeed or all fail together, so the data is never left half-updated. Moving money between two accounts is the classic example.">transaction</dfn>. Moving money between two bank accounts is the classic case: the debit and the credit must both happen or neither.</li>
   <li><strong>Questions.</strong> "Which customers ordered rye more than three times last quarter?" is one line in a database language and a small programming project against a pile of files.</li>
 </ul>
@@ -268,7 +268,7 @@ def list_products():
 <pre><code>SELECT status, COUNT(*) AS how_many
 FROM orders
 GROUP BY status;</code></pre>
-<p>"For each order status, how many orders are there?" Result: one row per status (placed 1, baking 1, ready 1). <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, and <code>MAX</code> work the same way. Every management dashboard in the world is a stack of queries like this.</p>
+<p>"For each order status, how many orders are there?" Result: one row per status (placed 1, baking 1, ready 1). <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, and <code>MAX</code> work the same way; together with <code>COUNT</code> they are called <dfn class="kw" id="kw-aggregate-function" data-def="A SQL function that combines many rows into one number: COUNT, SUM, AVG (average), MIN, MAX. Used with GROUP BY to produce totals per category, which is what most reports and dashboards are made of.">aggregate functions</dfn>, because each combines many rows into a single number. Every management dashboard in the world is a stack of queries like this.</p>
 
 <h4>Combining tables: JOIN</h4>
 <pre><code>SELECT customers.name, products.name, orders.quantity
